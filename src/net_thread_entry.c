@@ -27,6 +27,9 @@ static uint8_t s_dns[4]     = {8, 8, 8, 8};
 
 static volatile bool s_dhcp_bound = false;
 
+/* IoTConnect application glue (src/iotc/iotc_app.c). */
+extern void iotc_app_poll(bool network_up);
+
 static char s_print_buf[256];
 
 #define NET_PRINT(...)                                        \
@@ -130,6 +133,9 @@ void net_thread_entry(void *pvParameters)
             reported_down = true;
             reported_up = false;
         }
+
+        iotc_app_poll(up);
+
         vTaskDelay(pdMS_TO_TICKS(500));
     }
 }

@@ -40,6 +40,11 @@ typedef struct {
 } iotc_dra_config_t;
 
 /**
+ * Set the fallback root CA (PEM) used when a call passes ca_pem == NULL.
+ */
+void iotc_dra_set_default_ca(const char *ca_pem);
+
+/**
  * Run discovery + identity and populate the iotc-c-lib MQTT config in place.
  * On success, iotcl_mqtt_get_config() returns the resolved host/client_id/
  * username/topics. The library MUST already be initialized in

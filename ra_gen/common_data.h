@@ -28,6 +28,7 @@
 #include "FreeRTOS_IP.h"
 #include "tcp_sockets_wrapper.h"
 #include "transport_mbedtls_pkcs11.h"
+#include "core_mqtt.h"
 #include "arm_math.h"
 #include "arm_nnfunctions.h"
 #include "rm_ethosu_api.h"

@@ -240,7 +240,7 @@
     </config>
     <config id="config.bsp.ra">
       <property id="config.bsp.common.main" value="0x1000"/>
-      <property id="config.bsp.common.heap" value="0x3000"/>
+      <property id="config.bsp.common.heap" value="0x10000"/>
       <property id="config.bsp.common.bootloader.xip_enable" value="config.bsp.common.bootloader.xip_enable.disabled"/>
       <property id="config.bsp.common.vcc" value="3300"/>
       <property id="config.bsp.common.checking" value="config.bsp.common.checking.disabled"/>
@@ -569,6 +569,11 @@
       <description>AWS Demo key_provisioning_transport</description>
       <originalPack>Amazon.FreeRTOS.202411.0.0+renesas.1.fsp.6.3.1.pack</originalPack>
     </component>
+    <component apiversion="" class="Libraries" condition="" group="coreMQTT" subgroup="source" variant="" vendor="AWS" version="2.3.1+fsp.6.3.1">
+      <description>AWS coreMQTT</description>
+      <originalPack>Amazon.coreMQTT.2.3.1+fsp.6.3.1.pack</originalPack>
+    </component>
+    
   </raComponentSelection>
   <raElcConfiguration/>
   <raIcuConfiguration/>
@@ -1323,6 +1328,7 @@
       <property id="rtos.awsfreertos.object.flags.symbol" value="g_ai_app_event"/>
       <property id="rtos.awsfreertos.object.flags.allocation" value="rtos.awsfreertos.object.flags.allocation.static"/>
     </object>
+    <module id="module.aws.coreMqttLib.100000101"/>
     <context id="_hal.0">
       <stack module="module.driver.ioport_on_ioport.0"/>
       <stack module="module.middleware.rm_freertos_port.0"/>
@@ -1428,6 +1434,9 @@
           <stack module="module.aws.c_sdk.logging.1686658639" requires="module.aws.transport_interface.mbedtls_pkcs11.requires.c_sdk_logging"/>
           <stack module="module.aws.freertos.dev_mode_key_provisioning_mbed_transport_interface.837319086" requires="module.aws.transport_interface.mbedtls_pkcs11.requires.dev_mode_key_provisioning"/>
         </stack>
+      </stack>
+      <stack module="module.aws.coreMqttLib.100000101">
+        <stack module="module.aws.transport_interface.mbedtls_pkcs11.181153268" requires="module.aws.coreMqttLib.requires.transport_interface"/>
       </stack>
       <stack module="module.freertos.heap.4.497808624"/>
     </context>
@@ -2057,6 +2066,17 @@
       <property id="config.arm.mbedtls.mbedtls_x509_max_intermediate_ca" value="8"/>
       <property id="config.arm.mbedtls.mbedtls_x509_max_file_path_len_enabled" value="config.arm.mbedtls.mbedtls_x509_max_file_path_len_enabled.disabled"/>
       <property id="config.arm.mbedtls.mbedtls_x509_max_file_path_len" value="512"/>
+    </config>
+  <config id="config.aws.coreMqtt">
+      <property id="config.aws.coreMqtt.custom_mqtt_config" value=""/>
+      <property id="config.aws.coreMqtt.sub_unsub_max_vectors" value="4"/>
+      <property id="config.aws.coreMqtt.state_array_max_count" value="10U"/>
+      <property id="config.aws.coreMqtt.ping_resp_timeout" value="5000U"/>
+      <property id="config.aws.coreMqtt.recv_polling_timeout" value="10U"/>
+      <property id="config.aws.coreMqtt.send_retry_timeout" value="20000U"/>
+      <property id="config.aws.coreMqtt.max_connack_recieve_retry_count" value="2"/>
+      <property id="config.aws.coreMqtt.tx_timeout_ms" value="30000U"/>
+      <property id="config.aws.coreMqtt.rx_timeout_ms" value="30000U"/>
     </config>
   </raModuleConfiguration>
   <raPinConfiguration>
