@@ -19,6 +19,7 @@ JLinkLog.log
 /certs/
 *.pem
 *.key
+src/iotc/app_secrets.h
 !iotc-c-lib/tools/server-ca-cert-files/*.pem
 
 # Python

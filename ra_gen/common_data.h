@@ -5,6 +5,19 @@
 #include "bsp_api.h"
 #include "FreeRTOS.h"
                 #include "event_groups.h"
+#include "aws_dev_mode_key_provisioning.h"
+#include "mbedtls/platform.h"
+            #include "psa/crypto.h"
+            #include "psa/crypto_extra.h"
+            #include "rm_psa_crypto.h"
+#include "r_dmac.h"
+#include "r_transfer_api.h"
+#include "r_ospi_b.h"
+#include "r_spi_flash_api.h"
+#include "rm_littlefs_api.h"
+#include "rm_littlefs_spi_flash.h"
+#include "lfs_util.h"
+#include "lfs_util.h"
 #include "r_rmac_phy.h"
 #include "r_ether_phy_api.h"
 #include "r_layer3_switch.h"
@@ -13,6 +26,8 @@
 #include "FreeRTOSIPConfig.h"
 #include "rm_freertos_plus_tcp.h"
 #include "FreeRTOS_IP.h"
+#include "tcp_sockets_wrapper.h"
+#include "transport_mbedtls_pkcs11.h"
 #include "arm_math.h"
 #include "arm_nnfunctions.h"
 #include "rm_ethosu_api.h"
@@ -27,6 +42,38 @@
 #include "r_ioport.h"
 #include "bsp_pin_cfg.h"
 FSP_HEADER
+/* Transfer on DMAC Instance. */
+extern const transfer_instance_t g_transfer_ospi;
+
+/** Access the DMAC instance using these structures when calling API functions directly (::p_api is not used). */
+extern dmac_instance_ctrl_t g_transfer_ospi_ctrl;
+extern const transfer_cfg_t g_transfer_ospi_cfg;
+
+#ifndef NULL
+void NULL(transfer_callback_args_t * p_args);
+#endif
+#if OSPI_B_CFG_DMAC_SUPPORT_ENABLE
+    #include "r_dmac.h"
+#endif
+#if OSPI_CFG_DOTF_SUPPORT_ENABLE
+    #include "r_sce_if.h"
+#endif
+
+extern const spi_flash_instance_t g_ospi0;
+extern ospi_b_instance_ctrl_t g_ospi0_ctrl;
+extern const spi_flash_cfg_t g_ospi0_cfg;
+/** LittleFS on Flash Instance. */
+        extern const rm_littlefs_instance_t g_rm_littlefs0;
+        extern rm_littlefs_spi_flash_instance_ctrl_t g_rm_littlefs0_ctrl;
+        extern const rm_littlefs_cfg_t g_rm_littlefs0_cfg;
+
+        extern struct lfs g_rm_littlefs0_lfs;
+        extern const struct lfs_config g_rm_littlefs0_lfs_cfg;
+
+#ifndef g_rm_littlefs_spi_flash0_callback
+void g_rm_littlefs_spi_flash0_callback(rm_littlefs_spi_flash_callback_args_t * p_args);
+#endif
+
 #ifndef ETHER_PHY_LSI_TYPE_KIT_COMPONENT
   #define ETHER_PHY_LSI_TYPE_KIT_COMPONENT ETHER_PHY_LSI_TYPE_DEFAULT
 #endif
