@@ -25,6 +25,9 @@
             [18] = mipi_csi_pm_isr, /* MIPICSI PM (Power Management interrupt) */
             [19] = mipi_csi_gst_isr, /* MIPICSI GST (Generic Short Packet interrupt) */
             [20] = rm_ethosu_isr, /* NPU IRQ (NPU IRQ) */
+            [21] = layer3_switch_gwdi_isr, /* ETHER GWDI0 (GWCA Data Interrupt 0) */
+            [22] = layer3_switch_eaei_isr, /* ETHER EAEI0 (ETHA0 Error Interrupt) */
+            [23] = layer3_switch_eaei_isr, /* ETHER EAEI1 (ETHA1 Error Interrupt) */
         };
         #if BSP_FEATURE_ICU_HAS_IELSR
         const bsp_interrupt_event_t g_interrupt_event_link_select[BSP_ICU_VECTOR_NUM_ENTRIES] =
@@ -50,6 +53,9 @@
             [18] = BSP_PRV_VECT_ENUM(EVENT_MIPICSI_PM,GROUP2), /* MIPICSI PM (Power Management interrupt) */
             [19] = BSP_PRV_VECT_ENUM(EVENT_MIPICSI_GST,GROUP3), /* MIPICSI GST (Generic Short Packet interrupt) */
             [20] = BSP_PRV_VECT_ENUM(EVENT_NPU_IRQ,GROUP4), /* NPU IRQ (NPU IRQ) */
+            [21] = BSP_PRV_VECT_ENUM(EVENT_ETHER_GWDI0,GROUP5), /* ETHER GWDI0 (GWCA Data Interrupt 0) */
+            [22] = BSP_PRV_VECT_ENUM(EVENT_ETHER_EAEI0,GROUP6), /* ETHER EAEI0 (ETHA0 Error Interrupt) */
+            [23] = BSP_PRV_VECT_ENUM(EVENT_ETHER_EAEI1,GROUP7), /* ETHER EAEI1 (ETHA1 Error Interrupt) */
         };
         #endif
         #endif

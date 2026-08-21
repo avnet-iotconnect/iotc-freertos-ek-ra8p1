@@ -473,6 +473,30 @@
       <description>Ethos-U Driver Wrapper Implementation</description>
       <originalPack>Renesas.RA.6.3.1.pack</originalPack>
     </component>
+    <component apiversion="" class="HAL Drivers" condition="" group="all" subgroup="r_layer3_switch" variant="" vendor="Renesas" version="6.3.1">
+      <description>Event Link Controller</description>
+      <originalPack>Renesas.RA.6.3.1.pack</originalPack>
+    </component>
+    <component apiversion="" class="HAL Drivers" condition="" group="all" subgroup="r_rmac_phy" variant="" vendor="Renesas" version="6.3.1">
+      <description>Ethernet PHY on RMAC</description>
+      <originalPack>Renesas.RA.6.3.1.pack</originalPack>
+    </component>
+    <component apiversion="" class="HAL Drivers" condition="" group="all" subgroup="r_rmac" variant="" vendor="Renesas" version="6.3.1">
+      <description>Ethernet MAC</description>
+      <originalPack>Renesas.RA.6.3.1.pack</originalPack>
+    </component>
+    <component apiversion="" class="Middleware" condition="" group="all" subgroup="rm_freertos_plus_tcp" variant="" vendor="Renesas" version="6.3.1">
+      <description>r_ether to FreeRTOS+TCP Wrapper</description>
+      <originalPack>Renesas.RA.6.3.1.pack</originalPack>
+    </component>
+    <component apiversion="" class="Libraries" condition="" group="FreeRTOS" subgroup="BufferAllocation2" variant="" vendor="AWS" version="4.3.3+fsp.6.3.1">
+      <description>FreeRTOS - Buffer Allocation 2</description>
+      <originalPack>Amazon.FreeRTOS-Plus-TCP.4.3.3+fsp.6.3.1.pack</originalPack>
+    </component>
+    <component apiversion="" class="Libraries" condition="" group="FreeRTOS_Plus" subgroup="FreeRTOS_Plus_TCP" variant="" vendor="AWS" version="4.3.3+fsp.6.3.1">
+      <description>FreeRTOS+TCP</description>
+      <originalPack>Amazon.FreeRTOS-Plus-TCP.4.3.3+fsp.6.3.1.pack</originalPack>
+    </component>
   </raComponentSelection>
   <raElcConfiguration/>
   <raIcuConfiguration/>
@@ -1078,8 +1102,8 @@
       <property id="config.awsfreertos.thread.configidle_should_yield" value="config.awsfreertos.thread.configidle_should_yield.enabled"/>
       <property id="config.awsfreertos.thread.configuse_task_notifications" value="config.awsfreertos.thread.configuse_task_notifications.enabled"/>
       <property id="config.awsfreertos.thread.configtask_notifications_array_enteries" value="1"/>
-      <property id="config.awsfreertos.thread.configuse_mutexes" value="config.awsfreertos.thread.configuse_mutexes.disabled"/>
-      <property id="config.awsfreertos.thread.configuse_recursive_mutexes" value="config.awsfreertos.thread.configuse_recursive_mutexes.disabled"/>
+      <property id="config.awsfreertos.thread.configuse_mutexes" value="config.awsfreertos.thread.configuse_mutexes.enabled"/>
+      <property id="config.awsfreertos.thread.configuse_recursive_mutexes" value="config.awsfreertos.thread.configuse_recursive_mutexes.enabled"/>
       <property id="config.awsfreertos.thread.configuse_counting_semaphores" value="config.awsfreertos.thread.configuse_counting_semaphores.enabled"/>
       <property id="config.awsfreertos.thread.configcheck_for_stack_overflow" value="config.awsfreertos.thread.configcheck_for_stack_overflow.disabled"/>
       <property id="config.awsfreertos.thread.configqueue_registry_size" value="10"/>
@@ -1093,7 +1117,7 @@
       <property id="config.awsfreertos.thread.configheap_clear_memory_on_free" value="config.awsfreertos.thread.configheap_clear_memory_on_free.disabled"/>
       <property id="config.awsfreertos.thread.configsupport_static_allocation" value="config.awsfreertos.thread.configsupport_static_allocation.enabled"/>
       <property id="config.awsfreertos.thread.configsupport_dynamic_allocation" value="config.awsfreertos.thread.configsupport_dynamic_allocation.enabled"/>
-      <property id="config.awsfreertos.thread.configtotal_heap_size" value="0x4000"/>
+      <property id="config.awsfreertos.thread.configtotal_heap_size" value="0x20000"/>
       <property id="config.awsfreertos.thread.configapplication_allocated_heap" value="config.awsfreertos.thread.configapplication_allocated_heap.disabled"/>
       <property id="config.awsfreertos.thread.configgenerate_run_time_stats" value="config.awsfreertos.thread.configgenerate_run_time_stats.disabled"/>
       <property id="config.awsfreertos.thread.configuse_timers" value="config.awsfreertos.thread.configuse_timers.enabled"/>
@@ -1132,6 +1156,234 @@
     <config id="config.driver.drw">
       <property id="config.driver.drw.indirect" value="config.driver.drw.indirect.on"/>
       <property id="config.driver.drw.malloc" value="config.driver.drw.malloc.default"/>
+    </config>
+    <module id="module.aws.freertosplus.freertosplus_tcp.906451906"/>
+    <module id="module.driver.freertos_plus_tcp_on_ether.1453330521">
+      <property id="module.driver.freertos_plus_tcp_on_ether.name" value="g_freertos_plus_tcp0"/>
+      <property id="module.driver.freertos_plus_tcp_on_ether.rx_task_stacksize" value="configMINIMAL_STACK_SIZE"/>
+      <property id="module.driver.freertos_plus_tcp_on_ether.rx_task_priority" value="configMAX_PRIORITIES - 1"/>
+      <property id="module.driver.freertos_plus_tcp_on_ether.link_status_task_stacksize" value="configMINIMAL_STACK_SIZE"/>
+      <property id="module.driver.freertos_plus_tcp_on_ether.link_status_task_priority" value="configMAX_PRIORITIES - 1"/>
+      <property id="module.driver.freertos_plus_tcp_on_ether.link_check_interval" value="1000"/>
+    </module>
+    <module id="module.freertos.bufferallocation2.1175555210"/>
+    <module id="module.driver.ether_on_rmac.1107713002">
+      <property id="module.driver.ether.name" value="g_ether0"/>
+      <property id="module.driver.ether.channel" value="1"/>
+      <property id="module.driver.ether.zerocopy" value="module.driver.ether.zerocopy.0"/>
+      <property id="module.driver.ether.multicast" value="module.driver.ether.multicast.1"/>
+      <property id="module.driver.ether.promiscuous" value="module.driver.ether.promiscuous.0"/>
+      <property id="module.driver.ether.flow_control" value="module.driver.ether.flow_control.0"/>
+      <property id="module.driver.ether.padding" value="module.driver.ether.padding.0"/>
+      <property id="module.driver.ether.padding_offset" value="0"/>
+      <property id="module.driver.ether.broadcast_filter" value="0"/>
+      <property id="module.driver.ether.mac_address" value="00:11:22:33:44:55"/>
+      <property id="module.driver.rmac.tx_queue_length" value="4"/>
+      <property id="module.driver.rmac.rx_queue_length" value="4"/>
+      <property id="module.driver.rmac.tx_queue_num" value="2"/>
+      <property id="module.driver.rmac.rx_queue_num" value="2"/>
+      <property id="module.driver.ether.num_tx_descriptors" value="12"/>
+      <property id="module.driver.ether.num_rx_descriptors" value="12"/>
+      <property id="module.driver.ether.ether_buffer_size" value="1514"/>
+      <property id="module.driver.ether.rmpi_ipl" value="_disabled"/>
+      <property id="module.driver.ether.p_callback" value="NULL"/>
+      <property id="module.driver.ether.allocate_rx_buffer" value="module.driver.ether.allocate_rx_buffer.1"/>
+      <property id="module.driver.ether.node_num" value="24"/>
+      <property id="module.driver.rmac.ts_queue_length" value="8"/>
+      <property id="module.driver.ether.transmission_descriptor_format" value="module.driver.ether.transmission_descriptor_format.direct"/>
+      <property id="module.driver.ether.port_based_forwarding" value="module.driver.ether.port_based_forwarding.disabled"/>
+    </module>
+    <module id="module.driver.layer3_switch.606558962">
+      <property id="module.driver.layer3_switch.name" value="g_layer3_switch0"/>
+      <property id="module.driver.layer3_switch.channel" value="module.driver.layer3_switch.channel.0"/>
+      <property id="module.driver.layer3_switch.p_context" value="NULL"/>
+      <property id="module.driver.layer3_switch.p_callback" value="NULL"/>
+      <property id="module.driver.layer3_switch.ipl" value="board.icu.common.irq.priority12"/>
+      <property id="module.driver.layer3_switch.port_fowarding_port0" value="enum.driver.layer3_switch.port_bitmask.cpu"/>
+      <property id="module.driver.layer3_switch.port_fowarding_port1" value="enum.driver.layer3_switch.port_bitmask.cpu"/>
+      <property id="module.driver.layer3_switch.port_forwarding_cpu" value=""/>
+      <property id="module.driver.layer3_switch.p_frame_queue_port0" value=""/>
+      <property id="module.driver.layer3_switch.p_frame_queue_port1" value=""/>
+      <property id="module.driver.layer3_switch.frame_preemption_fragment_size_port0" value="module.driver.layer3_switch.frame_preemption_fragment_size_port0.64"/>
+      <property id="module.driver.layer3_switch.frame_preemption_fragment_size_port1" value="module.driver.layer3_switch.frame_preemption_fragment_size_port1.64"/>
+      <property id="module.driver.layer3_switch.mac_address0" value="00:11:22:33:44:55"/>
+      <property id="module.driver.layer3_switch.mac_address1" value="00:11:22:33:44:55"/>
+      <property id="module.driver.layer3_switch.queue0_depth_port0" value="64"/>
+      <property id="module.driver.layer3_switch.queue1_depth_port0" value="64"/>
+      <property id="module.driver.layer3_switch.queue2_depth_port0" value="64"/>
+      <property id="module.driver.layer3_switch.queue3_depth_port0" value="64"/>
+      <property id="module.driver.layer3_switch.queue4_depth_port0" value="64"/>
+      <property id="module.driver.layer3_switch.queue5_depth_port0" value="64"/>
+      <property id="module.driver.layer3_switch.queue6_depth_port0" value="64"/>
+      <property id="module.driver.layer3_switch.queue7_depth_port0" value="64"/>
+      <property id="module.driver.layer3_switch.queue0_depth_port1" value="64"/>
+      <property id="module.driver.layer3_switch.queue1_depth_port1" value="64"/>
+      <property id="module.driver.layer3_switch.queue2_depth_port1" value="64"/>
+      <property id="module.driver.layer3_switch.queue3_depth_port1" value="64"/>
+      <property id="module.driver.layer3_switch.queue4_depth_port1" value="64"/>
+      <property id="module.driver.layer3_switch.queue5_depth_port1" value="64"/>
+      <property id="module.driver.layer3_switch.queue6_depth_port1" value="64"/>
+      <property id="module.driver.layer3_switch.queue7_depth_port1" value="64"/>
+      <property id="module.driver.layer3_switch.p_callback_port0" value="NULL"/>
+      <property id="module.driver.layer3_switch.p_callback_port1" value="NULL"/>
+      <property id="module.driver.layer3_switch.p_context_port0" value="NULL"/>
+      <property id="module.driver.layer3_switch.p_context_port1" value="NULL"/>
+      <property id="module.driver.layer3_switch.gptp_timer_num_port0" value="module.driver.layer3_switch.gptp_timer_num_port0.0"/>
+      <property id="module.driver.layer3_switch.gptp_timer_num_port1" value="module.driver.layer3_switch.gptp_timer_num_port1.1"/>
+      <property id="module.driver.layer3_switch.l3_entry_num" value="10"/>
+      <property id="module.driver.layer3_switch.etha_error_ipl0" value="board.icu.common.irq.priority12"/>
+      <property id="module.driver.layer3_switch.etha_error_ipl1" value="board.icu.common.irq.priority12"/>
+      <property id="module.driver.layer3_switch.queue0_band_width_port0" value="0"/>
+      <property id="module.driver.layer3_switch.queue1_band_width_port0" value="0"/>
+      <property id="module.driver.layer3_switch.queue2_band_width_port0" value="0"/>
+      <property id="module.driver.layer3_switch.queue3_band_width_port0" value="0"/>
+      <property id="module.driver.layer3_switch.queue4_band_width_port0" value="0"/>
+      <property id="module.driver.layer3_switch.queue5_band_width_port0" value="0"/>
+      <property id="module.driver.layer3_switch.queue6_band_width_port0" value="0"/>
+      <property id="module.driver.layer3_switch.queue7_band_width_port0" value="0"/>
+      <property id="module.driver.layer3_switch.queue0_band_width_port1" value="0"/>
+      <property id="module.driver.layer3_switch.queue1_band_width_port1" value="0"/>
+      <property id="module.driver.layer3_switch.queue2_band_width_port1" value="0"/>
+      <property id="module.driver.layer3_switch.queue3_band_width_port1" value="0"/>
+      <property id="module.driver.layer3_switch.queue4_band_width_port1" value="0"/>
+      <property id="module.driver.layer3_switch.queue5_band_width_port1" value="0"/>
+      <property id="module.driver.layer3_switch.queue6_band_width_port1" value="0"/>
+      <property id="module.driver.layer3_switch.queue7_band_width_port1" value="0"/>
+      <property id="module.driver.layer3_switch.queue0_burst_frame_port0" value="0"/>
+      <property id="module.driver.layer3_switch.queue1_burst_frame_port0" value="0"/>
+      <property id="module.driver.layer3_switch.queue2_burst_frame_port0" value="0"/>
+      <property id="module.driver.layer3_switch.queue3_burst_frame_port0" value="0"/>
+      <property id="module.driver.layer3_switch.queue4_burst_frame_port0" value="0"/>
+      <property id="module.driver.layer3_switch.queue5_burst_frame_port0" value="0"/>
+      <property id="module.driver.layer3_switch.queue6_burst_frame_port0" value="0"/>
+      <property id="module.driver.layer3_switch.queue7_burst_frame_port0" value="0"/>
+      <property id="module.driver.layer3_switch.queue0_burst_frame_port1" value="0"/>
+      <property id="module.driver.layer3_switch.queue1_burst_frame_port1" value="0"/>
+      <property id="module.driver.layer3_switch.queue2_burst_frame_port1" value="0"/>
+      <property id="module.driver.layer3_switch.queue3_burst_frame_port1" value="0"/>
+      <property id="module.driver.layer3_switch.queue4_burst_frame_port1" value="0"/>
+      <property id="module.driver.layer3_switch.queue5_burst_frame_port1" value="0"/>
+      <property id="module.driver.layer3_switch.queue6_burst_frame_port1" value="0"/>
+      <property id="module.driver.layer3_switch.queue7_burst_frame_port1" value="0"/>
+    </module>
+    <module id="module.driver.ether_phy_on_rmac_phy.388013234">
+      <property id="module.driver.ether_phy.name" value="g_rmac_phy0"/>
+      <property id="module.driver.ether_phy.channel" value="module.driver.ether_phy.channel.1"/>
+      <property id="module.driver.ether_phy.default_phy_lsi_port" value="module.driver.ether_phy.default_phy_lsi_port.1"/>
+      <property id="module.driver.ether_phy.phy_reset_wait_time" value="0x00020000"/>
+      <property id="module.driver.ether_phy.mii_type" value="module.driver.mii_type.rgmii"/>
+      <property id="module.driver.rmac_phy.target_init" value="NULL"/>
+      <property id="module.driver.rmac_phy.target_link_partner_ability_get" value="NULL"/>
+      <property id="module.driver.ether_phy.flow_control" value="module.driver.ether_phy.flow_control.0"/>
+      <property id="module.driver.rmac_phy.frame_format" value="module.driver.rmac_phy.frame_format.mdio"/>
+      <property id="module.driver.rmac_phy.mdc_clock_rate" value="2500000"/>
+      <property id="module.driver.rmac_phy.mdio_hold_time" value="0"/>
+      <property id="module.driver.rmac_phy.mdio_capture_time" value="0"/>
+      <property id="module.driver.ether_phy.frame_preemption_enable" value="module.driver.ether_phy.frame_preemption_enable.disable"/>
+      <property id="module.driver.ether_phy.frame_preemption_verification_interval" value="10"/>
+      <property id="module.driver.ether_phy.p_context" value="NULL"/>
+      <property id="module.driver.ether_phy.p_callback" value="NULL"/>
+      <property id="module.driver.ether_phy.etha_status_ipl0" value="_disabled"/>
+      <property id="module.driver.ether_phy.etha_status_ipl1" value="_disabled"/>
+    </module>
+    <module id="module.driver.ether_phy_lsi_on_rmac_phy.856449406">
+      <property id="module.driver.ether_phy_lsi.name" value="g_rmac_phy_lsi1"/>
+      <property id="module.driver.ether_phy_lsi.phy_lsi_address" value="0"/>
+      <property id="module.driver.ether_phy_lsi.phy_lsi_type" value="module.driver.ether_phy_lsi.phy_lsi_type.kit_component"/>
+    </module>
+    <context id="rtos.awsfreertos.thread.0">
+      <property id="_symbol" value="net_thread"/>
+      <property id="rtos.awsfreertos.thread.name" value="Net Thread"/>
+      <property id="rtos.awsfreertos.thread.stack" value="4096"/>
+      <property id="rtos.awsfreertos.thread.priority" value="2"/>
+      <property id="rtos.awsfreertos.thread.context" value="NULL"/>
+      <property id="rtos.awsfreertos.thread.allocation" value="rtos.awsfreertos.thread.allocation.static"/>
+      <property id="rtos.awsfreertos.thread.secure_context" value="rtos.awsfreertos.thread.secure_context.enable"/>
+      <stack module="module.aws.freertosplus.freertosplus_tcp.906451906">
+        <stack module="module.driver.freertos_plus_tcp_on_ether.1453330521" requires="module.aws.freertosplus.freertosplus_tcp.requires.freertosplus_tcp_driver">
+          <stack module="module.driver.ether_on_rmac.1107713002" requires="module.driver.freertos_plus_tcp_on_ether.requires.ether">
+            <stack module="module.driver.layer3_switch.606558962" requires="module.driver.ether.requires.ether_switch_on_layer3_switch">
+              <stack module="module.driver.ether_phy_on_rmac_phy.388013234" requires="module.driver.layer3_switch.requires.rmac_phy_2">
+                <stack module="module.driver.ether_phy_lsi_on_rmac_phy.856449406" requires="module.driver.ether_phy.requires.phy_lsi1"/>
+              </stack>
+            </stack>
+          </stack>
+          <stack module="module.freertos.bufferallocation2.1175555210" requires="module.driver.freertos_plus_tcp_on_ether.requires.bufferallocation2"/>
+        </stack>
+      </stack>
+      <stack module="module.freertos.heap.4.497808624"/>
+    </context>
+    <config id="config.driver.rmac_phy">
+      <property id="config.driver.rmac_phy.param_checking_enable" value="config.driver.rmac_phy.param_checking_enable.bsp"/>
+      <property id="config.driver.rmac_phy.target_ksz8091rnb" value="config.driver.rmac_phy.target_ksz8091rnb.disabled"/>
+      <property id="config.driver.rmac_phy.target_ksz8041" value="config.driver.rmac_phy.target_ksz8041.disabled"/>
+      <property id="config.driver.rmac_phy.target_dp83620" value="config.driver.rmac_phy.target_dp83620.disabled"/>
+      <property id="config.driver.rmac_phy.target_ics1894" value="config.driver.rmac_phy.target_ics1894.disabled"/>
+      <property id="config.driver.rmac_phy.target_gpy111" value="config.driver.rmac_phy.target_gpy111.disabled"/>
+      <property id="config.driver.rmac_phy.target_vsc8541" value="config.driver.rmac_phy.target_vsc8541.disabled"/>
+      <property id="config.driver.rmac_phy.use_custom_phy_lsi" value="config.driver.rmac_phy.use_custom_phy_lsi.disabled"/>
+      <property id="config.driver.rmac_phy.use_reference_clock" value="config.driver.rmac_phy.use_reference_clock.default"/>
+    </config>
+    <config id="config.driver.layer3_switch">
+      <property id="config.driver.layer3_switch.param_checking_enable" value="config.driver.layer3_switch.param_checking_enable.bsp"/>
+      <property id="config.driver.layer3_switch.available_queue_num" value="4"/>
+      <property id="config.driver.layer3_switch.gptp_enable" value="config.driver.layer3_switch.gptp_enable.disabled"/>
+      <property id="config.driver.layer3_switch.tas_enable" value="config.driver.layer3_switch.tas_enable.disabled"/>
+    </config>
+    <config id="config.driver.rmac">
+      <property id="config.driver.rmac.param_checking_enable" value="config.driver.rmac.param_checking_enable.bsp"/>
+      <property id="config.driver.rmac.read_buffer_size_check" value="config.driver.rmac.read_buffer_size_check.disabled"/>
+    </config>
+    <config id="config.aws.freertosplus.freertosplus_tcp">
+      <property id="config.aws.freertosplus.freertosplus_tcp.ipconfigHAS_DEBUG_PRINTF" value="config.aws.freertosplus.freertosplus_tcp.ipconfigHAS_DEBUG_PRINTF.0"/>
+      <property id="config.aws.freertosplus.freertosplus_tcp.ipconfigIPv4_BACKWARD_COMPATIBLE" value="config.aws.freertosplus.freertosplus_tcp.ipconfigIPv4_BACKWARD_COMPATIBLE.1"/>
+      <property id="config.aws.freertosplus.freertosplus_tcp.ipconfigUSE_IPv6" value="config.aws.freertosplus.freertosplus_tcp.ipconfigUSE_IPv6.0"/>
+      <property id="config.aws.freertosplus.freertosplus_tcp.ipconfigHAS_PRINTF" value="config.aws.freertosplus.freertosplus_tcp.ipconfigHAS_PRINTF.0"/>
+      <property id="config.aws.freertosplus.freertosplus_tcp.ipconfigBYTE_ORDER" value="config.aws.freertosplus.freertosplus_tcp.ipconfigBYTE_ORDER.pdFREERTOS_LITTLE_ENDIAN"/>
+      <property id="config.aws.freertosplus.freertosplus_tcp.ipconfigDRIVER_INCLUDED_RX_IP_CHECKSUM" value="config.aws.freertosplus.freertosplus_tcp.ipconfigDRIVER_INCLUDED_RX_IP_CHECKSUM.1"/>
+      <property id="config.aws.freertosplus.freertosplus_tcp.ipconfigSOCK_DEFAULT_RECEIVE_BLOCK_TIME" value="2000"/>
+      <property id="config.aws.freertosplus.freertosplus_tcp.ipconfigSOCK_DEFAULT_SEND_BLOCK_TIME" value="2000"/>
+      <property id="config.aws.freertosplus.freertosplus_tcp.ipconfigUSE_DNS_CACHE" value="config.aws.freertosplus.freertosplus_tcp.ipconfigUSE_DNS_CACHE.1"/>
+      <property id="config.aws.freertosplus.freertosplus_tcp.ipconfigDNS_REQUEST_ATTEMPTS" value="5"/>
+      <property id="config.aws.freertosplus.freertosplus_tcp.ipconfigIP_TASK_PRIORITY" value="configMAX_PRIORITIES - 1"/>
+      <property id="config.aws.freertosplus.freertosplus_tcp.ipconfigIP_TASK_STACK_SIZE_WORDS" value="configMINIMAL_STACK_SIZE * 10"/>
+      <property id="config.aws.freertosplus.freertosplus_tcp.ipconfigUSE_NETWORK_EVENT_HOOK" value="config.aws.freertosplus.freertosplus_tcp.ipconfigUSE_NETWORK_EVENT_HOOK.0"/>
+      <property id="config.aws.freertosplus.freertosplus_tcp.ipconfigUDP_MAX_SEND_BLOCK_TIME_TICKS" value="15000 / portTICK_PERIOD_MS"/>
+      <property id="config.aws.freertosplus.freertosplus_tcp.ipconfigUSE_DHCP" value="config.aws.freertosplus.freertosplus_tcp.ipconfigUSE_DHCP.1"/>
+      <property id="config.aws.freertosplus.freertosplus_tcp.ipconfigDHCP_REGISTER_HOSTNAME" value="config.aws.freertosplus.freertosplus_tcp.ipconfigDHCP_REGISTER_HOSTNAME.1"/>
+      <property id="config.aws.freertosplus.freertosplus_tcp.ipconfigDHCP_USES_UNICAST" value="config.aws.freertosplus.freertosplus_tcp.ipconfigDHCP_USES_UNICAST.1"/>
+      <property id="config.aws.freertosplus.freertosplus_tcp.ipconfigUSE_DHCP_HOOK" value="config.aws.freertosplus.freertosplus_tcp.ipconfigUSE_DHCP_HOOK.1"/>
+      <property id="config.aws.freertosplus.freertosplus_tcp.ipconfigMAXIMUM_DISCOVER_TX_PERIOD" value="120000 / portTICK_PERIOD_MS"/>
+      <property id="config.aws.freertosplus.freertosplus_tcp.ipconfigARP_CACHE_ENTRIES" value="6"/>
+      <property id="config.aws.freertosplus.freertosplus_tcp.ipconfigMAX_ARP_RETRANSMISSIONS" value="5"/>
+      <property id="config.aws.freertosplus.freertosplus_tcp.ipconfigMAX_ARP_AGE" value="150"/>
+      <property id="config.aws.freertosplus.freertosplus_tcp.ipconfigINCLUDE_FULL_INET_ADDR" value="config.aws.freertosplus.freertosplus_tcp.ipconfigINCLUDE_FULL_INET_ADDR.1"/>
+      <property id="config.aws.freertosplus.freertosplus_tcp.ipconfigNUM_NETWORK_BUFFER_DESCRIPTORS" value="16"/>
+      <property id="config.aws.freertosplus.freertosplus_tcp.ipconfigEVENT_QUEUE_LENGTH" value="ipconfigNUM_NETWORK_BUFFER_DESCRIPTORS + 5"/>
+      <property id="config.aws.freertosplus.freertosplus_tcp.ipconfigALLOW_SOCKET_SEND_WITHOUT_BIND" value="config.aws.freertosplus.freertosplus_tcp.ipconfigALLOW_SOCKET_SEND_WITHOUT_BIND.0"/>
+      <property id="config.aws.freertosplus.freertosplus_tcp.ipconfigUDP_TIME_TO_LIVE" value="128"/>
+      <property id="config.aws.freertosplus.freertosplus_tcp.ipconfigTCP_TIME_TO_LIVE" value="128"/>
+      <property id="config.aws.freertosplus.freertosplus_tcp.ipconfigUSE_TCP" value="config.aws.freertosplus.freertosplus_tcp.ipconfigUSE_TCP.1"/>
+      <property id="config.aws.freertosplus.freertosplus_tcp.ipconfigUSE_TCP_WIN" value="config.aws.freertosplus.freertosplus_tcp.ipconfigUSE_TCP_WIN.0"/>
+      <property id="config.aws.freertosplus.freertosplus_tcp.ipconfigNETWORK_MTU" value="1500"/>
+      <property id="config.aws.freertosplus.freertosplus_tcp.ipconfigUSE_DNS" value="config.aws.freertosplus.freertosplus_tcp.ipconfigUSE_DNS.1"/>
+      <property id="config.aws.freertosplus.freertosplus_tcp.ipconfigREPLY_TO_INCOMING_PINGS" value="config.aws.freertosplus.freertosplus_tcp.ipconfigREPLY_TO_INCOMING_PINGS.1"/>
+      <property id="config.aws.freertosplus.freertosplus_tcp.ipconfigSUPPORT_OUTGOING_PINGS" value="config.aws.freertosplus.freertosplus_tcp.ipconfigSUPPORT_OUTGOING_PINGS.1"/>
+      <property id="config.aws.freertosplus.freertosplus_tcp.ipconfigSUPPORT_SELECT_FUNCTION" value="config.aws.freertosplus.freertosplus_tcp.ipconfigSUPPORT_SELECT_FUNCTION.0"/>
+      <property id="config.aws.freertosplus.freertosplus_tcp.ipconfigFILTER_OUT_NON_ETHERNET_II_FRAMES" value="config.aws.freertosplus.freertosplus_tcp.ipconfigFILTER_OUT_NON_ETHERNET_II_FRAMES.1"/>
+      <property id="config.aws.freertosplus.freertosplus_tcp.ipconfigETHERNET_DRIVER_FILTERS_FRAME_TYPES" value="config.aws.freertosplus.freertosplus_tcp.ipconfigETHERNET_DRIVER_FILTERS_FRAME_TYPES.0"/>
+      <property id="config.aws.freertosplus.freertosplus_tcp.ipconfigPACKET_FILLER_SIZE" value="2"/>
+      <property id="config.aws.freertosplus.freertosplus_tcp.ipconfigTCP_WIN_SEG_COUNT" value="240"/>
+      <property id="config.aws.freertosplus.freertosplus_tcp.ipconfigTCP_RX_BUFFER_LENGTH" value="3000"/>
+      <property id="config.aws.freertosplus.freertosplus_tcp.ipconfigTCP_TX_BUFFER_LENGTH" value="3000"/>
+      <property id="config.aws.freertosplus.freertosplus_tcp.ipconfigTCP_KEEP_ALIVE" value="config.aws.freertosplus.freertosplus_tcp.ipconfigTCP_KEEP_ALIVE.1"/>
+      <property id="config.aws.freertosplus.freertosplus_tcp.ipconfigTCP_KEEP_ALIVE_INTERVAL" value="120"/>
+      <property id="config.aws.freertosplus.freertosplus_tcp.ipconfigSOCKET_HAS_USER_SEMAPHORE" value="config.aws.freertosplus.freertosplus_tcp.ipconfigSOCKET_HAS_USER_SEMAPHORE.0"/>
+      <property id="config.aws.freertosplus.freertosplus_tcp.ipconfigSOCKET_HAS_USER_WAKE_CALLBACK" value="config.aws.freertosplus.freertosplus_tcp.ipconfigSOCKET_HAS_USER_WAKE_CALLBACK.1"/>
+      <property id="config.aws.freertosplus.freertosplus_tcp.ipconfigUSE_CALLBACKS" value="config.aws.freertosplus.freertosplus_tcp.ipconfigUSE_CALLBACKS.0"/>
+      <property id="config.aws.freertosplus.freertosplus_tcp.ipconfigZERO_COPY_TX_DRIVER" value="config.aws.freertosplus.freertosplus_tcp.ipconfigZERO_COPY_TX_DRIVER.0"/>
+      <property id="config.aws.freertosplus.freertosplus_tcp.ipconfigZERO_COPY_RX_DRIVER" value="config.aws.freertosplus.freertosplus_tcp.ipconfigZERO_COPY_RX_DRIVER.0"/>
+      <property id="config.aws.freertosplus.freertosplus_tcp.ipconfigUSE_LINKED_RX_MESSAGES" value="config.aws.freertosplus.freertosplus_tcp.ipconfigUSE_LINKED_RX_MESSAGES.0"/>
     </config>
   </raModuleConfiguration>
   <raPinConfiguration>
@@ -1854,6 +2106,63 @@
       <configSetting altId="sdram.sdclk.pa15" configurationId="sdram.sdclk"/>
       <configSetting altId="sdram.sdcs.p813" configurationId="sdram.sdcs"/>
       <configSetting altId="sdram.we.pa08" configurationId="sdram.we"/>
+      <configSetting altId="eswm_rgmii1.et1_mdc.p415" configurationId="eswm_rgmii1.et1_mdc"/>
+      <configSetting altId="eswm_rgmii1.et1_mdio.p414" configurationId="eswm_rgmii1.et1_mdio"/>
+      <configSetting altId="eswm_rgmii1.mode.custom.free" configurationId="eswm_rgmii1.mode"/>
+      <configSetting altId="eswm_rgmii1.rgmii1_rx_ctl.p206" configurationId="eswm_rgmii1.rgmii1_rx_ctl"/>
+      <configSetting altId="eswm_rgmii1.rgmii1_rxc.p905" configurationId="eswm_rgmii1.rgmii1_rxc"/>
+      <configSetting altId="eswm_rgmii1.rgmii1_rxd0.p906" configurationId="eswm_rgmii1.rgmii1_rxd0"/>
+      <configSetting altId="eswm_rgmii1.rgmii1_rxd1.p907" configurationId="eswm_rgmii1.rgmii1_rxd1"/>
+      <configSetting altId="eswm_rgmii1.rgmii1_rxd2.p908" configurationId="eswm_rgmii1.rgmii1_rxd2"/>
+      <configSetting altId="eswm_rgmii1.rgmii1_rxd3.p909" configurationId="eswm_rgmii1.rgmii1_rxd3"/>
+      <configSetting altId="eswm_rgmii1.rgmii1_tx_ctl.p310" configurationId="eswm_rgmii1.rgmii1_tx_ctl"/>
+      <configSetting altId="eswm_rgmii1.rgmii1_txc.p309" configurationId="eswm_rgmii1.rgmii1_txc"/>
+      <configSetting altId="eswm_rgmii1.rgmii1_txd0.p307" configurationId="eswm_rgmii1.rgmii1_txd0"/>
+      <configSetting altId="eswm_rgmii1.rgmii1_txd1.p306" configurationId="eswm_rgmii1.rgmii1_txd1"/>
+      <configSetting altId="eswm_rgmii1.rgmii1_txd2.p305" configurationId="eswm_rgmii1.rgmii1_txd2"/>
+      <configSetting altId="eswm_rgmii1.rgmii1_txd3.p304" configurationId="eswm_rgmii1.rgmii1_txd3"/>
+      <configSetting altId="p206.eswm_rgmii1.rgmii1_rx_ctl" configurationId="p206"/>
+      <configSetting altId="p206.gpio_speed.gpio_speed_h" configurationId="p206.gpio_drivecapacity"/>
+      <configSetting altId="p206.gpio_mode.gpio_mode_peripheral" configurationId="p206.gpio_mode"/>
+      <configSetting altId="p304.eswm_rgmii1.rgmii1_txd3" configurationId="p304"/>
+      <configSetting altId="p304.gpio_speed.gpio_speed_h" configurationId="p304.gpio_drivecapacity"/>
+      <configSetting altId="p304.gpio_mode.gpio_mode_peripheral" configurationId="p304.gpio_mode"/>
+      <configSetting altId="p305.eswm_rgmii1.rgmii1_txd2" configurationId="p305"/>
+      <configSetting altId="p305.gpio_speed.gpio_speed_h" configurationId="p305.gpio_drivecapacity"/>
+      <configSetting altId="p305.gpio_mode.gpio_mode_peripheral" configurationId="p305.gpio_mode"/>
+      <configSetting altId="p306.eswm_rgmii1.rgmii1_txd1" configurationId="p306"/>
+      <configSetting altId="p306.gpio_speed.gpio_speed_h" configurationId="p306.gpio_drivecapacity"/>
+      <configSetting altId="p306.gpio_mode.gpio_mode_peripheral" configurationId="p306.gpio_mode"/>
+      <configSetting altId="p307.eswm_rgmii1.rgmii1_txd0" configurationId="p307"/>
+      <configSetting altId="p307.gpio_speed.gpio_speed_h" configurationId="p307.gpio_drivecapacity"/>
+      <configSetting altId="p307.gpio_mode.gpio_mode_peripheral" configurationId="p307.gpio_mode"/>
+      <configSetting altId="p309.eswm_rgmii1.rgmii1_txc" configurationId="p309"/>
+      <configSetting altId="p309.gpio_speed.gpio_speed_h" configurationId="p309.gpio_drivecapacity"/>
+      <configSetting altId="p309.gpio_mode.gpio_mode_peripheral" configurationId="p309.gpio_mode"/>
+      <configSetting altId="p310.eswm_rgmii1.rgmii1_tx_ctl" configurationId="p310"/>
+      <configSetting altId="p310.gpio_speed.gpio_speed_h" configurationId="p310.gpio_drivecapacity"/>
+      <configSetting altId="p310.gpio_mode.gpio_mode_peripheral" configurationId="p310.gpio_mode"/>
+      <configSetting altId="p414.eswm_rgmii1.et1_mdio" configurationId="p414"/>
+      <configSetting altId="p414.gpio_speed.gpio_speed_m" configurationId="p414.gpio_drivecapacity"/>
+      <configSetting altId="p414.gpio_mode.gpio_mode_peripheral" configurationId="p414.gpio_mode"/>
+      <configSetting altId="p415.eswm_rgmii1.et1_mdc" configurationId="p415"/>
+      <configSetting altId="p415.gpio_speed.gpio_speed_m" configurationId="p415.gpio_drivecapacity"/>
+      <configSetting altId="p415.gpio_mode.gpio_mode_peripheral" configurationId="p415.gpio_mode"/>
+      <configSetting altId="p905.eswm_rgmii1.rgmii1_rxc" configurationId="p905"/>
+      <configSetting altId="p905.gpio_speed.gpio_speed_h" configurationId="p905.gpio_drivecapacity"/>
+      <configSetting altId="p905.gpio_mode.gpio_mode_peripheral" configurationId="p905.gpio_mode"/>
+      <configSetting altId="p906.eswm_rgmii1.rgmii1_rxd0" configurationId="p906"/>
+      <configSetting altId="p906.gpio_speed.gpio_speed_h" configurationId="p906.gpio_drivecapacity"/>
+      <configSetting altId="p906.gpio_mode.gpio_mode_peripheral" configurationId="p906.gpio_mode"/>
+      <configSetting altId="p907.eswm_rgmii1.rgmii1_rxd1" configurationId="p907"/>
+      <configSetting altId="p907.gpio_speed.gpio_speed_h" configurationId="p907.gpio_drivecapacity"/>
+      <configSetting altId="p907.gpio_mode.gpio_mode_peripheral" configurationId="p907.gpio_mode"/>
+      <configSetting altId="p908.eswm_rgmii1.rgmii1_rxd2" configurationId="p908"/>
+      <configSetting altId="p908.gpio_speed.gpio_speed_h" configurationId="p908.gpio_drivecapacity"/>
+      <configSetting altId="p908.gpio_mode.gpio_mode_peripheral" configurationId="p908.gpio_mode"/>
+      <configSetting altId="p909.eswm_rgmii1.rgmii1_rxd3" configurationId="p909"/>
+      <configSetting altId="p909.gpio_speed.gpio_speed_h" configurationId="p909.gpio_drivecapacity"/>
+      <configSetting altId="p909.gpio_mode.gpio_mode_peripheral" configurationId="p909.gpio_mode"/>
     </pincfg>
     <pincfg active="false" name="R7KA8P1KFLCAC.pincfg" selected="false" symbol="">
       <configSetting altId="jtag_fslash_swd.mode.jtag.free" configurationId="jtag_fslash_swd.mode"/>

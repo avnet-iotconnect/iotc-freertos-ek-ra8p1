@@ -9,6 +9,8 @@ extern void camera_thread_create(void);
                 extern TaskHandle_t camera_thread;
 extern void ai_inference_thread_create(void);
                 extern TaskHandle_t ai_inference_thread;
+extern void net_thread_create(void);
+                extern TaskHandle_t net_thread;
                 uint32_t g_fsp_common_thread_count;
                 bool g_fsp_common_initialized;
                 SemaphoreHandle_t g_fsp_common_initialized_semaphore;
@@ -107,6 +109,7 @@ extern void ai_inference_thread_create(void);
                     display_thread_create();
 camera_thread_create();
 ai_inference_thread_create();
+net_thread_create();
 
                     /* Start the scheduler. */
                     vTaskStartScheduler();

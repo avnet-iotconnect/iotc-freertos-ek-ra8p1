@@ -5,6 +5,14 @@
 #include "bsp_api.h"
 #include "FreeRTOS.h"
                 #include "event_groups.h"
+#include "r_rmac_phy.h"
+#include "r_ether_phy_api.h"
+#include "r_layer3_switch.h"
+#include "r_ether_api.h"
+#include "r_rmac.h"
+#include "FreeRTOSIPConfig.h"
+#include "rm_freertos_plus_tcp.h"
+#include "FreeRTOS_IP.h"
 #include "arm_math.h"
 #include "arm_nnfunctions.h"
 #include "rm_ethosu_api.h"
@@ -19,6 +27,62 @@
 #include "r_ioport.h"
 #include "bsp_pin_cfg.h"
 FSP_HEADER
+#ifndef ETHER_PHY_LSI_TYPE_KIT_COMPONENT
+  #define ETHER_PHY_LSI_TYPE_KIT_COMPONENT ETHER_PHY_LSI_TYPE_DEFAULT
+#endif
+
+#ifndef NULL
+void NULL(rmac_phy_instance_ctrl_t * p_instance_ctrl);
+#endif
+
+#ifndef NULL
+bool NULL(rmac_phy_instance_ctrl_t * p_instance_ctrl, uint32_t line_speed_duplex);
+#endif
+
+/** ETHER_PHY on RMAC_PHY Instance. */
+extern const ether_phy_instance_t g_rmac_phy0;
+
+/** Access the Ethernet PHY instance using these structures when calling API functions directly (::p_api is not used). */
+extern rmac_phy_instance_ctrl_t g_rmac_phy0_ctrl;
+extern const ether_phy_cfg_t g_rmac_phy0_cfg;
+extern const rmac_phy_extended_cfg_t g_rmac_phy0_extended_cfg;
+
+#ifndef NULL
+void NULL(ether_phy_callback_args_t * p_args);
+#endif
+#ifndef NULL
+void NULL(ether_switch_callback_args_t * p_args);
+#endif
+#ifndef NULL
+void NULL(ether_switch_callback_args_t * p_args);
+#endif
+#ifndef NULL
+void NULL(ether_switch_callback_args_t * p_args);
+#endif
+
+/** Ethernet Switch on Layer3 Switch Instance. */
+extern const ether_switch_instance_t g_layer3_switch0;
+
+/** Access the Layer3 Switch instance using these structures when calling API functions directly (::p_api is not used). */
+extern layer3_switch_instance_ctrl_t g_layer3_switch0_ctrl;
+extern const ether_switch_cfg_t g_layer3_switch0_cfg;
+/** Ether on RMAC Instance. */
+extern const ether_instance_t g_ether0;
+
+/** Access the RMAC instance using these structures when calling API functions directly (::p_api is not used). */
+extern rmac_instance_ctrl_t g_ether0_ctrl;
+extern const ether_cfg_t g_ether0_cfg;
+
+#ifndef vEtherISRCallback
+void vEtherISRCallback(ether_callback_args_t * p_args);
+#endif
+#if (ipconfigIPv4_BACKWARD_COMPATIBLE == 1)
+ extern rm_freertos_plus_tcp_instance_t * gp_freertos_plus_tcp_instance;
+#else
+ extern NetworkInterface_t g_freertos_plus_tcp0_xInterface;
+ extern NetworkInterface_t * pxFSP_Eth_FillInterfaceDescriptor(BaseType_t xEMACIndex, NetworkInterface_t * pxInterface);
+#endif
+extern rm_freertos_plus_tcp_instance_t g_freertos_plus_tcp0;
 #include "ethosu_driver.h"
             extern struct ethosu_driver g_ethosu0;
 extern rm_ethosu_instance_ctrl_t g_rm_ethosu0_ctrl;

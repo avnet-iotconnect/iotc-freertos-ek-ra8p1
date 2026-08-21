@@ -133,7 +133,7 @@
             (((RA_NOT_DEFINED > 0) ? 0U : 1U) << 26) /* CANFD1 */ | \
             (((RA_NOT_DEFINED > 0) ? 0U : 1U) << 27) /* CANFD0 */ | \
             (((RA_NOT_DEFINED > 0) ? 0U : 1U) << 28) /* ETHPHYCLK */ | \
-            (((RA_NOT_DEFINED > 0) ? 0U : 1U) << 30) /* ESWM */ | \
+            (((1 > 0) ? 0U : 1U) << 30) /* ESWM */ | \
             (((RA_NOT_DEFINED > 0) ? 0U : 1U) << 31) /* RSIP-E50D */)
 #endif
 #ifndef BSP_TZ_CFG_PSARD

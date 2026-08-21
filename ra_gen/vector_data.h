@@ -6,7 +6,7 @@
         #endif
                 /* Number of interrupts allocated */
         #ifndef VECTOR_DATA_IRQ_COUNT
-        #define VECTOR_DATA_IRQ_COUNT    (21)
+        #define VECTOR_DATA_IRQ_COUNT    (24)
         #endif
         /* ISR prototypes */
         void iic_master_rxi_isr(void);
@@ -30,6 +30,8 @@
         void mipi_csi_pm_isr(void);
         void mipi_csi_gst_isr(void);
         void rm_ethosu_isr(void);
+        void layer3_switch_gwdi_isr(void);
+        void layer3_switch_eaei_isr(void);
 
         /* Vector table allocations */
         #define VECTOR_NUMBER_IIC1_RXI ((IRQn_Type) 0) /* IIC1 RXI (Receive data full) */
@@ -74,8 +76,14 @@
         #define MIPICSI_GST_IRQn          ((IRQn_Type) 19) /* MIPICSI GST (Generic Short Packet interrupt) */
         #define VECTOR_NUMBER_NPU_IRQ ((IRQn_Type) 20) /* NPU IRQ (NPU IRQ) */
         #define NPU_IRQ_IRQn          ((IRQn_Type) 20) /* NPU IRQ (NPU IRQ) */
+        #define VECTOR_NUMBER_ETHER_GWDI0 ((IRQn_Type) 21) /* ETHER GWDI0 (GWCA Data Interrupt 0) */
+        #define ETHER_GWDI0_IRQn          ((IRQn_Type) 21) /* ETHER GWDI0 (GWCA Data Interrupt 0) */
+        #define VECTOR_NUMBER_ETHER_EAEI0 ((IRQn_Type) 22) /* ETHER EAEI0 (ETHA0 Error Interrupt) */
+        #define ETHER_EAEI0_IRQn          ((IRQn_Type) 22) /* ETHER EAEI0 (ETHA0 Error Interrupt) */
+        #define VECTOR_NUMBER_ETHER_EAEI1 ((IRQn_Type) 23) /* ETHER EAEI1 (ETHA1 Error Interrupt) */
+        #define ETHER_EAEI1_IRQn          ((IRQn_Type) 23) /* ETHER EAEI1 (ETHA1 Error Interrupt) */
         /* The number of entries required for the ICU vector table. */
-        #define BSP_ICU_VECTOR_NUM_ENTRIES (21)
+        #define BSP_ICU_VECTOR_NUM_ENTRIES (24)
 
         #ifdef __cplusplus
         }
