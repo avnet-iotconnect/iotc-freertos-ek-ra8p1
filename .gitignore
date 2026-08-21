@@ -1,0 +1,31 @@
+# Build output
+/Debug/
+/Release/
+*.o
+*.elf
+*.map
+*.srec
+*.hex
+
+# e2 studio / Eclipse local state
+/.settings/
+/.metadata/
+*.jlink
+JLinkLog.log
+.api_xml
+.clangd
+
+# Secrets — device certs/keys are provisioned at runtime, never committed
+/certs/
+*.pem
+*.key
+!iotc-c-lib/tools/server-ca-cert-files/*.pem
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+
+# Model artifacts (large binaries; keep scripts, not outputs)
+tools/vela/output/
+*.tflite.vela
