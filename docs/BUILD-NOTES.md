@@ -74,6 +74,25 @@ MRAM programs at ~127 KB/s; option bytes are handled by the flashloader.
 - After deleting/moving source files outside the IDE, run `-cleanBuild`
   (stale makefiles reference removed files otherwise).
 
+## OSPI flash / model store (Phase 5)
+
+- **The MX25LW51245G stays in octal-DDR mode across MCU resets** once any
+  firmware (e.g. the factory demo) switches it - only a power cycle or a
+  RESET# pulse restores 1S SPI mode. Symptom: every r_ospi_b op returns
+  FSP_ERR_DEVICE_BUSY (40002) and XIP reads are 0xFF. `iotc_fs_init()`
+  pulses P106 (om_0_reset) before opening the OSPI. Keep this.
+- `rm_littlefs_spi_flash.c` is patched in-repo to invalidate D-cache before
+  XIP reads (the port memcpy's from the cacheable XIP window while the OSPI
+  driver programs the array behind the cache).
+- **Open issue:** `lfs_format` on the OSPI volume returns LFS_ERR_NOSPC with
+  both the donor geometry (read 1 / prog 4) and 64/64; every block appears
+  "bad" to littlefs. The PKCS#11 credential store depends on littlefs, so
+  device credentials currently re-provision at each boot (works; does not
+  persist). The model store does NOT use littlefs - it writes a raw OSPI
+  slot at +56 MB (verified across reboots).
+- Serial-flash writes must go through `g_ospi0.p_api` in <=64-byte chunks
+  (combination-buffer size) with status polling between chunks.
+
 ## Serial console
 
 The r11an0995 demo console is the J-Link OB CDC UART at **230400** 8N1
