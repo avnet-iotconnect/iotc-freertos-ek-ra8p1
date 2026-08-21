@@ -24,10 +24,18 @@
 
 #include "console_output/console_output.h"
 
-/* Latest results from the vision pipeline (FaceDetection.cc). */
+#include "iotc_dra_client.h"
+#include "model_store/model_store.h"
+
+/* Vision pipeline interface (FaceDetection.cc). */
 extern uint32_t face_detection_box_count(void);
 extern void face_detection_box_get(uint32_t i, int16_t *x, int16_t *y,
                                    int16_t *w, int16_t *h, float *score);
+extern const char *face_detection_request_swap(const uint8_t *iotv_blob, size_t len);
+extern uint8_t *face_detection_pending_buf(size_t *size);
+extern void face_detection_revert(void);
+extern void face_detection_model_info(const char **name, unsigned *ver,
+                                      const char **src, unsigned *size_b);
 
 #define IOTC_TELEMETRY_PERIOD_S_DEFAULT 10
 
@@ -81,24 +89,82 @@ static void prv_on_command(IotclC2dEventData data)
     }
     if (0 == strcmp(cmd, "model-info"))
     {
+        const char *name; const char *src; unsigned ver, size_b;
+        face_detection_model_info(&name, &ver, &src, &size_b);
+        char info[96];
+        snprintf(info, sizeof(info), "%s v%u (%s, %u bytes)", name, ver, src, size_b);
+        iotcl_mqtt_send_cmd_ack(ack_id, IOTCL_C2D_EVT_CMD_SUCCESS_WITH_ACK, info);
+        return;
+    }
+    if (0 == strcmp(cmd, "model-revert"))
+    {
+        face_detection_revert();
         iotcl_mqtt_send_cmd_ack(ack_id, IOTCL_C2D_EVT_CMD_SUCCESS_WITH_ACK,
-                                "builtin yolo-fastest-192 v1");
+                                "reverting to builtin model");
         return;
     }
     iotcl_mqtt_send_cmd_ack(ack_id, IOTCL_C2D_EVT_CMD_FAILED, "unknown command");
 }
 
+/*
+ * AI Model Management push (ct:2) / OTA. Downloads the blob into the vision
+ * pipeline's pending buffer, validates the IOTV envelope (unwrapping a raw
+ * .tflite or STORED zip if needed is done by pack_model.py conventions:
+ * we push .iotv blobs), and queues the hot-swap. Runs on the MQTT pump
+ * task; the AI thread applies the swap between inferences and persists the
+ * model to the OSPI flash store.
+ */
 static void prv_on_ota(IotclC2dEventData data)
 {
-    /* Phase 5: AI Model Management push (ct:2) lands here. */
-    const char *url = iotcl_c2d_get_ota_url(data, 0);
-    IOTC_PRINT("IOTC: OTA/model push received (url: %s) - not yet implemented\r\n",
-               url ? url : "?");
+    const char *host = iotcl_c2d_get_ota_url_hostname(data, 0);
+    const char *res = iotcl_c2d_get_ota_url_resource(data, 0);
     const char *ack_id = iotcl_c2d_get_ack_id(data);
+    IOTC_PRINT("IOTC: model push from https://%s%s\r\n", host ? host : "?", res ? res : "");
+
+    if (!host || !res)
+    {
+        if (ack_id)
+        {
+            iotcl_mqtt_send_ota_ack(ack_id, IOTCL_C2D_EVT_OTA_FAILED, "no download url");
+        }
+        return;
+    }
+
     if (ack_id)
     {
-        iotcl_mqtt_send_ota_ack(ack_id, IOTCL_C2D_EVT_OTA_FAILED,
-                                "model store not yet implemented");
+        iotcl_mqtt_send_ota_ack(ack_id, IOTCL_C2D_EVT_OTA_DOWNLOADING, NULL);
+    }
+
+    size_t cap = 0;
+    uint8_t *buf = face_detection_pending_buf(&cap);
+    size_t got = 0;
+    /* NULL ca: the signed URL is S3/CloudFront; default CA set covers it. */
+    int rc = iotc_https_download_large(host, res, NULL, 30000, buf, cap, &got);
+    if (0 != rc)
+    {
+        IOTC_PRINT("IOTC: model download failed (%d)\r\n", rc);
+        if (ack_id)
+        {
+            iotcl_mqtt_send_ota_ack(ack_id, IOTCL_C2D_EVT_OTA_DOWNLOAD_FAILED, "download failed");
+        }
+        return;
+    }
+    IOTC_PRINT("IOTC: model downloaded (%u bytes)\r\n", (unsigned) got);
+
+    const char *reason = face_detection_request_swap(buf, got);
+    if (reason)
+    {
+        IOTC_PRINT("IOTC: model rejected: %s\r\n", reason);
+        if (ack_id)
+        {
+            iotcl_mqtt_send_ota_ack(ack_id, IOTCL_C2D_EVT_OTA_DOWNLOAD_FAILED, reason);
+        }
+        return;
+    }
+    if (ack_id)
+    {
+        iotcl_mqtt_send_ota_ack(ack_id, IOTCL_C2D_EVT_OTA_DOWNLOAD_DONE,
+                                "model queued for hot-swap");
     }
 }
 
@@ -118,12 +184,16 @@ static void prv_publish_telemetry(void)
         face_detection_box_get(0, &x, &y, &w, &h, &top_score);
     }
 
+    const char *mname; const char *msrc; unsigned mver, msize;
+    face_detection_model_info(&mname, &mver, &msrc, &msize);
+
     iotcl_telemetry_set_number(msg, "vision.face_count", (double) n);
     iotcl_telemetry_set_number(msg, "vision.score", (double) (top_score * 100.0f));
     iotcl_telemetry_set_string(msg, "vision.state", (n > 0) ? "face" : "clear");
-    iotcl_telemetry_set_string(msg, "model.name", "yolo-fastest-192");
-    iotcl_telemetry_set_number(msg, "model.ver", 1);
-    iotcl_telemetry_set_string(msg, "model.src", "builtin");
+    iotcl_telemetry_set_string(msg, "model.name", mname);
+    iotcl_telemetry_set_number(msg, "model.ver", (double) mver);
+    iotcl_telemetry_set_string(msg, "model.src", msrc);
+    iotcl_telemetry_set_number(msg, "model.size_b", (double) msize);
     iotcl_telemetry_set_number(msg, "sys.uptime_s",
                                (double) (xTaskGetTickCount() / configTICK_RATE_HZ));
     iotcl_telemetry_set_number(msg, "sys.free_heap", (double) xPortGetFreeHeapSize());

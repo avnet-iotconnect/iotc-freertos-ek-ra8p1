@@ -161,10 +161,22 @@ int rm_littlefs_spi_flash_read (const struct lfs_config * c,
     FSP_ERROR_RETURN(RM_LITTLEFS_SPI_FLASH_OPEN == p_instance_ctrl->open, LFS_ERR_IO);
 #endif
 
+    uint8_t * p_read_addr =
+        (uint8_t *) (p_instance_ctrl->start_address + (p_instance_ctrl->p_cfg->p_lfs_cfg->block_size * block) + off);
+
+#if __DCACHE_PRESENT
+    /* The XIP window is cacheable on CM85; the OSPI driver programs the flash
+     * behind the cache's back, so stale lines must be dropped before reading.
+     * The window is never written through the cache, so invalidate is safe. */
+    {
+        uint32_t start = ((uint32_t) p_read_addr) & ~31U;
+        uint32_t end = (((uint32_t) p_read_addr) + size + 31U) & ~31U;
+        SCB_InvalidateDCache_by_Addr((void *) start, (int32_t) (end - start));
+    }
+#endif
+
     /* Read directly from the flash. */
-    memcpy(buffer,
-           (uint8_t *) (p_instance_ctrl->start_address + (p_instance_ctrl->p_cfg->p_lfs_cfg->block_size * block) + off),
-           size);
+    memcpy(buffer, p_read_addr, size);
 
     return LFS_ERR_OK;
 }

@@ -48,16 +48,18 @@ void iotc_dra_set_default_ca(const char *ca_pem)
  * Single HTTPS GET: connect, request, deliver body via callback or buffer.
  * With sink == NULL the body lands in buf/out_len.
  */
-static int https_get(const char *host,
-                     const char *resource,
-                     const char *ca_pem,
-                     int timeout_ms,
-                     uint8_t *buf,
-                     size_t buf_size,
-                     size_t *out_len,
-                     iotc_https_sink_t sink,
-                     void *sink_user,
-                     size_t *sink_total)
+static int https_get_ex(const char *host,
+                        const char *resource,
+                        const char *ca_pem,
+                        int timeout_ms,
+                        uint8_t *resp_buf,   /* coreHTTP work buffer (headers+body) */
+                        size_t resp_size,
+                        uint8_t *buf,
+                        size_t buf_size,
+                        size_t *out_len,
+                        iotc_https_sink_t sink,
+                        void *sink_user,
+                        size_t *sink_total)
 {
     TlsTransportParams_t params;
     NetworkContext_t net = {0};
@@ -81,7 +83,7 @@ static int https_get(const char *host,
                                                    (uint32_t) timeout_ms);
     if (TLS_TRANSPORT_SUCCESS != ts)
     {
-        IOTCL_ERROR(ts, "DRA: TLS connect to %s failed");
+        IOTCL_ERROR(ts, "DRA: TLS connect failed");
         return -1;
     }
 
@@ -103,13 +105,13 @@ static int https_get(const char *host,
     req.pathLen = strlen(resource);
     req.reqFlags = 0;
 
-    hdrs.pBuffer = s_http_buf;
-    hdrs.bufferLen = sizeof(s_http_buf);
+    hdrs.pBuffer = resp_buf;
+    hdrs.bufferLen = resp_size;
 
     if (HTTPSuccess == HTTPClient_InitializeRequestHeaders(&hdrs, &req))
     {
-        resp.pBuffer = s_http_buf;
-        resp.bufferLen = sizeof(s_http_buf);
+        resp.pBuffer = resp_buf;
+        resp.bufferLen = resp_size;
 
         HTTPStatus_t hs = HTTPClient_Send(&xport, &hdrs, NULL, 0, &resp, 0);
         if ((HTTPSuccess == hs) && (resp.statusCode >= 200) && (resp.statusCode < 300))
@@ -158,11 +160,34 @@ static int https_get(const char *host,
     return rc;
 }
 
+static int https_get(const char *host, const char *resource, const char *ca_pem,
+                     int timeout_ms, uint8_t *buf, size_t buf_size, size_t *out_len,
+                     iotc_https_sink_t sink, void *sink_user, size_t *sink_total)
+{
+    return https_get_ex(host, resource, ca_pem, timeout_ms,
+                        s_http_buf, sizeof(s_http_buf),
+                        buf, buf_size, out_len, sink, sink_user, sink_total);
+}
+
 int iotc_https_download(const char *hostname, const char *resource, const char *ca_pem,
                         int timeout_ms, uint8_t *buf, size_t buf_size, size_t *out_len)
 {
     return https_get(hostname, resource, ca_pem, timeout_ms, buf, buf_size, out_len,
                      NULL, NULL, NULL);
+}
+
+/*
+ * Large download: the caller's buffer serves as the coreHTTP work buffer
+ * (headers + body), so multi-hundred-KB payloads (AI models) never need a
+ * second copy. On success the body is moved to the start of workbuf.
+ */
+int iotc_https_download_large(const char *hostname, const char *resource,
+                              const char *ca_pem, int timeout_ms,
+                              uint8_t *workbuf, size_t workbuf_size, size_t *out_len)
+{
+    return https_get_ex(hostname, resource, ca_pem, timeout_ms,
+                        workbuf, workbuf_size,
+                        workbuf, workbuf_size, out_len, NULL, NULL, NULL);
 }
 
 int iotc_https_download_stream(const char *hostname, const char *resource, const char *ca_pem,

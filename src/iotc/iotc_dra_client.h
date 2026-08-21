@@ -69,6 +69,15 @@ int iotc_https_download(const char *hostname,
                         size_t *out_len);
 
 /**
+ * Large download: the caller's buffer serves as the coreHTTP work buffer
+ * (headers + body), so multi-hundred-KB payloads (AI models) avoid a second
+ * copy. On success the body is moved to the start of workbuf.
+ */
+int iotc_https_download_large(const char *hostname, const char *resource,
+                              const char *ca_pem, int timeout_ms,
+                              uint8_t *workbuf, size_t workbuf_size, size_t *out_len);
+
+/**
  * Streaming variant for large payloads (AI model blobs): the body is
  * delivered in chunks to sink() as it arrives, so multi-MB models never need
  * a contiguous RAM buffer and can be written straight to OSPI flash.

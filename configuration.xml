@@ -1221,8 +1221,8 @@
     <module id="module.middleware.rm_littlefs_spi_flash.1448464951">
       <property id="module.middleware.rm_littlefs_spi_flash.name" value="g_rm_littlefs0"/>
       <property id="module.middleware.rm_littlefs_spi_flash.callback" value="g_rm_littlefs_spi_flash0_callback"/>
-      <property id="module.middleware.rm_littlefs_spi_flash.read_size" value="1"/>
-      <property id="module.middleware.rm_littlefs_spi_flash.prog_size" value="4"/>
+      <property id="module.middleware.rm_littlefs_spi_flash.read_size" value="64"/>
+      <property id="module.middleware.rm_littlefs_spi_flash.prog_size" value="64"/>
       <property id="module.middleware.rm_littlefs_spi_flash.block_size" value="4096"/>
       <property id="module.middleware.rm_littlefs_spi_flash.block_cycles" value="1024"/>
       <property id="module.middleware.rm_littlefs_spi_flash.cache_size" value="64"/>

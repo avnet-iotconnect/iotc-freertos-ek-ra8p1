@@ -31,10 +31,7 @@
 #include "iotc_dra_client.h"
 #include "iotc_time.h"
 
-/* Generated LittleFS instance (net_thread stack). */
-extern const rm_littlefs_instance_t g_rm_littlefs0;
-extern struct lfs g_rm_littlefs0_lfs;
-extern const struct lfs_config g_rm_littlefs0_lfs_cfg;
+#include "iotc_fs.h"
 
 /* Referenced by the generated rm_littlefs_spi_flash instance. */
 void g_rm_littlefs_spi_flash0_callback(rm_littlefs_spi_flash_callback_args_t *p_args)
@@ -49,7 +46,6 @@ static struct
     char *cpid;
     char *duid;
     bool lib_inited;
-    bool fs_inited;
 } s_ctx;
 
 static const char *const s_broker_ca = IOTCL_AMAZON_ROOT_CA1;
@@ -60,39 +56,6 @@ void iotconnect_sdk_init_config(IotConnectClientConfig *c)
     memset(c, 0, sizeof(*c));
     c->qos = 1;
     c->connection_type = IOTC_CT_AWS;
-}
-
-static int prv_fs_init(void)
-{
-    if (s_ctx.fs_inited)
-    {
-        return 0;
-    }
-    fsp_err_t err = g_rm_littlefs0.p_api->open(g_rm_littlefs0.p_ctrl, g_rm_littlefs0.p_cfg);
-    if ((FSP_SUCCESS != err) && (FSP_ERR_ALREADY_OPEN != err))
-    {
-        IOTCL_ERROR(err, "IOTC: littlefs open failed");
-        return -1;
-    }
-    /* Mount first; format only a virgin/corrupt filesystem so PKCS#11
-     * credentials survive reboots. */
-    int lfs_err = lfs_mount(&g_rm_littlefs0_lfs, &g_rm_littlefs0_lfs_cfg);
-    if (0 != lfs_err)
-    {
-        IOTCL_WARN(lfs_err, "IOTC: littlefs mount failed; formatting");
-        lfs_err = lfs_format(&g_rm_littlefs0_lfs, &g_rm_littlefs0_lfs_cfg);
-        if (0 == lfs_err)
-        {
-            lfs_err = lfs_mount(&g_rm_littlefs0_lfs, &g_rm_littlefs0_lfs_cfg);
-        }
-    }
-    if (0 != lfs_err)
-    {
-        IOTCL_ERROR(lfs_err, "IOTC: littlefs unusable");
-        return -1;
-    }
-    s_ctx.fs_inited = true;
-    return 0;
 }
 
 static int prv_provision_identity(const IotConnectAuthInfo *auth)
@@ -130,8 +93,9 @@ int iotconnect_sdk_init(IotConnectClientConfig *c)
     s_ctx.cpid = iotcl_strdup(c->cpid);
     s_ctx.duid = iotcl_strdup(c->duid);
 
-    if (0 != prv_fs_init())
+    if (0 != iotc_fs_init())
     {
+        IOTCL_ERROR(0, "IOTC: filesystem init failed");
         return -1;
     }
     if (0 != prv_provision_identity(&c->auth_info))
