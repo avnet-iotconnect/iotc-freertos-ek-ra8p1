@@ -159,7 +159,7 @@ bool face_detection_init(void)
     prv_load_builtin_to_staging();
     bool ok = prv_model_apply(s_model_len);
 
-#define MODEL_STORE_SELFTEST 1
+#define MODEL_STORE_SELFTEST 0
 #if MODEL_STORE_SELFTEST
     /* One-shot persistence test: seed the OSPI store with the builtin model
      * wrapped as IOTV "selftest" v2. The NEXT boot must report

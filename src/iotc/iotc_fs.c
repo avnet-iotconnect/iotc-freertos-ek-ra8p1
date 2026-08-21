@@ -59,53 +59,8 @@ int iotc_fs_init(void)
 
     int rc = -1;
     fsp_err_t err = g_rm_littlefs0.p_api->open(g_rm_littlefs0.p_ctrl, g_rm_littlefs0.p_cfg);
-    {
-        /* Probe: direct OSPI erase/program/readback at 63 MB (outside the
-         * 32 MB littlefs partition), with raw FSP error codes. */
-        extern const spi_flash_instance_t g_ospi0;
-        volatile uint8_t *xip = (volatile uint8_t *) 0x90000000u;
-        uint8_t *probe = (uint8_t *) 0x93F00000u; /* +63 MB */
-        spi_flash_status_t st = {0};
-
-        fsp_err_t e1 = g_ospi0.p_api->erase(g_ospi0.p_ctrl, probe, 4096);
-        fsp_err_t e2 = FSP_SUCCESS;
-        for (int i = 0; i < 10000; i++)
-        {
-            e2 = g_ospi0.p_api->statusGet(g_ospi0.p_ctrl, &st);
-            if ((FSP_SUCCESS != e2) || !st.write_in_progress) { break; }
-            vTaskDelay(1);
-        }
-        static const uint8_t pat[8] = {0xA5,1,2,3,4,5,6,7};
-        fsp_err_t e3 = g_ospi0.p_api->write(g_ospi0.p_ctrl, (uint8_t *) pat, probe, sizeof(pat));
-        for (int i = 0; i < 10000; i++)
-        {
-            if ((FSP_SUCCESS != g_ospi0.p_api->statusGet(g_ospi0.p_ctrl, &st)) || !st.write_in_progress) { break; }
-            vTaskDelay(1);
-        }
-        SCB_InvalidateDCache_by_Addr((void *) probe, 32);
-        snprintf(dbg, sizeof(dbg),
-                 "FS: open=%d erase=%d poll=%d write=%d rb=%02x %02x %02x xip0=%02x\r\n",
-                 (int) err, (int) e1, (int) e2, (int) e3, probe[0], probe[1], probe[2], xip[0]);
-        print_to_console(dbg);
-    }
-/* Set to 1 once to wipe a filesystem written by older/broken firmware. */
-#define IOTC_FS_FORCE_FORMAT 1
-
     if ((FSP_SUCCESS == err) || (FSP_ERR_ALREADY_OPEN == err))
     {
-#if IOTC_FS_FORCE_FORMAT
-        snprintf(dbg, sizeof(dbg), "FS: geometry rd=%u pg=%u blk=%u cnt=%u cache=%u look=%u\r\n",
-                 (unsigned) g_rm_littlefs0_lfs_cfg.read_size,
-                 (unsigned) g_rm_littlefs0_lfs_cfg.prog_size,
-                 (unsigned) g_rm_littlefs0_lfs_cfg.block_size,
-                 (unsigned) g_rm_littlefs0_lfs_cfg.block_count,
-                 (unsigned) g_rm_littlefs0_lfs_cfg.cache_size,
-                 (unsigned) g_rm_littlefs0_lfs_cfg.lookahead_size);
-        print_to_console(dbg);
-        int ff = lfs_format(&g_rm_littlefs0_lfs, &g_rm_littlefs0_lfs_cfg);
-        snprintf(dbg, sizeof(dbg), "FS: FORCE FORMAT rc=%d\r\n", ff);
-        print_to_console(dbg);
-#endif
         int lfs_err = lfs_mount(&g_rm_littlefs0_lfs, &g_rm_littlefs0_lfs_cfg);
         if (0 != lfs_err)
         {

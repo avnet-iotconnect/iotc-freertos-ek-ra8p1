@@ -2,7 +2,13 @@
  * Copyright (c) 2026 Avnet, Inc.
  * SPDX-License-Identifier: MIT
  *
- * IOTV model envelope + LittleFS persistence. See model_store.h.
+ * IOTV model envelope + persistence. See model_store.h.
+ *
+ * Storage: a raw slot in the 64 MB OSPI flash at +56 MB (top 8 MB),
+ * clear of the 32 MB LittleFS credential partition and the factory asset
+ * area. Written with the r_ospi_b spi-flash API; read back through the
+ * XIP window (with D-cache invalidation - the OSPI programs the array
+ * behind the cache's back).
  */
 
 #include "model_store.h"
@@ -10,10 +16,17 @@
 #include <string.h>
 #include <stdio.h>
 
-#include "lfs.h"
+#include "hal_data.h"
 #include "iotc/iotc_fs.h"
 
-#define MODEL_FILE "model.iotv"
+/* OSPI CS1 XIP window base and the model slot within the flash. */
+#define OSPI_XIP_BASE      (0x90000000u)
+#define MODEL_SLOT_OFFSET  (56u * 1024u * 1024u)
+#define MODEL_SLOT_ADDR    (OSPI_XIP_BASE + MODEL_SLOT_OFFSET)
+#define OSPI_BLOCK_ERASE   (65536u)
+#define OSPI_PROG_CHUNK    (64u)
+
+extern const spi_flash_instance_t g_ospi0;
 
 uint32_t iotv_crc32(const uint8_t *data, size_t len)
 {
@@ -74,29 +87,79 @@ void iotv_wrap_in_place(uint8_t *buf, size_t payload_len, uint16_t model_ver,
     strncpy(h->name, name, sizeof(h->name) - 1);
 }
 
+static int prv_wait_idle(void)
+{
+    spi_flash_status_t st = {0};
+    for (uint32_t i = 0; i < 4000000u; i++)
+    {
+        if (FSP_SUCCESS != g_ospi0.p_api->statusGet(g_ospi0.p_ctrl, &st))
+        {
+            return -5;
+        }
+        if (!st.write_in_progress)
+        {
+            return 0;
+        }
+    }
+    return -110; /* timeout */
+}
+
 int model_store_save(const uint8_t *iotv_blob, size_t len)
 {
-    if (0 != iotc_fs_init())
+    if (0 != iotc_fs_init()) /* opens the OSPI (littlefs mount may fail; ok) */
     {
-        return -5;
+        /* iotc_fs_init reports failure when littlefs is unusable, but the
+         * OSPI itself is opened first; proceed if the flash API works. */
     }
-    const char *reason = iotv_validate(iotv_blob, len);
-    if (reason)
+    if (NULL != iotv_validate(iotv_blob, len))
     {
-        (void) reason;
         return -22;
     }
 
-    int rc;
-    lfs_file_t f;
     iotc_fs_lock();
-    rc = lfs_file_open(iotc_fs_lfs(), &f, MODEL_FILE,
-                       LFS_O_WRONLY | LFS_O_CREAT | LFS_O_TRUNC);
+    int rc = 0;
+
+    /* Erase whole 64KB blocks covering the blob. */
+    size_t erase_len = (len + OSPI_BLOCK_ERASE - 1) & ~(OSPI_BLOCK_ERASE - 1);
+    for (size_t off = 0; (0 == rc) && (off < erase_len); off += OSPI_BLOCK_ERASE)
+    {
+        if (FSP_SUCCESS != g_ospi0.p_api->erase(g_ospi0.p_ctrl,
+                                                (uint8_t *) (MODEL_SLOT_ADDR + off),
+                                                OSPI_BLOCK_ERASE))
+        {
+            rc = -5;
+            break;
+        }
+        rc = prv_wait_idle();
+    }
+
+    /* Program in small chunks (combination-buffer sized). */
+    for (size_t off = 0; (0 == rc) && (off < len); off += OSPI_PROG_CHUNK)
+    {
+        size_t n = len - off;
+        if (n > OSPI_PROG_CHUNK)
+        {
+            n = OSPI_PROG_CHUNK;
+        }
+        if (FSP_SUCCESS != g_ospi0.p_api->write(g_ospi0.p_ctrl,
+                                                (uint8_t *) (iotv_blob + off),
+                                                (uint8_t *) (MODEL_SLOT_ADDR + off),
+                                                (uint32_t) n))
+        {
+            rc = -5;
+            break;
+        }
+        rc = prv_wait_idle();
+    }
+
     if (0 == rc)
     {
-        lfs_ssize_t n = lfs_file_write(iotc_fs_lfs(), &f, iotv_blob, (lfs_size_t) len);
-        int cl = lfs_file_close(iotc_fs_lfs(), &f);
-        rc = ((n == (lfs_ssize_t) len) && (0 == cl)) ? 0 : -5;
+        /* Verify through the XIP window. */
+        SCB_InvalidateDCache_by_Addr((void *) MODEL_SLOT_ADDR, (int32_t) len);
+        if (0 != memcmp((const void *) MODEL_SLOT_ADDR, iotv_blob, len))
+        {
+            rc = -84; /* verify failed */
+        }
     }
     iotc_fs_unlock();
     return rc;
@@ -104,54 +167,51 @@ int model_store_save(const uint8_t *iotv_blob, size_t len)
 
 int model_store_load(uint8_t *buf, size_t buf_size, size_t *out_len)
 {
-    if (0 != iotc_fs_init())
-    {
-        return -5;
-    }
+    (void) iotc_fs_init();
 
-    int rc;
-    lfs_file_t f;
     iotc_fs_lock();
-    rc = lfs_file_open(iotc_fs_lfs(), &f, MODEL_FILE, LFS_O_RDONLY);
-    if (0 != rc)
+    SCB_InvalidateDCache_by_Addr((void *) MODEL_SLOT_ADDR, IOTV_HDR_LEN);
+    const struct iotv_hdr *h = (const struct iotv_hdr *) MODEL_SLOT_ADDR;
+    if (0 != memcmp(h->magic, IOTV_MAGIC, 4))
     {
         iotc_fs_unlock();
-        return -2; /* ENOENT */
+        return -2; /* empty */
     }
-    lfs_soff_t size = lfs_file_size(iotc_fs_lfs(), &f);
-    if ((size <= 0) || ((size_t) size > buf_size))
+    size_t total = (size_t) h->model_len + IOTV_HDR_LEN;
+    if ((h->model_len > MODEL_MAX_BLOB - IOTV_HDR_LEN) || (total > buf_size))
     {
-        (void) lfs_file_close(iotc_fs_lfs(), &f);
         iotc_fs_unlock();
         return -12;
     }
-    lfs_ssize_t n = lfs_file_read(iotc_fs_lfs(), &f, buf, (lfs_size_t) size);
-    (void) lfs_file_close(iotc_fs_lfs(), &f);
+    SCB_InvalidateDCache_by_Addr((void *) MODEL_SLOT_ADDR, (int32_t) total);
+    memcpy(buf, (const void *) MODEL_SLOT_ADDR, total);
     iotc_fs_unlock();
 
-    if (n != size)
+    if (NULL != iotv_validate(buf, total))
     {
-        return -5;
-    }
-    if (NULL != iotv_validate(buf, (size_t) n))
-    {
-        return -2; /* treat corrupt as absent; caller falls back to builtin */
+        return -2; /* treat corrupt as absent */
     }
     if (out_len)
     {
-        *out_len = (size_t) n;
+        *out_len = total;
     }
     return 0;
 }
 
 int model_store_erase(void)
 {
-    if (0 != iotc_fs_init())
-    {
-        return -5;
-    }
+    (void) iotc_fs_init();
     iotc_fs_lock();
-    int rc = lfs_remove(iotc_fs_lfs(), MODEL_FILE);
+    int rc = 0;
+    if (FSP_SUCCESS != g_ospi0.p_api->erase(g_ospi0.p_ctrl,
+                                            (uint8_t *) MODEL_SLOT_ADDR, 4096))
+    {
+        rc = -5;
+    }
+    else
+    {
+        rc = prv_wait_idle();
+    }
     iotc_fs_unlock();
-    return (rc == 0 || rc == LFS_ERR_NOENT) ? 0 : -5;
+    return rc;
 }
