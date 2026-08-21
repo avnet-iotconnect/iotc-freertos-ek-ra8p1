@@ -35,7 +35,8 @@
  * Imported global variables and functions (from other files)
  ***************************************************************************************************************************/
 
-extern vision_ai_app_err_t image_classification(void);
+extern bool face_detection_init(void);
+extern vision_ai_app_err_t face_detection_run(void);
 
 /***************************************************************************************************************************
  * Exported global variables and functions (to be accessed by other files)
@@ -106,7 +107,7 @@ void ai_inference_thread_entry(void *pvParameters)
 
     RegisterDebugLogCallback(print_log);
 
-    if(VISION_AI_APP_SUCCESS != vision_ai_status )
+    if(true != face_detection_init())
     {
         handle_error(VISION_AI_APP_ERR_AI_INIT);
     }
@@ -124,7 +125,7 @@ void ai_inference_thread_entry(void *pvParameters)
         {
             memset(&g_ai_classification[i], 0, sizeof(g_ai_classification[i]));
         }
-        vision_ai_status = image_classification();
+        vision_ai_status = face_detection_run();
 
         if(VISION_AI_APP_ERR_AI_INFERENCE == vision_ai_status)
         {
