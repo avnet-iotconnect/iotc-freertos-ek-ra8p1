@@ -55,6 +55,25 @@ Needs a recent J-Link (V9.x knows RA8P1; V8.74 does not).
 
 MRAM programs at ~127 KB/s; option bytes are handled by the flashloader.
 
+## Phase 1 additions (Ethernet merge)
+
+- `r_layer3_switch.h` (FSP 6.3.1 and 6.5.1) is not C++-clean: clang hard-errors
+  (C++ DR2229) on `volatile uintN_t : n;` anonymous bit-fields and on tagged
+  struct definitions inside anonymous unions. Patched in-repo (qualifiers
+  dropped on reserved padding, tags stripped; neither is referenced anywhere).
+  If FSP regeneration ever redeploys this file, re-apply the patch.
+- picolibc's TLS `errno` (R_ARM_TLS_IE32 in `bsp_sbrk.o` and TFLM kernels)
+  makes lld synthesize a `.got`; once the TCP stack shifted the layout, lld
+  failed with "__flash_.got$$ is not contiguous with other relro sections".
+  Fix: `-Wl,-z,norelro`. The managed-build plugin silently drops the linker
+  "User defined options" field, so the flag is carried as a **tool command
+  override** in `.cproject`:
+  `<tool command="clang++ --target=arm-none-eabi -Wl,-z,norelro" ... cpp.linker ...>`.
+- FSP generates a stub `src/<thread>_entry.cpp` whenever no `<thread>_entry.*`
+  exists at `src/` root — keep thread entry files there (`src/net_thread_entry.c`).
+- After deleting/moving source files outside the IDE, run `-cleanBuild`
+  (stale makefiles reference removed files otherwise).
+
 ## Serial console
 
 The r11an0995 demo console is the J-Link OB CDC UART at **230400** 8N1
