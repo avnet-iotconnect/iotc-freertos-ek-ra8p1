@@ -93,6 +93,40 @@ MRAM programs at ~127 KB/s; option bytes are handled by the flashloader.
 - Serial-flash writes must go through `g_ospi0.p_api` in <=64-byte chunks
   (combination-buffer size) with status polling between chunks.
 
+## Ethernet bring-up findings (Phase 1 completion)
+
+Five independent faults, any one of which kills networking. All fixed in-repo:
+
+1. **Clock tree**: ESWCLK + ESWPHYCLK must be enabled (PLL1P); ETHPHYCLK
+   must be **exactly 25 MHz** — here sourced from the otherwise-unused
+   PLL1R (400 MHz) ÷16, so camera/display/SDRAM clocks stay untouched.
+   Without these the ESWM is unclocked: MDIO reads zeros, link error 4001.
+2. **P708 (ETHERNET_RST)** must be GPIO output high — the GPY111 is
+   otherwise held in reset (PHY ID reads 0000; healthy = d565:a401).
+3. **D-cache must be disabled** (`config.bsp.fsp.dcache`): FSP
+   r_rmac/r_layer3_switch do no cache maintenance on their DMA
+   descriptors; every Renesas EK-RA8P1 ethernet example ships cache-off.
+   Vision cost: preprocess 2→10 ms; camera/NPU/LCD rates unchanged.
+   (A future refinement: nocache-section placement for the ether arrays;
+   note lld INSERT loses input-section pattern matching to the main
+   script, so this needs the FSP linker-section-mapping mechanism.)
+4. **xApplicationGetRandomNumber**: the linked weak default returns
+   pdFALSE, which aborts DHCP with no error. Strong override in
+   `src/net_thread_entry.c` (TODO: RSIP TRNG).
+5. **Vendor spin-bugs** (patched in-repo, look for "patched" comments):
+   `rm_freertos_plus_tcp/NetworkInterface.c` treats NO_DATA as a received
+   frame (stale recycled buffer → infinite zero-byte events);
+   `FreeRTOS_DHCP.c` vDHCPProcess re-PEEKs an unconsumed message forever.
+   Both starve everything below the IP task's priority the moment real
+   traffic arrives — symptom is the console dying ~11 s after boot while
+   the scheduler stays alive.
+
+Console: `print_to_console` is now mutex-serialized with a bounded TX
+wait; concurrent prints previously hit APP_ERROR_TRAP. MAC is the
+locally-administered 02:8a:9b:71:04:d2 (set in configuration.xml AND
+net_thread_entry.c). Note many home routers isolate Wi-Fi from wired —
+test connectivity from the board side (gateway ping), not from a Wi-Fi PC.
+
 ## Serial console
 
 The r11an0995 demo console is the J-Link OB CDC UART at **230400** 8N1
