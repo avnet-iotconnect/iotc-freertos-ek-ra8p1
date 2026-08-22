@@ -69,10 +69,14 @@ static char local_prob[5][8] = {0};
 ***********************************************************************************************************************/
 static void print_inf_time(void)
 {
-    uint32_t time = (uint32_t)(application_processing_time.ai_inference_time_ms); // ms
+    extern volatile uint32_t g_ai_inference_time_us;
+    uint32_t time = g_ai_inference_time_us;
+    if (time > 9999) {
+        time = 9999;
+    }
 
     // update string on display
-    char time_str[8] = {'0', '0', '0', '0', ' ', 'm', 's', '\0'};
+    char time_str[8] = {'0', '0', '0', '0', ' ', 'u', 's', '\0'};
     time_str[0] += (char)(time / 1000);
     time_str[1] += (char)((time / 100) % 10);
     time_str[2] += (char)((time / 10) % 10);

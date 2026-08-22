@@ -26,9 +26,13 @@ extern "C" {
 #include "ai_application_config.h"
 #include "console_output/console_output.h"
 #include "model_store/model_store.h"
+#include "time_counter/time_counter.h"
 
 bool face_detection_init(void);
 vision_ai_app_err_t face_detection_run(void);
+
+/* Last NPU invoke duration in microseconds (DWT cycle counter). */
+volatile uint32_t g_ai_inference_time_us;
 
 /* Camera output staged by camera_thread: AI_INPUT_IMAGE_WIDTH x HEIGHT RGB888. */
 extern int8_t model_buffer_int8[];
@@ -313,7 +317,18 @@ vision_ai_app_err_t face_detection_run(void)
         memcpy(input->data.uint8, s_gray, n);
     }
 
-    if (!s_model.RunInference()) {
+    /* Time the NPU invoke with the app's 100 us tick counter: the U55
+     * finishes this model in ~1 ms, below the 1 ms resolution the donor
+     * used (which is why its readout showed 0). The DWT cycle counter is
+     * debug-gated on this core, so use the peripheral timer instead. */
+    uint32_t t0 = TimeCounter_CurrentCountGet();
+    bool inference_ok = s_model.RunInference();
+    g_ai_inference_time_us = (TimeCounter_CurrentCountGet() - t0) * 100U;
+    /* Keep the donor field alive for anything still reading it (rounded up
+     * so a sub-ms inference no longer reads 0). */
+    application_processing_time.ai_inference_time_ms = (g_ai_inference_time_us + 999U) / 1000U;
+
+    if (!inference_ok) {
         return VISION_AI_APP_ERR_AI_INFERENCE;
     }
 

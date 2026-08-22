@@ -38,9 +38,13 @@ void console_output_processing_time(void)
     sprintf (sprintf_buffer, "  AI inference pre processing time  : %4d ms, %4d fps\r\n",
             application_processing_time.ai_inference_pre_processing_time_ms, TimeCounter_ConvertFromMsToFps(application_processing_time.ai_inference_pre_processing_time_ms));
     print_to_console(sprintf_buffer);
-    sprintf (sprintf_buffer, "  AI inference time                 : %4d ms, %4d fps\r\n",
-            application_processing_time.ai_inference_time_ms, TimeCounter_ConvertFromMsToFps(application_processing_time.ai_inference_time_ms));
-    print_to_console(sprintf_buffer);
+    {
+        extern volatile uint32_t g_ai_inference_time_us;
+        uint32_t us = g_ai_inference_time_us;
+        sprintf (sprintf_buffer, "  AI inference time (Ethos-U55)     : %4lu us, %4lu fps\r\n",
+                (unsigned long) us, (unsigned long) ((us > 0) ? (1000000U / us) : 0));
+        print_to_console(sprintf_buffer);
+    }
     sprintf (sprintf_buffer, "  LCD display vsync period          : %4d ms, %4d fps\r\n",
             application_processing_time.lcd_display_update_refresh_ms, TimeCounter_ConvertFromMsToFps(application_processing_time.lcd_display_update_refresh_ms));
     print_to_console(sprintf_buffer);
