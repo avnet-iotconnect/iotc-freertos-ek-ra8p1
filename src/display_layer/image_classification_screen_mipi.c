@@ -157,29 +157,41 @@ void do_image_classification_screen(bool ai_result_new)
                                                int16_t *w, int16_t *h, float *score);
             extern void face_detection_model_info(const char **name, unsigned *ver,
                                                   const char **src, unsigned *size_b);
+            extern bool face_detection_class_info(const char **label, int *pct);
 
             print_inf_time();
 
             const char *mname; const char *msrc; unsigned mver, msize;
             face_detection_model_info(&mname, &mver, &msrc, &msize);
             uint32_t n = face_detection_box_count();
+            const char *clabel = NULL; int cpct = 0;
+            bool classifier = face_detection_class_info(&clabel, &cpct);
 
             char line[40];
             snprintf(line, sizeof(line), "Model: %.12s v%u      ", mname, mver);
             print_bg_font_18(d2_handle, hpos, vpos, NORMAL_FONT_SCALING, line);
             snprintf(line, sizeof(line), "Source: %.8s      ", msrc);
             print_bg_font_18(d2_handle, hpos, vpos + INFERENCE_ROW_HEIGHT, NORMAL_FONT_SCALING, line);
-            snprintf(line, sizeof(line), "Faces: %u      ", (unsigned) n);
-            print_bg_font_18(d2_handle, hpos, vpos + INFERENCE_ROW_HEIGHT*2, NORMAL_FONT_SCALING, line);
-            if (n > 0)
+            if (classifier)
             {
-                int16_t x, y, w, h; float score;
-                face_detection_box_get(0, &x, &y, &w, &h, &score);
-                snprintf(line, sizeof(line), "Best: %02d%%      ", (int)(score * 100.0f));
+                snprintf(line, sizeof(line), "Class: %.13s      ", clabel);
+                print_bg_font_18(d2_handle, hpos, vpos + INFERENCE_ROW_HEIGHT*2, NORMAL_FONT_SCALING, line);
+                snprintf(line, sizeof(line), "Score: %02d%%      ", cpct);
             }
             else
             {
-                snprintf(line, sizeof(line), "Best: --      ");
+                snprintf(line, sizeof(line), "Faces: %u      ", (unsigned) n);
+                print_bg_font_18(d2_handle, hpos, vpos + INFERENCE_ROW_HEIGHT*2, NORMAL_FONT_SCALING, line);
+                if (n > 0)
+                {
+                    int16_t x, y, w, h; float score;
+                    face_detection_box_get(0, &x, &y, &w, &h, &score);
+                    snprintf(line, sizeof(line), "Best: %02d%%      ", (int)(score * 100.0f));
+                }
+                else
+                {
+                    snprintf(line, sizeof(line), "Best: --      ");
+                }
             }
             print_bg_font_18(d2_handle, hpos, vpos + INFERENCE_ROW_HEIGHT*3, NORMAL_FONT_SCALING, line);
             (void) labels;

@@ -40,6 +40,7 @@ extern uint8_t *face_detection_pending_buf(size_t *size);
 extern void face_detection_revert(void);
 extern void face_detection_model_info(const char **name, unsigned *ver,
                                       const char **src, unsigned *size_b);
+extern bool face_detection_class_info(const char **label, int *pct);
 
 #define IOTC_TELEMETRY_PERIOD_S_DEFAULT 10
 
@@ -232,9 +233,22 @@ static void prv_publish_telemetry(void)
     const char *mname; const char *msrc; unsigned mver, msize;
     face_detection_model_info(&mname, &mver, &msrc, &msize);
 
-    iotcl_telemetry_set_number(msg, "vision.face_count", (double) n);
-    iotcl_telemetry_set_number(msg, "vision.score", (double) (top_score * 100.0f));
-    iotcl_telemetry_set_string(msg, "vision.state", (n > 0) ? "face" : "clear");
+    /* Detector models report face count/state; classifier models report the
+     * top-1 ImageNet label in vision.state with its confidence. */
+    const char *class_label = NULL;
+    int class_pct = 0;
+    if (face_detection_class_info(&class_label, &class_pct))
+    {
+        iotcl_telemetry_set_number(msg, "vision.face_count", 0);
+        iotcl_telemetry_set_number(msg, "vision.score", (double) class_pct);
+        iotcl_telemetry_set_string(msg, "vision.state", class_label);
+    }
+    else
+    {
+        iotcl_telemetry_set_number(msg, "vision.face_count", (double) n);
+        iotcl_telemetry_set_number(msg, "vision.score", (double) (top_score * 100.0f));
+        iotcl_telemetry_set_string(msg, "vision.state", (n > 0) ? "face" : "clear");
+    }
     iotcl_telemetry_set_string(msg, "model.name", mname);
     iotcl_telemetry_set_number(msg, "model.ver", (double) mver);
     iotcl_telemetry_set_string(msg, "model.src", msrc);

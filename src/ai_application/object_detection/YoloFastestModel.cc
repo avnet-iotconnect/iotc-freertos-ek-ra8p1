@@ -33,6 +33,13 @@ bool arm::app::YoloFastestModel::EnlistOperations()
     this->m_opResolver.AddPad();
     this->m_opResolver.AddMaxPool2D();
     this->m_opResolver.AddConcatenation();
+    /* NOTE: pushed models may only use ops linked in here. Both shipped
+     * model families are 100% NPU-resident after vela (single ethos-u op),
+     * so no extra CPU kernels are linked - MRAM is within ~1 KB of full.
+     * A pushed model with CPU-fallback ops is rejected at Init with a
+     * clear "failed to get registration" log. */
+    this->m_opResolver.AddAveragePool2D();
+    this->m_opResolver.AddReshape();
 
 #if 1 /* ARM_NPU: Ethos-U always present on RA8P1 */
     if (kTfLiteOk == this->m_opResolver.AddEthosU()) {

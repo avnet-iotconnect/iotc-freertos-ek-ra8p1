@@ -27,6 +27,7 @@ extern "C" {
 #include "console_output/console_output.h"
 #include "model_store/model_store.h"
 #include "time_counter/time_counter.h"
+#include "../image_classification/Labels.h"
 
 bool face_detection_init(void);
 vision_ai_app_err_t face_detection_run(void);
@@ -53,7 +54,7 @@ extern size_t GetModelLen();
 
 /* Staging area for the ACTIVE model's flatbuffer. Lives in SDRAM like the
  * frame buffers; 16-byte alignment required by TFLM. */
-#define MODEL_STAGING_MAX (1024 * 1024)
+#define MODEL_STAGING_MAX MODEL_MAX_BLOB
 static uint8_t s_model_staging[MODEL_STAGING_MAX] BSP_ALIGN_VARIABLE(16)
     BSP_PLACE_IN_SECTION(BSP_UNINIT_SECTION_PREFIX ".sdram_noinit");
 static size_t s_model_len;
@@ -69,11 +70,21 @@ static char s_model_name[16] = "builtin";
 static uint16_t s_model_ver = 1;
 static char s_model_src[8] = "builtin"; /* builtin | flash | cloud */
 
-/* Tensor arena: worst-case size for the models we intend to hot-swap. */
-static uint8_t s_arena[0x80000] BSP_ALIGN_VARIABLE(16);
+/* Tensor arena: worst-case size for the models we intend to hot-swap
+ * (largest: MobileNet v1 0.5 at ~590 KiB per the vela report). */
+static uint8_t s_arena[0xA0000] BSP_ALIGN_VARIABLE(16);
 
 static arm::app::YoloFastestModel s_model;
 static uint8_t s_gray[FD_INPUT_W * FD_INPUT_H];
+
+/* Model family, decided from the input tensor shape at load time:
+ * 192x192x1 -> YOLO face detector, 224x224x3 -> ImageNet classifier. */
+typedef enum { MODEL_KIND_DETECTOR = 0, MODEL_KIND_CLASSIFIER } model_kind_t;
+static model_kind_t s_model_kind;
+
+/* Latest classification result (classifier models only). */
+static char s_class_label[32] = "-";
+static int s_class_pct;
 
 /* Latest detection results, for telemetry (Phase 3) and display overlay. */
 typedef struct {
@@ -118,8 +129,33 @@ static bool prv_model_apply(size_t len)
         FD_PRINT("FD: TFLM model init FAILED\r\n");
         return false;
     }
-    FD_PRINT("FD: model \"%s\" v%u (%s, %u bytes) loaded, ethos-u delegated: %s\r\n",
+
+    /* Classify the model family by its input shape; reject shapes the
+     * capture pipeline cannot feed. dims = [1, H, W, C]. */
+    TfLiteTensor *in = s_model.GetInputTensor(0);
+    if ((in == NULL) || (in->dims->size != 4)) {
+        FD_PRINT("FD: model rejected: unexpected input tensor\r\n");
+        return false;
+    }
+    int h = in->dims->data[1], w = in->dims->data[2], c = in->dims->data[3];
+    if ((h == FD_INPUT_H) && (w == FD_INPUT_W) && (c == 1) &&
+        (2 == s_model.GetNumOutputs())) {
+        s_model_kind = MODEL_KIND_DETECTOR;
+    } else if ((h == AI_INPUT_IMAGE_HEIGHT) && (w == AI_INPUT_IMAGE_WIDTH) &&
+               (c == 3) && (1 == s_model.GetNumOutputs())) {
+        s_model_kind = MODEL_KIND_CLASSIFIER;
+    } else {
+        FD_PRINT("FD: model rejected: unsupported shape %dx%dx%d/%u-out\r\n",
+                 h, w, c, (unsigned) s_model.GetNumOutputs());
+        return false;
+    }
+    s_box_count = 0;
+    strncpy(s_class_label, "-", sizeof(s_class_label));
+    s_class_pct = 0;
+
+    FD_PRINT("FD: model \"%s\" v%u (%s, %u bytes) loaded: %s, ethos-u: %s\r\n",
              s_model_name, (unsigned) s_model_ver, s_model_src, (unsigned) len,
+             (s_model_kind == MODEL_KIND_CLASSIFIER) ? "classifier" : "face detector",
              s_model.ContainsEthosUOperator() ? "yes" : "no");
     return true;
 }
@@ -233,6 +269,18 @@ extern "C" void face_detection_model_info(const char **name, unsigned *ver,
     if (size_b) { *size_b = (unsigned) s_model_len; }
 }
 
+/* Classifier-mode result. Returns false when a detector model is active
+ * (label/pct untouched). */
+extern "C" bool face_detection_class_info(const char **label, int *pct)
+{
+    if (s_model_kind != MODEL_KIND_CLASSIFIER) {
+        return false;
+    }
+    if (label) { *label = s_class_label; }
+    if (pct) { *pct = s_class_pct; }
+    return true;
+}
+
 /* Called on the AI thread between inferences. */
 static void prv_swap_if_pending(void)
 {
@@ -303,18 +351,34 @@ vision_ai_app_err_t face_detection_run(void)
 
     TfLiteTensor *input = s_model.GetInputTensor(0);
 
-    rgb224_to_gray192((const uint8_t *) model_buffer_int8);
-
-    /* Fill the input tensor: grayscale, then shift to int8 if quantised signed. */
-    const size_t want = (size_t) FD_INPUT_W * FD_INPUT_H;
-    size_t n = (input->bytes < want) ? input->bytes : want;
-    if (s_model.IsDataSigned()) {
-        int8_t *d = input->data.int8;
-        for (size_t i = 0; i < n; i++) {
-            d[i] = (int8_t) ((int) s_gray[i] - 128);
+    if (s_model_kind == MODEL_KIND_CLASSIFIER) {
+        /* The camera thread already provides AI_INPUT_IMAGE_WIDTH^2 RGB888
+         * exactly as the classifier wants it. */
+        const uint8_t *rgb = (const uint8_t *) model_buffer_int8;
+        const size_t want = (size_t) AI_INPUT_IMAGE_WIDTH * AI_INPUT_IMAGE_HEIGHT * 3;
+        size_t n = (input->bytes < want) ? input->bytes : want;
+        if (s_model.IsDataSigned()) {
+            int8_t *d = input->data.int8;
+            for (size_t i = 0; i < n; i++) {
+                d[i] = (int8_t) ((int) rgb[i] - 128);
+            }
+        } else {
+            memcpy(input->data.uint8, rgb, n);
         }
     } else {
-        memcpy(input->data.uint8, s_gray, n);
+        rgb224_to_gray192((const uint8_t *) model_buffer_int8);
+
+        /* Fill the input tensor: grayscale, then shift to int8 if quantised signed. */
+        const size_t want = (size_t) FD_INPUT_W * FD_INPUT_H;
+        size_t n = (input->bytes < want) ? input->bytes : want;
+        if (s_model.IsDataSigned()) {
+            int8_t *d = input->data.int8;
+            for (size_t i = 0; i < n; i++) {
+                d[i] = (int8_t) ((int) s_gray[i] - 128);
+            }
+        } else {
+            memcpy(input->data.uint8, s_gray, n);
+        }
     }
 
     /* Time the NPU invoke with the app's 100 us tick counter: the U55
@@ -330,6 +394,38 @@ vision_ai_app_err_t face_detection_run(void)
 
     if (!inference_ok) {
         return VISION_AI_APP_ERR_AI_INFERENCE;
+    }
+
+    if (s_model_kind == MODEL_KIND_CLASSIFIER) {
+        TfLiteTensor *out = s_model.GetOutputTensor(0);
+        if (out == NULL) {
+            return VISION_AI_APP_ERR_AI_INFERENCE;
+        }
+        /* Top-1 over the (typically 1001-way) quantised class vector. */
+        size_t best = 0;
+        int best_q = -256;
+        for (size_t i = 0; i < out->bytes; i++) {
+            int q = s_model.IsDataSigned() ? (int) out->data.int8[i]
+                                           : (int) out->data.uint8[i];
+            if (q > best_q) {
+                best_q = q;
+                best = i;
+            }
+        }
+        float score = out->params.scale *
+                      ((float) best_q - (float) out->params.zero_point);
+        int pct = (int) (score * 100.0f + 0.5f);
+        const char *label = (best < (size_t) getLabelSize())
+                                ? getLabelPtr()[best] : "?";
+
+        s_box_count = 0;
+        int changed = (0 != strncmp(s_class_label, label, sizeof(s_class_label) - 1));
+        snprintf(s_class_label, sizeof(s_class_label), "%s", label);
+        s_class_pct = pct;
+        if (changed && pct >= 30) {
+            FD_PRINT("IC: %s (%d%%)\r\n", s_class_label, pct);
+        }
+        return VISION_AI_APP_SUCCESS;
     }
 
     TfLiteTensor *outputs[2] = {s_model.GetOutputTensor(0), s_model.GetOutputTensor(1)};
