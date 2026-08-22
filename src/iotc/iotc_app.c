@@ -20,6 +20,7 @@
 #include "iotcl.h"
 #include "iotcl_log.h"
 #include "iotcl_c2d.h"
+#include "iotcl_certs.h"
 #include "iotcl_telemetry.h"
 
 #include "console_output/console_output.h"
@@ -153,8 +154,10 @@ static void prv_on_ota(IotclC2dEventData data)
     size_t cap = 0;
     uint8_t *buf = face_detection_pending_buf(&cap);
     size_t got = 0;
-    /* NULL ca: the signed URL is S3/CloudFront; default CA set covers it. */
-    int rc = iotc_https_download_large(host, res, NULL, 30000, buf, cap, &got);
+    /* The signed model URL is S3 (*.amazonaws.com), which chains to Amazon
+     * Root CA 1 - NOT the GoDaddy root the DRA default covers. */
+    int rc = iotc_https_download_large(host, res, IOTCL_AMAZON_ROOT_CA1,
+                                       30000, buf, cap, &got);
     if (0 != rc)
     {
         IOTC_PRINT("IOTC: model download failed (%d)\r\n", rc);
