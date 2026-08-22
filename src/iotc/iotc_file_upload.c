@@ -220,6 +220,18 @@ static int fu_https_request(const char *method, const char *host,
         IOTCL_ERROR(ts, "FU: TLS connect to %s failed", host);
         return -1;
     }
+    /* Debug: confirm what this session actually negotiated and which client
+     * certificate mbedTLS loaded from the PKCS#11 store. */
+    {
+        extern uint32_t iotv_crc32(const uint8_t *data, size_t len);
+        const mbedtls_x509_crt *cc = &params.sslContext.clientCert;
+        IOTCL_INFO("FU: tls=%s cert_len=%u cert_crc=%08lx",
+                   mbedtls_ssl_get_version(&params.sslContext.context),
+                   (unsigned) cc->raw.len,
+                   (cc->raw.p != NULL)
+                       ? (unsigned long) iotv_crc32(cc->raw.p, cc->raw.len)
+                       : 0UL);
+    }
 
     int rc = -1;
     TransportInterface_t xport = {0};
@@ -580,6 +592,24 @@ static int fetch_credentials(const char *creds_url, const char *client_id,
         return -74; /* -EBADMSG */
     }
     return 0;
+}
+
+/* One-shot diagnostic: exercise only the credentials fetch (step 1). */
+int iotc_fu_selftest(void)
+{
+    IotclMqttConfig *mc = iotcl_mqtt_get_config();
+    struct aws_creds c = {0};
+
+    if (!iotc_fu_available())
+    {
+        IOTCL_INFO("FU: selftest skipped (upload not available)");
+        return -95;
+    }
+    int ret = fetch_credentials(mc->aws.fs_creds_url, mc->client_id, &c);
+    IOTCL_INFO("FU: selftest creds fetch -> %d%s", ret,
+               (0 == ret) ? " (OK)" : "");
+    creds_free(&c);
+    return ret;
 }
 
 /* --------------------------------------------------------------------------

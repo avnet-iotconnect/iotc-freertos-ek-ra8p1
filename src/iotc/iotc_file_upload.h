@@ -49,6 +49,10 @@ void iotc_fu_identity_hook(const char *identity_json);
  * template has File Support enabled and DRA ran). */
 bool iotc_fu_available(void);
 
+/* One-shot diagnostic: run only the credentials-provider fetch and log the
+ * result. Blocking; call from the net thread. Returns 0 or -errno. */
+int iotc_fu_selftest(void);
+
 /*
  * Upload a file and announce it. Blocking (DNS + 2x TLS handshakes + body
  * transfer); call from a worker task, not from the MQTT callback task.

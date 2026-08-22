@@ -843,7 +843,7 @@ extern "C" {
  *
  * Comment this macro to disable support for server name indication in SSL
  */
-#if 0
+#if 1
 #define MBEDTLS_SSL_SERVER_NAME_INDICATION
 #endif
 

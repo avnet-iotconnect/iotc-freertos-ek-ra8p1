@@ -309,6 +309,18 @@ void iotc_app_poll(bool network_up)
                 s_state = IOTC_APP_FAILED; /* TODO: reconnect backoff */
                 break;
             }
+            {
+                /* One-shot after each boot's first connect: exercise the
+                 * Telemetry Files credentials fetch so upload problems show
+                 * on the console without needing a dashboard command. */
+                static bool s_fu_tested;
+                extern int iotc_fu_selftest(void);
+                if (!s_fu_tested)
+                {
+                    s_fu_tested = true;
+                    (void) iotc_fu_selftest();
+                }
+            }
             if (s_snapshot_pending)
             {
                 char result[96];

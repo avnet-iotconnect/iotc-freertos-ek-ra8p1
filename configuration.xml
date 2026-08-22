@@ -2022,7 +2022,7 @@
       <property id="config.arm.mbedtls.mbedtls_ssl_dtls_hello_verify" value="config.arm.mbedtls.mbedtls_ssl_dtls_hello_verify.disabled"/>
       <property id="config.arm.mbedtls.mbedtls_ssl_dtls_client_port_reuse" value="config.arm.mbedtls.mbedtls_ssl_dtls_client_port_reuse.disabled"/>
       <property id="config.arm.mbedtls.mbedtls_ssl_session_tickets" value="config.arm.mbedtls.mbedtls_ssl_session_tickets.disabled"/>
-      <property id="config.arm.mbedtls.mbedtls_ssl_server_name_indication" value="config.arm.mbedtls.mbedtls_ssl_server_name_indication.disabled"/>
+      <property id="config.arm.mbedtls.mbedtls_ssl_server_name_indication" value="config.arm.mbedtls.mbedtls_ssl_server_name_indication.enabled"/>
       <property id="config.arm.mbedtls.mbedtls_x509_trusted_certificate_callback" value="config.arm.mbedtls.mbedtls_x509_trusted_certificate_callback.disabled"/>
       <property id="config.arm.mbedtls.mbedtls_x509_remove_info" value="config.arm.mbedtls.mbedtls_x509_remove_info.disabled"/>
       <property id="config.arm.mbedtls.mbedtls_x509_rsassa_pss_support" value="config.arm.mbedtls.mbedtls_x509_rsassa_pss_support.disabled"/>
