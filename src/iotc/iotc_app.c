@@ -157,9 +157,20 @@ static void prv_on_ota(IotclC2dEventData data)
     uint8_t *buf = face_detection_pending_buf(&cap);
     size_t got = 0;
     /* The signed model URL is S3 (*.amazonaws.com), which chains to Amazon
-     * Root CA 1 - NOT the GoDaddy root the DRA default covers. */
-    int rc = iotc_https_download_large(host, res, IOTCL_AMAZON_ROOT_CA1,
+     * Root CA 1 - NOT the GoDaddy root the DRA default covers. DNS/TLS to
+     * S3 fails transiently now and then; retry a few times before giving
+     * the deployment up. */
+    int rc = -1;
+    for (int attempt = 1; (attempt <= 3) && (0 != rc); attempt++)
+    {
+        if (attempt > 1)
+        {
+            IOTC_PRINT("IOTC: model download retry %d/3\r\n", attempt);
+            vTaskDelay(pdMS_TO_TICKS(3000));
+        }
+        rc = iotc_https_download_large(host, res, IOTCL_AMAZON_ROOT_CA1,
                                        30000, buf, cap, &got);
+    }
     if (0 != rc)
     {
         IOTC_PRINT("IOTC: model download failed (%d)\r\n", rc);
