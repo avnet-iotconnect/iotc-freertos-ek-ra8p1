@@ -25,9 +25,9 @@ extern "C" {
 #define IOTV_HDR_LEN 32
 
 /* Ceiling for one enveloped model (header + .tflite). Must match the
- * SDRAM staging buffer and tools/pack_model.py. Sized for MobileNet v1
- * 0.5 (~1.1 MB vela'd) with headroom; the OSPI slot itself is 8 MB. */
-#define MODEL_MAX_BLOB (2 * 1024 * 1024)
+ * SDRAM staging buffer and tools/pack_model.py. Sized for MobileNet v2
+ * 1.0 (~3.1 MB vela'd) with headroom; the OSPI slot itself is 8 MB. */
+#define MODEL_MAX_BLOB (4 * 1024 * 1024)
 
 #if defined(__GNUC__) || defined(__clang__)
 #define IOTV_PACKED __attribute__((packed))
