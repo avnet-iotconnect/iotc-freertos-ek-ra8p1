@@ -16,6 +16,7 @@
 
 #include "FreeRTOS.h"
 #include "task.h"
+#include "semphr.h"
 #include "core_mqtt.h"
 #include "transport_mbedtls_pkcs11.h"
 #include "core_pkcs11_config.h"
@@ -46,6 +47,10 @@ static volatile bool s_stop;
 static TaskHandle_t s_pump_task;
 static const iotc_mqtt_config_t *s_cfg;
 
+/* coreMQTT is not thread-safe: serialize ProcessLoop vs publish/subscribe. */
+static SemaphoreHandle_t s_api_mutex;
+static StaticSemaphore_t s_api_mutex_buf;
+
 static uint32_t prv_time_ms(void)
 {
     return (uint32_t) (xTaskGetTickCount() * portTICK_PERIOD_MS);
@@ -72,7 +77,9 @@ static void prv_pump(void *arg)
     (void) arg;
     while (!s_stop)
     {
+        xSemaphoreTake(s_api_mutex, portMAX_DELAY);
         MQTTStatus_t st = MQTT_ProcessLoop(&s_mqtt);
+        xSemaphoreGive(s_api_mutex);
         if ((MQTTSuccess != st) && (MQTTNeedMoreBytes != st))
         {
             IOTCL_ERROR(st, "MQTT: process loop error");
@@ -97,6 +104,11 @@ int iotc_mqtt_client_connect(const iotc_mqtt_config_t *cfg)
     }
     s_cfg = cfg;
     s_status_cb = cfg->status_cb;
+
+    if (NULL == s_api_mutex)
+    {
+        s_api_mutex = xSemaphoreCreateMutexStatic(&s_api_mutex_buf);
+    }
 
     memset(&s_tls_params, 0, sizeof(s_tls_params));
     s_net.pParams = &s_tls_params;
@@ -123,6 +135,18 @@ int iotc_mqtt_client_connect(const iotc_mqtt_config_t *cfg)
 
     MQTTFixedBuffer_t fixed = {.pBuffer = s_mqtt_buf, .size = sizeof(s_mqtt_buf)};
     if (MQTTSuccess != MQTT_Init(&s_mqtt, &xport, prv_time_ms, prv_event_cb, &fixed))
+    {
+        TLS_FreeRTOS_Disconnect(&s_net);
+        return -1;
+    }
+
+    /* Required for QoS1: without stateful-QoS records every QoS1 subscribe
+     * and publish returns MQTTBadParameter. */
+    static MQTTPubAckInfo_t s_outgoing_records[10];
+    static MQTTPubAckInfo_t s_incoming_records[10];
+    if (MQTTSuccess != MQTT_InitStatefulQoS(&s_mqtt,
+                                            s_outgoing_records, 10,
+                                            s_incoming_records, 10))
     {
         TLS_FreeRTOS_Disconnect(&s_net);
         return -1;
@@ -155,9 +179,11 @@ int iotc_mqtt_client_connect(const iotc_mqtt_config_t *cfg)
         sub.qos = MQTTQoS1;
         sub.pTopicFilter = cfg->sub_c2d;
         sub.topicFilterLength = (uint16_t) strlen(cfg->sub_c2d);
-        if (MQTTSuccess != MQTT_Subscribe(&s_mqtt, &sub, 1, MQTT_GetPacketId(&s_mqtt)))
+        MQTTStatus_t st = MQTT_Subscribe(&s_mqtt, &sub, 1, MQTT_GetPacketId(&s_mqtt));
+        if (MQTTSuccess != st)
         {
-            IOTCL_ERROR(0, "MQTT: subscribe to c2d failed");
+            IOTCL_ERROR((int) st, "MQTT: subscribe failed");
+            IOTCL_INFO("MQTT: c2d topic was \"%s\"", cfg->sub_c2d);
         }
     }
 
@@ -211,9 +237,12 @@ void iotc_mqtt_client_publish(const char *topic, const char *json_str)
     pub.pPayload = json_str;
     pub.payloadLength = strlen(json_str);
 
-    if (MQTTSuccess != MQTT_Publish(&s_mqtt, &pub, MQTT_GetPacketId(&s_mqtt)))
+    xSemaphoreTake(s_api_mutex, portMAX_DELAY);
+    MQTTStatus_t st = MQTT_Publish(&s_mqtt, &pub, MQTT_GetPacketId(&s_mqtt));
+    xSemaphoreGive(s_api_mutex);
+    if (MQTTSuccess != st)
     {
-        IOTCL_ERROR(0, "MQTT: publish failed");
+        IOTCL_ERROR((int) st, "MQTT: publish failed");
         if (s_status_cb)
         {
             s_status_cb(IOTC_MQTT_EVT_SEND_FAILED);

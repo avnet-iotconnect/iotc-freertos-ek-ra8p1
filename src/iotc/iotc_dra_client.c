@@ -18,6 +18,7 @@
 #include "FreeRTOS.h"
 #include "core_http_client.h"
 #include "transport_mbedtls_pkcs11.h"
+#include "core_pkcs11_config.h"
 
 #include "iotcl.h"
 #include "iotcl_log.h"
@@ -71,7 +72,11 @@ static int https_get_ex(const char *host,
     const char *ca = ca_pem ? ca_pem : s_default_ca;
     creds.pRootCa = (const unsigned char *) ca;
     creds.rootCaSize = ca ? strlen(ca) + 1 : 0;
-    /* no client cert labels: server-auth only */
+    /* The FSP transport configASSERTs that the PKCS#11 labels are non-NULL
+     * even for server-auth-only connections. The client cert is only sent
+     * if the server requests it; DRA endpoints do not. */
+    creds.pClientCertLabel = pkcs11configLABEL_DEVICE_CERTIFICATE_FOR_TLS;
+    creds.pPrivateKeyLabel = pkcs11configLABEL_DEVICE_PRIVATE_KEY_FOR_TLS;
 
     if (timeout_ms <= 0)
     {

@@ -1227,8 +1227,8 @@
       <property id="module.middleware.rm_littlefs_spi_flash.block_cycles" value="1024"/>
       <property id="module.middleware.rm_littlefs_spi_flash.cache_size" value="64"/>
       <property id="module.middleware.rm_littlefs_spi_flash.lookahead_size" value="16"/>
-      <property id="module.middleware.rm_littlefs_spi_flash.address_offset" value="0"/>
-      <property id="module.middleware.rm_littlefs_spi_flash.size" value="33554432"/>
+      <property id="module.middleware.rm_littlefs_spi_flash.address_offset" value="0x02000000"/>
+      <property id="module.middleware.rm_littlefs_spi_flash.size" value="16777216"/>
       <property id="module.middleware.rm_littlefs_spi_flash.poll_status_count" value="0xFFFFFFFF"/>
     </module>
     <module id="module.driver.ospi_on_ospi_b.1211829100">
@@ -1388,7 +1388,7 @@
     <context id="rtos.awsfreertos.thread.0">
       <property id="_symbol" value="net_thread"/>
       <property id="rtos.awsfreertos.thread.name" value="Net Thread"/>
-      <property id="rtos.awsfreertos.thread.stack" value="16384"/>
+      <property id="rtos.awsfreertos.thread.stack" value="32768"/>
       <property id="rtos.awsfreertos.thread.priority" value="2"/>
       <property id="rtos.awsfreertos.thread.context" value="NULL"/>
       <property id="rtos.awsfreertos.thread.allocation" value="rtos.awsfreertos.thread.allocation.static"/>

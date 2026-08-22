@@ -20,6 +20,7 @@
 #include "rm_littlefs_api.h"
 #include "lfs.h"
 #include "aws_dev_mode_key_provisioning.h"
+#include "mbedtls/platform.h"
 
 #include "iotcl.h"
 #include "iotcl_log.h"
@@ -73,6 +74,22 @@ static int prv_provision_identity(const IotConnectAuthInfo *auth)
     params.pucClientPrivateKey = (uint8_t *) auth->cert_info.device_key;
     params.ulClientPrivateKeyLength = (uint32_t) (auth->cert_info.device_key_len
         ? auth->cert_info.device_key_len : strlen(auth->cert_info.device_key) + 1);
+
+    {
+        /* FSP requirement: initialise the crypto hardware, mbedTLS threading
+         * (MBEDTLS_THREADING_ALT) and allocator before any mbedTLS/PSA use. */
+        static bool s_platform_ready;
+        if (!s_platform_ready)
+        {
+            int r = mbedtls_platform_setup(NULL);
+            IOTCL_INFO("IOTC: mbedtls_platform_setup -> %d", r);
+            if (0 != r)
+            {
+                return -1;
+            }
+            s_platform_ready = true;
+        }
+    }
 
     CK_RV rv = vAlternateKeyProvisioning(&params);
     if (CKR_OK != rv)
