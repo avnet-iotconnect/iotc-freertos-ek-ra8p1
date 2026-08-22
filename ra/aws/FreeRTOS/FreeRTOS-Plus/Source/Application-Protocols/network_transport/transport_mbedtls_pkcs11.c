@@ -314,6 +314,16 @@ static TlsTransportStatus_t tlsSetup( NetworkContext_t * pNetworkContext,
         /* Per mbed TLS docs, mbedtls_ssl_config_defaults only fails on memory allocation. */
         returnStatus = TLS_TRANSPORT_INSUFFICIENT_MEMORY;
     }
+    else
+    {
+        /* IOTC patch: cap at TLS 1.2. The AWS IoT credentials-provider
+         * endpoint mishandles client certificates over TLS 1.3 (handshake
+         * completes but the HTTP layer rejects with 403 "Certificate is
+         * invalid on this endpoint"); every endpoint this device talks to
+         * fully supports TLS 1.2 with mutual auth. */
+        mbedtls_ssl_conf_max_tls_version( &( pTlsTransportParams->sslContext.config ),
+                                          MBEDTLS_SSL_VERSION_TLS1_2 );
+    }
 
     #ifdef MBEDTLS_PSA_CRYPTO_C
         mbedtlsError = psa_crypto_init();

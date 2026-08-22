@@ -554,6 +554,11 @@ static int fetch_credentials(const char *creds_url, const char *client_id,
     if (ret != 0 || status != 200)
     {
         IOTCL_ERROR(ret, "FU: credentials GET failed (HTTP %u)", status);
+        IOTCL_ERROR(0, "FU: host=%s path=%s thing=%s", host, path, client_id);
+        if (body_len > 0)
+        {
+            IOTCL_ERROR(0, "FU: server says: %.300s", (char *) s_fu_buf);
+        }
         return (ret != 0) ? ret : -13; /* -EACCES */
     }
 

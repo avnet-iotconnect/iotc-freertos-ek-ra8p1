@@ -166,6 +166,32 @@ static void prv_on_ota(IotclC2dEventData data)
     }
     IOTC_PRINT("IOTC: model downloaded (%u bytes)\r\n", (unsigned) got);
 
+    /* The platform's AI Models upload may serve the file zip-wrapped. Unwrap
+     * a single STORED (uncompressed) entry in place; pack_model.py emits
+     * exactly that. Deflated zips are rejected (no inflate on-device). */
+    if ((got >= 34) && (0 == memcmp(buf, "PK\x03\x04", 4)))
+    {
+        uint16_t method = (uint16_t) (buf[8] | (buf[9] << 8));
+        uint32_t csize = (uint32_t) buf[18] | ((uint32_t) buf[19] << 8) |
+                         ((uint32_t) buf[20] << 16) | ((uint32_t) buf[21] << 24);
+        uint16_t nlen = (uint16_t) (buf[26] | (buf[27] << 8));
+        uint16_t xlen = (uint16_t) (buf[28] | (buf[29] << 8));
+        size_t data_off = 30U + nlen + xlen;
+        if ((method != 0) || (csize == 0) || (data_off + csize > got))
+        {
+            IOTC_PRINT("IOTC: zip is not a STORED archive; repack with pack_model.py\r\n");
+            if (ack_id)
+            {
+                iotcl_mqtt_send_ota_ack(ack_id, IOTCL_C2D_EVT_OTA_DOWNLOAD_FAILED,
+                                        "zip must contain one STORED .iotv entry");
+            }
+            return;
+        }
+        memmove(buf, buf + data_off, csize);
+        got = csize;
+        IOTC_PRINT("IOTC: unwrapped STORED zip -> %u bytes\r\n", (unsigned) got);
+    }
+
     const char *reason = face_detection_request_swap(buf, got);
     if (reason)
     {
