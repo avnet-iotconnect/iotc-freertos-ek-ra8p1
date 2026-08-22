@@ -86,6 +86,28 @@ static model_kind_t s_model_kind;
 static char s_class_label[32] = "-";
 static int s_class_pct;
 
+/*
+ * Map a class index to a display label. The ImageNet table (Labels.c) has
+ * 1000 entries starting at class "Tench"; the stock MobileNet quant models
+ * output 1001 classes with index 0 = background, so those need a -1 shift
+ * (showing the neighbouring class otherwise - looks like random labels).
+ * Tiny 2-class outputs are person detectors (visual wake words layout).
+ */
+static const char *prv_class_label(size_t idx, size_t n_classes)
+{
+    if (n_classes <= 2) {
+        return (idx == 1) ? "person" : "no person";
+    }
+    size_t n_labels = (size_t) getLabelSize();
+    if (n_classes == n_labels + 1) { /* background at index 0 */
+        if (idx == 0) {
+            return "background";
+        }
+        idx--;
+    }
+    return (idx < n_labels) ? getLabelPtr()[idx] : "?";
+}
+
 /* Latest detection results, for telemetry (Phase 3) and display overlay. */
 typedef struct {
     int16_t x, y, w, h; /* in model input coordinates (192x192) */
@@ -141,8 +163,11 @@ static bool prv_model_apply(size_t len)
     if ((h == FD_INPUT_H) && (w == FD_INPUT_W) && (c == 1) &&
         (2 == s_model.GetNumOutputs())) {
         s_model_kind = MODEL_KIND_DETECTOR;
-    } else if ((h == AI_INPUT_IMAGE_HEIGHT) && (w == AI_INPUT_IMAGE_WIDTH) &&
-               (c == 3) && (1 == s_model.GetNumOutputs())) {
+    } else if ((1 == s_model.GetNumOutputs()) && ((c == 1) || (c == 3)) &&
+               (h >= 32) && (h <= AI_INPUT_IMAGE_HEIGHT) &&
+               (w >= 32) && (w <= AI_INPUT_IMAGE_WIDTH)) {
+        /* Any single-output color or grayscale classifier up to the camera
+         * staging size: the input is resampled from the 224x224 RGB frame. */
         s_model_kind = MODEL_KIND_CLASSIFIER;
     } else {
         FD_PRINT("FD: model rejected: unsupported shape %dx%dx%d/%u-out\r\n",
@@ -352,18 +377,32 @@ vision_ai_app_err_t face_detection_run(void)
     TfLiteTensor *input = s_model.GetInputTensor(0);
 
     if (s_model_kind == MODEL_KIND_CLASSIFIER) {
-        /* The camera thread already provides AI_INPUT_IMAGE_WIDTH^2 RGB888
-         * exactly as the classifier wants it. */
+        /* Resample the camera thread's 224x224 RGB888 staging frame to the
+         * classifier's input (any WxH, RGB or luma), nearest-neighbour.
+         * int8-quantised inputs take value-128, done as ^0x80. */
         const uint8_t *rgb = (const uint8_t *) model_buffer_int8;
-        const size_t want = (size_t) AI_INPUT_IMAGE_WIDTH * AI_INPUT_IMAGE_HEIGHT * 3;
-        size_t n = (input->bytes < want) ? input->bytes : want;
-        if (s_model.IsDataSigned()) {
-            int8_t *d = input->data.int8;
-            for (size_t i = 0; i < n; i++) {
-                d[i] = (int8_t) ((int) rgb[i] - 128);
+        const int th = input->dims->data[1];
+        const int tw = input->dims->data[2];
+        const int tc = input->dims->data[3];
+        const uint8_t flip = s_model.IsDataSigned() ? 0x80 : 0x00;
+        uint8_t *dst = input->data.uint8; /* aliases data.int8 */
+        size_t o = 0;
+        for (int y = 0; y < th; y++) {
+            const int sy = (y * AI_INPUT_IMAGE_HEIGHT) / th;
+            const uint8_t *row = rgb + (size_t) sy * AI_INPUT_IMAGE_WIDTH * 3;
+            for (int x = 0; x < tw; x++) {
+                const uint8_t *px =
+                    row + (size_t) ((x * AI_INPUT_IMAGE_WIDTH) / tw) * 3;
+                if (tc == 3) {
+                    dst[o++] = (uint8_t) (px[0] ^ flip);
+                    dst[o++] = (uint8_t) (px[1] ^ flip);
+                    dst[o++] = (uint8_t) (px[2] ^ flip);
+                } else {
+                    uint8_t g8 = (uint8_t) ((77u * px[0] + 150u * px[1] +
+                                             29u * px[2]) >> 8);
+                    dst[o++] = (uint8_t) (g8 ^ flip);
+                }
             }
-        } else {
-            memcpy(input->data.uint8, rgb, n);
         }
     } else {
         rgb224_to_gray192((const uint8_t *) model_buffer_int8);
@@ -401,10 +440,11 @@ vision_ai_app_err_t face_detection_run(void)
         if (out == NULL) {
             return VISION_AI_APP_ERR_AI_INFERENCE;
         }
-        /* Top-1 over the (typically 1001-way) quantised class vector. */
+        /* Top-1 over the quantised class vector. */
+        size_t n_classes = out->bytes;
         size_t best = 0;
         int best_q = -256;
-        for (size_t i = 0; i < out->bytes; i++) {
+        for (size_t i = 0; i < n_classes; i++) {
             int q = s_model.IsDataSigned() ? (int) out->data.int8[i]
                                            : (int) out->data.uint8[i];
             if (q > best_q) {
@@ -415,8 +455,7 @@ vision_ai_app_err_t face_detection_run(void)
         float score = out->params.scale *
                       ((float) best_q - (float) out->params.zero_point);
         int pct = (int) (score * 100.0f + 0.5f);
-        const char *label = (best < (size_t) getLabelSize())
-                                ? getLabelPtr()[best] : "?";
+        const char *label = prv_class_label(best, n_classes);
 
         s_box_count = 0;
         int changed = (0 != strncmp(s_class_label, label, sizeof(s_class_label) - 1));
