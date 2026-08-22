@@ -2,8 +2,9 @@
  * Copyright (c) 2026 Avnet, Inc.
  * SPDX-License-Identifier: MIT
  *
- * Minimal grayscale PNG encoder (deflate "stored" blocks, no compression).
- * Ported from the Avnet Zephyr vision-occupancy demo to plain C.
+ * Minimal PNG encoder (deflate "stored" blocks, no compression) for 8-bit
+ * grayscale (1 channel) or RGB truecolor (3 channels) images. Ported from
+ * the Avnet Zephyr vision-occupancy demo (grayscale) and generalized.
  */
 #include <string.h>
 
@@ -61,25 +62,30 @@ static void put_chunk(struct png_writer *w, const char tag[4],
     }
 }
 
-int png_gray_encode(const uint8_t *gray, uint16_t w, uint16_t h,
-                    uint8_t *out, size_t out_size)
+int png_encode(const uint8_t *pixels, uint16_t w, uint16_t h,
+               uint8_t channels, uint8_t *out, size_t out_size)
 {
     static const uint8_t magic[8] = {0x89, 'P', 'N', 'G', '\r', '\n', 0x1a, '\n'};
     struct png_writer pw = {.buf = out, .cap = out_size};
     uint8_t ihdr[13];
 
+    if ((channels != 1) && (channels != 3)) {
+        return -22; /* EINVAL */
+    }
+    size_t rowbytes = (size_t) w * channels;
+
     put_bytes(&pw, magic, sizeof(magic));
 
     be32(w, &ihdr[0]);
     be32(h, &ihdr[4]);
-    ihdr[8] = 8;  /* bit depth */
-    ihdr[9] = 0;  /* color type: grayscale */
-    ihdr[10] = 0; /* compression */
-    ihdr[11] = 0; /* filter */
-    ihdr[12] = 0; /* interlace */
+    ihdr[8] = 8;                             /* bit depth */
+    ihdr[9] = (channels == 3) ? 2 : 0;       /* color type: RGB / grayscale */
+    ihdr[10] = 0;                            /* compression */
+    ihdr[11] = 0;                            /* filter */
+    ihdr[12] = 0;                            /* interlace */
     put_chunk(&pw, "IHDR", ihdr, sizeof(ihdr));
 
-    size_t raw_total = ((size_t) w + 1) * h;
+    size_t raw_total = (rowbytes + 1) * h;   /* +1 filter byte per row */
     size_t idat_len_pos = pw.len;
 
     put_be32(&pw, 0); /* patched below */
@@ -92,8 +98,8 @@ int png_gray_encode(const uint8_t *gray, uint16_t w, uint16_t h,
 
     uint32_t adler_a = 1, adler_b = 0;
     size_t emitted = 0;
-    uint16_t row = 0;
-    uint16_t col = 0;
+    uint32_t row = 0;
+    uint32_t col = 0; /* 0 = filter byte, 1..rowbytes = pixel bytes */
 
     while (emitted < raw_total) {
         size_t block = raw_total - emitted;
@@ -114,8 +120,8 @@ int png_gray_encode(const uint8_t *gray, uint16_t w, uint16_t h,
                 byte = 0; /* filter: none */
                 col = 1;
             } else {
-                byte = gray[(size_t) row * w + (col - 1)];
-                if (++col == (uint16_t) (w + 1)) {
+                byte = pixels[(size_t) row * rowbytes + (col - 1)];
+                if (++col == rowbytes + 1) {
                     col = 0;
                     row++;
                 }
