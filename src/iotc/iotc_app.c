@@ -245,13 +245,13 @@ void iotc_app_poll(bool network_up)
 
                 if (0 != iotconnect_sdk_init(&cfg))
                 {
-                    IOTC_PRINT("IOTC: init failed\r\n");
+                    IOTC_PRINT("IOTC: init failed (will retry)\r\n");
                     s_state = IOTC_APP_FAILED;
                     break;
                 }
                 if (0 != iotconnect_sdk_connect())
                 {
-                    IOTC_PRINT("IOTC: MQTT connect failed\r\n");
+                    IOTC_PRINT("IOTC: MQTT connect failed (will retry)\r\n");
                     s_state = IOTC_APP_FAILED;
                     break;
                 }
@@ -275,8 +275,25 @@ void iotc_app_poll(bool network_up)
             }
             break;
 
-        case IOTC_APP_STARTING:
         case IOTC_APP_FAILED:
+        {
+            /* Retry from scratch after a backoff. */
+            static TickType_t s_fail_at;
+            if (0 == s_fail_at)
+            {
+                s_fail_at = xTaskGetTickCount();
+            }
+            else if ((xTaskGetTickCount() - s_fail_at) >= pdMS_TO_TICKS(20000))
+            {
+                s_fail_at = 0;
+                iotconnect_sdk_deinit();
+                s_state = IOTC_APP_IDLE;
+                IOTC_PRINT("IOTC: retrying\r\n");
+            }
+            break;
+        }
+
+        case IOTC_APP_STARTING:
         default:
             break;
     }

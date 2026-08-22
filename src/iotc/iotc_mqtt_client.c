@@ -237,6 +237,14 @@ void iotc_mqtt_client_publish(const char *topic, const char *json_str)
     pub.pPayload = json_str;
     pub.payloadLength = strlen(json_str);
 
+    /* Debug: show the first few outbound payloads. */
+    static uint32_t s_dbg_prints;
+    if (s_dbg_prints < 3)
+    {
+        s_dbg_prints++;
+        IOTCL_INFO("MQTT TX [%s]: %.220s", topic, json_str);
+    }
+
     xSemaphoreTake(s_api_mutex, portMAX_DELAY);
     MQTTStatus_t st = MQTT_Publish(&s_mqtt, &pub, MQTT_GetPacketId(&s_mqtt));
     xSemaphoreGive(s_api_mutex);

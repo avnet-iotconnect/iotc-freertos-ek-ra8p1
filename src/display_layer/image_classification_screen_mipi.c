@@ -132,16 +132,16 @@ void do_image_classification_screen(bool ai_result_new)
             d2_startframe(d2_handle);
 
 
-            print_bg_font_18(d2_handle, 20,  25, IMAGE_CLASSIFICATION_FONT_SCALING, (char*)"Image Classification");
+            print_bg_font_18(d2_handle, 20,  25, IMAGE_CLASSIFICATION_FONT_SCALING, (char*)"/IOTCONNECT");
 
-            print_bg_font_18(d2_handle, 20,  95, DISPLAY_FONT_SCALING, (char*)"Model: MobileNet V1 0.25");
-           
-            print_bg_font_18(d2_handle, 20,  135, DISPLAY_FONT_SCALING, (char*)"Dataset: ImageNet");
+            print_bg_font_18(d2_handle, 20,  95, DISPLAY_FONT_SCALING, (char*)"Face Detection");
+
+            print_bg_font_18(d2_handle, 20,  135, DISPLAY_FONT_SCALING, (char*)"Ethos-U55 NPU");
 
             /*show inference time in ms*/
             print_bg_font_18(d2_handle, 20, 205, DISPLAY_FONT_SCALING, (char*)"Ethos-U Inference Time:");
 
-            print_bg_font_18(d2_handle, 20, 305, DISPLAY_FONT_SCALING, (char*)"Inference Result: ");
+            print_bg_font_18(d2_handle, 20, 305, DISPLAY_FONT_SCALING, (char*)"Detections: ");
 
             /* Enable the back light */
             R_IOPORT_PinWrite(&g_ioport_ctrl, DISP_BLEN, BSP_IO_LEVEL_HIGH);
@@ -149,24 +149,37 @@ void do_image_classification_screen(bool ai_result_new)
         }
         else if(ai_result_new)
         {
+            extern uint32_t face_detection_box_count(void);
+            extern void face_detection_box_get(uint32_t i, int16_t *x, int16_t *y,
+                                               int16_t *w, int16_t *h, float *score);
+            extern void face_detection_model_info(const char **name, unsigned *ver,
+                                                  const char **src, unsigned *size_b);
 
             print_inf_time();
-            for(uint8_t i = 0; i < AI_MAX_DETECTION_NUM; i++)
+
+            const char *mname; const char *msrc; unsigned mver, msize;
+            face_detection_model_info(&mname, &mver, &msrc, &msize);
+            uint32_t n = face_detection_box_count();
+
+            char line[40];
+            snprintf(line, sizeof(line), "Model: %.12s v%u      ", mname, mver);
+            print_bg_font_18(d2_handle, hpos, vpos, NORMAL_FONT_SCALING, line);
+            snprintf(line, sizeof(line), "Source: %.8s      ", msrc);
+            print_bg_font_18(d2_handle, hpos, vpos + INFERENCE_ROW_HEIGHT, NORMAL_FONT_SCALING, line);
+            snprintf(line, sizeof(line), "Faces: %u      ", (unsigned) n);
+            print_bg_font_18(d2_handle, hpos, vpos + INFERENCE_ROW_HEIGHT*2, NORMAL_FONT_SCALING, line);
+            if (n > 0)
             {
-
-                char processed_str[MAX_STR_LEN] = {0};
-
-                process_str(labels[g_ai_classification[i].category], processed_str, MAX_STR_LEN);
-                sprintf(local_str[i],"%s            ", processed_str);
-                local_str[i][MAX_STR_LEN] = '\0';
-                memset(&local_str[i][strlen(processed_str)], ' ', strlen(local_str[i])-1);
-
-                sprintf(local_prob[i],"%02d%%  ", (size_t)(g_ai_classification[i].prob * 100.0f));
-                local_prob[i][5] = '\0';
-                print_bg_font_18(d2_handle, hpos, vpos + INFERENCE_ROW_HEIGHT*i, NORMAL_FONT_SCALING, (char*)local_prob[i]);
-                print_bg_font_18(d2_handle, hpos + PERCENTAGE_OFF, vpos + INFERENCE_ROW_HEIGHT*i, NORMAL_FONT_SCALING, (char*)local_str[i]);
+                int16_t x, y, w, h; float score;
+                face_detection_box_get(0, &x, &y, &w, &h, &score);
+                snprintf(line, sizeof(line), "Best: %02d%%      ", (int)(score * 100.0f));
             }
-
+            else
+            {
+                snprintf(line, sizeof(line), "Best: --      ");
+            }
+            print_bg_font_18(d2_handle, hpos, vpos + INFERENCE_ROW_HEIGHT*3, NORMAL_FONT_SCALING, line);
+            (void) labels;
         }
         d2_endframe(d2_handle);
         d2_flushframe(d2_handle);
