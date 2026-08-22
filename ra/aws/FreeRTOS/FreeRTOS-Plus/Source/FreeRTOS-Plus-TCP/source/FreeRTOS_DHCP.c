@@ -207,6 +207,7 @@
         {
             /* No need to initialise 'pucUDPPayload', it just looks nicer. */
             uint8_t * pucUDPPayload = NULL;
+            uint8_t * pucPrevUDPPayload = NULL; /* patched: loop-breaker */
             const DHCPMessage_IPv4_t * pxDHCPMessage;
             int32_t lBytes;
 
@@ -217,6 +218,27 @@
 
                 /* Peek the next UDP message. */
                 lBytes = FreeRTOS_recvfrom( EP_DHCPData.xDHCPSocket, &( pucUDPPayload ), 0, xRecvFlags, NULL, NULL );
+
+                /* Patched from FSP original: if the endpoint's state machine
+                 * declines to consume a peeked message (state mismatch), the
+                 * same message is peeked forever and this loop spins at IP-task
+                 * priority, starving the system. Consume and discard a message
+                 * that made no progress. */
+                if( ( lBytes >= ( ( int32_t ) sizeof( DHCPMessage_IPv4_t ) ) ) &&
+                    ( pucUDPPayload == pucPrevUDPPayload ) )
+                {
+                    lBytes = FreeRTOS_recvfrom( EP_DHCPData.xDHCPSocket, &( pucUDPPayload ), 0, FREERTOS_ZERO_COPY, NULL, NULL );
+
+                    if( ( lBytes > 0 ) && ( pucUDPPayload != NULL ) )
+                    {
+                        FreeRTOS_ReleaseUDPPayloadBuffer( pucUDPPayload );
+                    }
+
+                    pucPrevUDPPayload = NULL;
+                    continue;
+                }
+
+                pucPrevUDPPayload = ( lBytes >= ( ( int32_t ) sizeof( DHCPMessage_IPv4_t ) ) ) ? pucUDPPayload : NULL;
 
                 if( lBytes < ( ( int32_t ) sizeof( DHCPMessage_IPv4_t ) ) )
                 {

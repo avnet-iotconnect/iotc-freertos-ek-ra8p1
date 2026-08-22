@@ -379,8 +379,8 @@ const ether_phy_instance_t g_rmac_phy0 =
 };
 layer3_switch_instance_ctrl_t g_layer3_switch0_ctrl;
 
-uint8_t g_layer3_switch0_mac_address_port0[6] = { 0x00,0x11,0x22,0x33,0x44,0x55 };
-uint8_t g_layer3_switch0_mac_address_port1[6] = { 0x00,0x11,0x22,0x33,0x44,0x55 };
+uint8_t g_layer3_switch0_mac_address_port0[6] = { 0x02,0x8A,0x9B,0x71,0x04,0xD2 };
+uint8_t g_layer3_switch0_mac_address_port1[6] = { 0x02,0x8A,0x9B,0x71,0x04,0xD2 };
 layer3_switch_l3_filter_t g_layer3_switch0_l3_filter_list[10];
 
 #define RA_NOT_DEFINED (1)
@@ -541,7 +541,7 @@ const ether_switch_instance_t g_layer3_switch0 =
 rmac_instance_ctrl_t g_ether0_ctrl;
             static rmac_buffer_node_t g_ether0_buffer_node_list[24];
 
-            uint8_t g_ether0_mac_address[6] = { 0x00,0x11,0x22,0x33,0x44,0x55 };
+            uint8_t g_ether0_mac_address[6] = { 0x02,0x8A,0x9B,0x71,0x04,0xD2 };
 
             layer3_switch_ts_reception_process_descriptor_t g_ether0_ts_descriptor_array0[8];rmac_queue_info_t g_ether0_ts_queue[1] =
  {

@@ -94,7 +94,7 @@
       <property id="config.bsp.fsp.mcu.adc_dmac.samples_per_channel" value="32767"/>
       <property id="config.bsp.fsp.mcu.sci_b_lin.max_baud" value="7812500"/>
       <property id="config.bsp.fsp.mcu.ospi_b.spi_dspi_qspi_mode_max_freq_hz" value="120000000"/>
-      <property id="config.bsp.fsp.dcache" value="config.bsp.fsp.dcache.enabled"/>
+      <property id="config.bsp.fsp.dcache" value="config.bsp.fsp.dcache.disabled"/>
       <property id="config.bsp.fsp.mscr.forcewt" value="config.bsp.fsp.mscr.forcewt.disabled"/>
       <property id="config.bsp.fsp.mcu.rtc.err_adjustment_value.max_value" value="63"/>
     </config>
@@ -350,14 +350,14 @@
     <node id="board.clock.adcclk.source" option="board.clock.adcclk.source.disabled"/>
     <node id="board.clock.adcclk.div" option="board.clock.adcclk.div.4"/>
     <node id="board.clock.adcclk.display" option="board.clock.adcclk.display.value"/>
-    <node id="board.clock.eswclk.source" option="board.clock.eswclk.source.disabled"/>
+    <node id="board.clock.eswclk.source" option="board.clock.eswclk.source.pll1p"/>
     <node id="board.clock.eswclk.div" option="board.clock.eswclk.div.4"/>
     <node id="board.clock.eswclk.display" option="board.clock.eswclk.display.value"/>
-    <node id="board.clock.eswphyclk.source" option="board.clock.eswphyclk.source.disabled"/>
+    <node id="board.clock.eswphyclk.source" option="board.clock.eswphyclk.source.pll1p"/>
     <node id="board.clock.eswphyclk.div" option="board.clock.eswphyclk.div.2"/>
     <node id="board.clock.eswphyclk.display" option="board.clock.eswphyclk.display.value"/>
-    <node id="board.clock.ethphyclk.source" option="board.clock.ethphyclk.source.disabled"/>
-    <node id="board.clock.ethphyclk.div" option="board.clock.ethphyclk.div.32"/>
+    <node id="board.clock.ethphyclk.source" option="board.clock.ethphyclk.source.pll1r"/>
+    <node id="board.clock.ethphyclk.div" option="board.clock.ethphyclk.div.16"/>
     <node id="board.clock.ethphyclk.display" option="board.clock.ethphyclk.display.value"/>
   </raClockConfiguration>
   <raComponentSelection>
@@ -1089,7 +1089,7 @@
       <property id="module.driver.ether.padding" value="module.driver.ether.padding.0"/>
       <property id="module.driver.ether.padding_offset" value="0"/>
       <property id="module.driver.ether.broadcast_filter" value="0"/>
-      <property id="module.driver.ether.mac_address" value="00:11:22:33:44:55"/>
+      <property id="module.driver.ether.mac_address" value="02:8A:9B:71:04:D2"/>
       <property id="module.driver.rmac.tx_queue_length" value="4"/>
       <property id="module.driver.rmac.rx_queue_length" value="4"/>
       <property id="module.driver.rmac.tx_queue_num" value="2"/>
@@ -1118,8 +1118,8 @@
       <property id="module.driver.layer3_switch.p_frame_queue_port1" value=""/>
       <property id="module.driver.layer3_switch.frame_preemption_fragment_size_port0" value="module.driver.layer3_switch.frame_preemption_fragment_size_port0.64"/>
       <property id="module.driver.layer3_switch.frame_preemption_fragment_size_port1" value="module.driver.layer3_switch.frame_preemption_fragment_size_port1.64"/>
-      <property id="module.driver.layer3_switch.mac_address0" value="00:11:22:33:44:55"/>
-      <property id="module.driver.layer3_switch.mac_address1" value="00:11:22:33:44:55"/>
+      <property id="module.driver.layer3_switch.mac_address0" value="02:8A:9B:71:04:D2"/>
+      <property id="module.driver.layer3_switch.mac_address1" value="02:8A:9B:71:04:D2"/>
       <property id="module.driver.layer3_switch.queue0_depth_port0" value="64"/>
       <property id="module.driver.layer3_switch.queue1_depth_port0" value="64"/>
       <property id="module.driver.layer3_switch.queue2_depth_port0" value="64"/>
@@ -2909,6 +2909,9 @@
       <configSetting altId="p808.ospi0.om_0_sclk" configurationId="p808"/>
       <configSetting altId="p808.gpio_speed.gpio_speed_hh" configurationId="p808.gpio_drivecapacity"/>
       <configSetting altId="p808.gpio_mode.gpio_mode_peripheral" configurationId="p808.gpio_mode"/>
+    <configSetting altId="p708.output.high" configurationId="p708"/>
+      <configSetting altId="p708.gpio_speed.gpio_speed_m" configurationId="p708.gpio_drivecapacity"/>
+      <configSetting altId="p708.gpio_mode.gpio_mode_out.high" configurationId="p708.gpio_mode"/>
     </pincfg>
     <pincfg active="false" name="R7KA8P1KFLCAC.pincfg" selected="false" symbol="">
       <configSetting altId="jtag_fslash_swd.mode.jtag.free" configurationId="jtag_fslash_swd.mode"/>

@@ -80,6 +80,7 @@
         </peripheral>
         <peripheral name="PORT7.CPU0" group="PORT">
             <slot name="P707.CPU0" secure="true"/>
+            <slot name="P708.CPU0" secure="true"/>
             <slot name="P709.CPU0" secure="true"/>
             <slot name="P711.CPU0" secure="true"/>
             <slot name="P712.CPU0" secure="true"/>

@@ -19,6 +19,8 @@
 
 #include "common_util.h"
 #include "console_output.h"
+#include "FreeRTOS.h"
+#include "semphr.h"
 
 
 /***************************************************************************************************************************
@@ -126,23 +128,34 @@ static fsp_err_t console_output_write(const char *buffer)
 {
     fsp_err_t err = FSP_SUCCESS;
 
+    /* Serialize writers: multiple tasks (vision, display, net, iotc) print;
+     * a write() while the UART is busy would return FSP_ERR_IN_USE and trap. */
+    static SemaphoreHandle_t s_console_mutex;
+    static StaticSemaphore_t s_console_mutex_buf;
+    if (NULL == s_console_mutex)
+    {
+        s_console_mutex = xSemaphoreCreateMutexStatic(&s_console_mutex_buf);
+    }
+    xSemaphoreTake(s_console_mutex, portMAX_DELAY);
 
     g_transfer_complete = false;
 
     err = g_console_output_uart.p_api->write(g_console_output_uart.p_ctrl, (uint8_t *)buffer, strlen(buffer));
     if (FSP_SUCCESS != err)
     {
-    	handle_error(VISION_AI_APP_ERR_CONSOLE_WRITE);
-    	APP_ERROR_TRAP(VISION_AI_APP_ERR_CONSOLE_WRITE);
+        xSemaphoreGive(s_console_mutex);
+        handle_error(VISION_AI_APP_ERR_CONSOLE_WRITE);
+        return err;
     }
 
-    while (!g_transfer_complete)
+    /* Bounded wait: a lost TX-complete event must cost one line, not hang
+     * every future print behind the mutex. */
+    for (uint32_t i = 0; (i < 200) && !g_transfer_complete; i++)
     {
-
         vTaskDelay(1);
-
     }
 
+    xSemaphoreGive(s_console_mutex);
     return err;
 }
 

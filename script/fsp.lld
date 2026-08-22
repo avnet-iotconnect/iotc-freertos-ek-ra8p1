@@ -4,3 +4,25 @@
 
 INCLUDE memory_regions.lld
 INCLUDE fsp_gen.lld
+
+/*
+ * Ethernet DMA descriptors and frame buffers must be non-cacheable: the FSP
+ * r_rmac/r_layer3_switch drivers perform no cache maintenance, and the GWCA
+ * bus master updates descriptors behind the CM85 D-cache. This section is
+ * placed between __ram_noinit_nocache$$ and __ram_zero_nocache$$; the BSP
+ * programs one MPU non-cacheable region spanning
+ * [__ram_noinit_nocache$$Base, __ram_zero_nocache$$Limit], so everything
+ * here is covered (see bsp_linker_info.h nocache_list).
+ */
+SECTIONS
+{
+  .ram_ether_nocache ALIGN(32) (NOLOAD) :
+  {
+    *(.bss.g_ether0_tx_descriptor_array*)
+    *(.bss.g_ether0_rx_descriptor_array*)
+    *(.bss.g_ether0_ts_descriptor_array*)
+    *(.bss.g_ether0_ether_buffer*)
+    *(.bss.g_ether0_buffer_node_list)
+    . = ALIGN(32);
+  } > RAM
+} INSERT AFTER __ram_noinit_nocache$$

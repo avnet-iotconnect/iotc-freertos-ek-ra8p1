@@ -386,8 +386,12 @@ static BaseType_t prvNetworkInterfaceInput (NetworkInterface_t * pxInterface) {
         pxBufferDescriptor->pxEndPoint  =
             FreeRTOS_MatchingEndpoint(pxInterface, pxBufferDescriptor->pucEthernetBuffer);
 
-        /* When driver received any data. */
-        if ((FSP_SUCCESS == err) || (FSP_ERR_ETHER_ERROR_NO_DATA == err))
+        /* When driver received any data. NOTE: patched from the FSP original,
+         * which also accepted FSP_ERR_ETHER_ERROR_NO_DATA here - the recycled
+         * buffer still holds the previous frame, so the MAC checks pass and a
+         * zero-length event loops between the RX and IP tasks forever,
+         * starving every lower-priority task. */
+        if ((FSP_SUCCESS == err) && (xBytesReceived > 0))
         {
             if ((pxBufferDescriptor->pxEndPoint != NULL) &&
                 (eConsiderFrameForProcessing(pxBufferDescriptor->pucEthernetBuffer) == eProcessBuffer))
