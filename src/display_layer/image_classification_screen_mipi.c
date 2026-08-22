@@ -70,18 +70,17 @@ static char local_prob[5][8] = {0};
 static void print_inf_time(void)
 {
     extern volatile uint32_t g_ai_inference_time_us;
-    uint32_t time = g_ai_inference_time_us;
-    if (time > 9999) {
-        time = 9999;
-    }
+    uint32_t us = g_ai_inference_time_us;
+    uint32_t infer_fps = (us > 0) ? (1000000U / us) : 0;
+    uint32_t cam_ms = application_processing_time.camera_image_capture_time_ms;
+    uint32_t cam_fps = (cam_ms > 0) ? (1000U / cam_ms) : 0;
 
-    // update string on display
-    char time_str[8] = {'0', '0', '0', '0', ' ', 'u', 's', '\0'};
-    time_str[0] += (char)(time / 1000);
-    time_str[1] += (char)((time / 100) % 10);
-    time_str[2] += (char)((time / 10) % 10);
-    time_str[3] += (char)(time % 10);
-    print_bg_font_18(d2_handle, 160, 245, DISPLAY_FONT_SCALING, (char*)time_str);
+    char buf[36];
+    snprintf(buf, sizeof(buf), "%lu us / %lu fps    ",
+             (unsigned long) us, (unsigned long) infer_fps);
+    print_bg_font_18(d2_handle, 20, 245, NORMAL_FONT_SCALING, buf);
+    snprintf(buf, sizeof(buf), "Camera: %lu fps    ", (unsigned long) cam_fps);
+    print_bg_font_18(d2_handle, 20, 272, NORMAL_FONT_SCALING, buf);
 }
 
 /*********************************************************************************************************************

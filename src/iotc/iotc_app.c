@@ -24,6 +24,7 @@
 #include "iotcl_telemetry.h"
 
 #include "console_output/console_output.h"
+#include "common/common_util.h" /* application_processing_time */
 
 #include "iotc_dra_client.h"
 #include "iotc_snapshot.h"
@@ -238,6 +239,16 @@ static void prv_publish_telemetry(void)
     iotcl_telemetry_set_number(msg, "model.ver", (double) mver);
     iotcl_telemetry_set_string(msg, "model.src", msrc);
     iotcl_telemetry_set_number(msg, "model.size_b", (double) msize);
+    {
+        extern volatile uint32_t g_ai_inference_time_us;
+        uint32_t infer_us = g_ai_inference_time_us;
+        uint32_t infer_fps = (infer_us > 0) ? (1000000U / infer_us) : 0;
+        uint32_t cam_ms = application_processing_time.camera_image_capture_time_ms;
+        uint32_t cam_fps = (cam_ms > 0) ? (1000U / cam_ms) : 0;
+        iotcl_telemetry_set_number(msg, "perf.infer_us", (double) infer_us);
+        iotcl_telemetry_set_number(msg, "perf.infer_fps", (double) infer_fps);
+        iotcl_telemetry_set_number(msg, "perf.cam_fps", (double) cam_fps);
+    }
     iotcl_telemetry_set_number(msg, "sys.uptime_s",
                                (double) (xTaskGetTickCount() / configTICK_RATE_HZ));
     iotcl_telemetry_set_number(msg, "sys.free_heap", (double) xPortGetFreeHeapSize());

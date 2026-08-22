@@ -9,6 +9,8 @@
 
 #include "bsp_api.h"
 
+#include "common/common_util.h" /* application_processing_time */
+
 #include "iotc_snapshot.h"
 #include "iotc_file_upload.h"
 #include "iotc_time.h"
@@ -137,9 +139,21 @@ int iotc_snapshot_capture_upload(char *msg, size_t msg_size)
     snprintf(name, sizeof(name), "snap-%lu.png",
              (unsigned long) iotc_time_now());
 
-    char cf[96];
-    snprintf(cf, sizeof(cf), "{\"face_count\":%u,\"score\":%d}",
-             (unsigned) n, (int) (top_score * 100.0f));
+    /* Classification metadata shown on the file card: detections plus the
+     * live performance metrics at capture time. */
+    extern volatile uint32_t g_ai_inference_time_us;
+    uint32_t infer_us = g_ai_inference_time_us;
+    uint32_t infer_fps = (infer_us > 0) ? (1000000U / infer_us) : 0;
+    uint32_t cam_ms = application_processing_time.camera_image_capture_time_ms;
+    uint32_t cam_fps = (cam_ms > 0) ? (1000U / cam_ms) : 0;
+
+    char cf[160];
+    snprintf(cf, sizeof(cf),
+             "{\"face_count\":%u,\"score\":%d,\"infer_us\":%lu,"
+             "\"infer_fps\":%lu,\"cam_fps\":%lu}",
+             (unsigned) n, (int) (top_score * 100.0f),
+             (unsigned long) infer_us, (unsigned long) infer_fps,
+             (unsigned long) cam_fps);
 
     int rc = iotc_fu_upload(name, s_png, (size_t) png_len, "image/png", cf);
     if (msg) {

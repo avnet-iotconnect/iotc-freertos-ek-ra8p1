@@ -76,6 +76,38 @@
    ]
   },
   {
+   "name": "perf",
+   "displayName": "Performance",
+   "type": "OBJECT",
+   "description": "Live pipeline performance metrics",
+   "childs": [
+    {
+     "name": "infer_us",
+     "displayName": "Inference time",
+     "type": "DECIMAL",
+     "description": "Ethos-U55 NPU invoke wall time",
+     "unit": "us",
+     "attributeColor": ""
+    },
+    {
+     "name": "infer_fps",
+     "displayName": "Inference rate capability",
+     "type": "DECIMAL",
+     "description": "1e6 / inference time",
+     "unit": "fps",
+     "attributeColor": ""
+    },
+    {
+     "name": "cam_fps",
+     "displayName": "Camera capture rate",
+     "type": "DECIMAL",
+     "description": "from the VIN vsync period",
+     "unit": "fps",
+     "attributeColor": ""
+    }
+   ]
+  },
+  {
    "name": "sys",
    "displayName": "Device Vitals",
    "type": "OBJECT",
