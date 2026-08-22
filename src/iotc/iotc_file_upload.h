@@ -37,6 +37,10 @@
 extern "C" {
 #endif
 
+/* Root CA (PEM) for the AWS endpoints this module talks to (credentials
+ * provider, STS, S3): Amazon Root CA 1. Set once at init. */
+void iotc_fu_set_ca(const char *ca_pem);
+
 /* Called by the DRA client with the raw identity-response JSON to capture
  * the upload bucket and fu topic (no-op if the fs block is absent). */
 void iotc_fu_identity_hook(const char *identity_json);

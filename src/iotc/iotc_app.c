@@ -25,6 +25,8 @@
 #include "console_output/console_output.h"
 
 #include "iotc_dra_client.h"
+#include "iotc_snapshot.h"
+#include "iotcl_util.h"
 #include "model_store/model_store.h"
 
 /* Vision pipeline interface (FaceDetection.cc). */
@@ -59,6 +61,12 @@ static uint32_t s_period_s = IOTC_TELEMETRY_PERIOD_S_DEFAULT;
 static TickType_t s_last_pub;
 static uint32_t s_msgs_sent;
 
+/* Snapshot requests are deferred: the command callback runs on the MQTT pump
+ * task, but the upload takes seconds (TLS x3 + ~230 KB PUT) and must not
+ * stall the process loop. The net thread performs it from iotc_app_poll(). */
+static volatile bool s_snapshot_pending;
+static char *s_snapshot_ack_id;
+
 static void prv_on_command(IotclC2dEventData data)
 {
     const char *cmd = iotcl_c2d_get_command(data);
@@ -83,8 +91,15 @@ static void prv_on_command(IotclC2dEventData data)
     }
     if (0 == strcmp(cmd, "snapshot"))
     {
-        /* Phase 4: annotate + JPEG encode + Telemetry Files upload. */
-        iotcl_mqtt_send_cmd_ack(ack_id, IOTCL_C2D_EVT_CMD_FAILED, "snapshot: not yet implemented");
+        if (s_snapshot_pending)
+        {
+            iotcl_mqtt_send_cmd_ack(ack_id, IOTCL_C2D_EVT_CMD_FAILED,
+                                    "snapshot already in progress");
+            return;
+        }
+        iotcl_free(s_snapshot_ack_id);
+        s_snapshot_ack_id = ack_id ? iotcl_strdup(ack_id) : NULL;
+        s_snapshot_pending = true; /* net thread picks it up */
         return;
     }
     if (0 == strcmp(cmd, "model-info"))
@@ -267,6 +282,23 @@ void iotc_app_poll(bool network_up)
                 IOTC_PRINT("IOTC: disconnected\r\n");
                 s_state = IOTC_APP_FAILED; /* TODO: reconnect backoff */
                 break;
+            }
+            if (s_snapshot_pending)
+            {
+                char result[96];
+                IOTC_PRINT("IOTC: snapshot: capturing + uploading...\r\n");
+                int rc = iotc_snapshot_capture_upload(result, sizeof(result));
+                IOTC_PRINT("IOTC: snapshot: %s\r\n", result);
+                if (s_snapshot_ack_id)
+                {
+                    iotcl_mqtt_send_cmd_ack(s_snapshot_ack_id,
+                                            (0 == rc) ? IOTCL_C2D_EVT_CMD_SUCCESS_WITH_ACK
+                                                      : IOTCL_C2D_EVT_CMD_FAILED,
+                                            result);
+                    iotcl_free(s_snapshot_ack_id);
+                    s_snapshot_ack_id = NULL;
+                }
+                s_snapshot_pending = false;
             }
             if ((xTaskGetTickCount() - s_last_pub) >= pdMS_TO_TICKS(s_period_s * 1000))
             {

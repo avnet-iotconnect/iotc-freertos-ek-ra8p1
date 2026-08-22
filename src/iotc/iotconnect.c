@@ -30,6 +30,7 @@
 
 #include "iotc_mqtt_client.h"
 #include "iotc_dra_client.h"
+#include "iotc_file_upload.h"
 #include "iotc_time.h"
 
 #include "iotc_fs.h"
@@ -138,6 +139,7 @@ int iotconnect_sdk_init(IotConnectClientConfig *c)
     s_ctx.lib_inited = true;
 
     iotc_dra_set_default_ca(c->auth_info.dra_ca ? c->auth_info.dra_ca : s_dra_ca);
+    iotc_fu_set_ca(s_broker_ca); /* creds provider/STS/S3 all chain to Amazon Root CA 1 */
 
     iotc_dra_config_t dra = {
         .platform = (c->connection_type == IOTC_CT_AZURE) ? IOTC_DRA_PF_AZURE : IOTC_DRA_PF_AWS,

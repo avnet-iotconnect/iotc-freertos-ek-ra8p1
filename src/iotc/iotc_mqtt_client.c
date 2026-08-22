@@ -77,9 +77,9 @@ static void prv_pump(void *arg)
     (void) arg;
     while (!s_stop)
     {
-        xSemaphoreTake(s_api_mutex, portMAX_DELAY);
+        xSemaphoreTakeRecursive(s_api_mutex, portMAX_DELAY);
         MQTTStatus_t st = MQTT_ProcessLoop(&s_mqtt);
-        xSemaphoreGive(s_api_mutex);
+        xSemaphoreGiveRecursive(s_api_mutex);
         if ((MQTTSuccess != st) && (MQTTNeedMoreBytes != st))
         {
             IOTCL_ERROR(st, "MQTT: process loop error");
@@ -107,7 +107,7 @@ int iotc_mqtt_client_connect(const iotc_mqtt_config_t *cfg)
 
     if (NULL == s_api_mutex)
     {
-        s_api_mutex = xSemaphoreCreateMutexStatic(&s_api_mutex_buf);
+        s_api_mutex = xSemaphoreCreateRecursiveMutexStatic(&s_api_mutex_buf);
     }
 
     memset(&s_tls_params, 0, sizeof(s_tls_params));
@@ -245,9 +245,11 @@ void iotc_mqtt_client_publish(const char *topic, const char *json_str)
         IOTCL_INFO("MQTT TX [%s]: %.220s", topic, json_str);
     }
 
-    xSemaphoreTake(s_api_mutex, portMAX_DELAY);
+    /* Recursive: publishes also happen from C2D callbacks that run inside
+     * MQTT_ProcessLoop while this same task already holds the mutex. */
+    xSemaphoreTakeRecursive(s_api_mutex, portMAX_DELAY);
     MQTTStatus_t st = MQTT_Publish(&s_mqtt, &pub, MQTT_GetPacketId(&s_mqtt));
-    xSemaphoreGive(s_api_mutex);
+    xSemaphoreGiveRecursive(s_api_mutex);
     if (MQTTSuccess != st)
     {
         IOTCL_ERROR((int) st, "MQTT: publish failed");

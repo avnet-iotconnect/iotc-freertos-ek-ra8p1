@@ -25,6 +25,7 @@
 #include "iotcl_dra_url.h"
 #include "iotcl_dra_discovery.h"
 #include "iotcl_dra_identity.h"
+#include "iotc_file_upload.h"
 
 /* One shared scratch for HTTP headers+body; DRA responses are a few KB. */
 #define IOTC_DRA_HTTP_BUF_SIZE (8 * 1024)
@@ -254,6 +255,12 @@ int iotc_dra_run(const iotc_dra_config_t *cfg)
         {
             s_http_buf[len] = 0;
             status = iotcl_dra_identity_configure_library_mqtt((const char *) s_http_buf);
+            if (IOTCL_SUCCESS == status)
+            {
+                /* Telemetry Files: capture fu topic + bucket from the raw
+                 * identity JSON (iotc-c-lib only keeps fs.url). */
+                iotc_fu_identity_hook((const char *) s_http_buf);
+            }
         }
     }
 
