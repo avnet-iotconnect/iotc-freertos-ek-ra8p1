@@ -72,7 +72,7 @@ upload → push.
 | Document | For |
 |---|---|
 | [docs/QUICKSTART.md](docs/QUICKSTART.md) | Flash a prebuilt image, provision credentials over the serial terminal, and connect — no toolchain |
-| [docs/WORKSHOP.md](docs/WORKSHOP.md) | Hands-on workshop (~75 min): flash → provision → dashboard → snapshots → model hot-swap |
+| [docs/WORKSHOP.md](docs/WORKSHOP.md) | Hands-on workshop: flash → provision → dashboard → snapshots → model hot-swap |
 | [docs/DEVELOPER-GUIDE.md](docs/DEVELOPER-GUIDE.md) | Build from source, connect to /IOTCONNECT, architecture, adding models |
 | [docs/DEMO-GUIDE.md](docs/DEMO-GUIDE.md) | The presenter's script: what to show, in what order, with expected results |
 | [docs/BUILD-NOTES.md](docs/BUILD-NOTES.md) | Raw engineering log: toolchain quirks, hardware gotchas, debugging recipes |

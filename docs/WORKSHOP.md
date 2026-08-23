@@ -1,7 +1,6 @@
 # Workshop: Vision AI with Cloud Model Management on the EK-RA8P1
 
 **Audience:** embedded and IoT engineers; no prior Renesas or /IOTCONNECT experience needed.
-**Duration:** about 75 minutes.
 
 ## What you will build
 
@@ -26,7 +25,7 @@ Verify everything on this list before starting.
 | This repository | Cloned or downloaded | `firmware/iotc-vision-ai-ek-ra8p1-demo.hex` exists |
 | LCD (optional) | Bundled 7" panel | Not required — the workshop works headless |
 
-## Step 1 — Flash the prebuilt firmware (10 min)
+## Step 1 — Flash the prebuilt firmware
 
 In this step you will program the demo image into the board's flash.
 
@@ -39,7 +38,7 @@ In this step you will program the demo image into the board's flash.
 
 **Checkpoint:** J-Flash Lite reports the program operation completed without errors.
 
-## Step 2 — Watch the vision pipeline run (5 min)
+## Step 2 — Watch the vision pipeline run
 
 In this step you will confirm the NPU is running inference locally.
 
@@ -61,7 +60,7 @@ The camera runs at 55 fps and a full face detection takes about 5.8 ms on the NP
 line is expected — the cloud connection starts in Step 4. If the LCD is attached, it shows
 live video with green detection boxes.
 
-## Step 3 — Create the device in /IOTCONNECT (10 min)
+## Step 3 — Create the device in /IOTCONNECT
 
 In this step you will create the cloud identity the board will use.
 
@@ -77,7 +76,7 @@ In this step you will create the cloud identity the board will use.
 **Checkpoint:** the device appears in the device list (disconnected), and you have the two
 PEM files, the CPID, the environment name, and your Unique ID at hand.
 
-## Step 4 — Provision the board over the serial terminal (10 min)
+## Step 4 — Provision the board over the serial terminal
 
 In this step you will store the cloud identity on the board. It persists in the board's
 OSPI flash across power cycles.
@@ -106,7 +105,7 @@ FU: selftest creds fetch -> 0 (OK)
 
 and the device shows **connected** in /IOTCONNECT with telemetry arriving every 10 seconds.
 
-## Step 5 — Import the dashboard (10 min)
+## Step 5 — Import the dashboard
 
 In this step you will bring up the prebuilt dashboard.
 
@@ -124,7 +123,7 @@ In this step you will bring up the prebuilt dashboard.
 Step in front of the camera: the Detection State card switches to FACE DETECTED and the
 Faces gauge moves.
 
-## Step 6 — Capture a snapshot to the cloud (5 min)
+## Step 6 — Capture a snapshot to the cloud
 
 In this step the board will photograph what it sees, annotate it, and upload it.
 
@@ -135,7 +134,7 @@ In this step the board will photograph what it sees, annotate it, and upload it.
 detection boxes drawn on it, tagged with the detection results. The image was PNG-encoded
 and uploaded to S3 with a signature computed on the microcontroller.
 
-## Step 7 — Push a different AI model from the cloud (15 min)
+## Step 7 — Push a different AI model from the cloud
 
 In this step you will re-task the device over the air. First register the models (one-time,
 often pre-staged by the facilitator): **AI Models → Create Model**, Model Type "AI Model",
@@ -168,7 +167,7 @@ Variant "Renesas", and upload zips from [`tools/models/`](../tools/models/) — 
 
    **Checkpoint:** detection boxes return; the Model Source card shows BUILT-IN MODEL.
 
-## Step 8 — Prove persistence (5 min)
+## Step 8 — Prove persistence
 
 In this step you will show that both the credentials and the deployed model survive power
 loss.
