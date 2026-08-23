@@ -15,6 +15,7 @@
 #include "DetectorPostProcessing.h"
 #include "log_macros.h"
 
+#include <cmath>
 #include <cstring>
 #include <cstdio>
 #include <new>
@@ -454,7 +455,26 @@ vision_ai_app_err_t face_detection_run(void)
         }
         float score = out->params.scale *
                       ((float) best_q - (float) out->params.zero_point);
+        /* v1-style quant models emit post-softmax probabilities (scale
+         * 1/256); v2-style emit LOGITS, where scale*(q-zp) can be >> 1
+         * (showed as e.g. "722%"). If the top value cannot be a
+         * probability, softmax the dequantised vector: with the max as
+         * reference, prob(best) = 1 / sum(exp(x_i - x_best)). */
+        if (score > 1.001f) {
+            float sum = 0.0f;
+            for (size_t i = 0; i < n_classes; i++) {
+                int q = s_model.IsDataSigned() ? (int) out->data.int8[i]
+                                               : (int) out->data.uint8[i];
+                float x = out->params.scale *
+                          ((float) q - (float) out->params.zero_point);
+                sum += expf(x - score);
+            }
+            score = 1.0f / sum;
+        }
         int pct = (int) (score * 100.0f + 0.5f);
+        if (pct > 100) {
+            pct = 100;
+        }
         const char *label = prv_class_label(best, n_classes);
 
         s_box_count = 0;
