@@ -19,8 +19,8 @@ All capabilities below are verified on hardware.
 
 <img src="docs/media/ek-ra8p1-board.webp" alt="Renesas EK-RA8P1 board" width="360"/>
 
-*Renesas EK-RA8P1 evaluation board (image: Zephyr Project documentation). The kit also
-includes the OV5640 camera expansion board and a 7-inch parallel LCD.*
+*Renesas EK-RA8P1 evaluation board. The kit also includes the OV5640 camera expansion
+board and a 7-inch parallel LCD.*
 
 ## Contents
 
@@ -69,7 +69,6 @@ upload → push.
 | [docs/DEVELOPER-GUIDE.md](docs/DEVELOPER-GUIDE.md) | Build from source, connect to /IOTCONNECT, architecture, adding models |
 | [docs/DEMO-GUIDE.md](docs/DEMO-GUIDE.md) | The presenter's script: what to show, in what order, with expected results |
 | [docs/BUILD-NOTES.md](docs/BUILD-NOTES.md) | Raw engineering log: toolchain quirks, hardware gotchas, debugging recipes |
-| [docs/PLAN.md](docs/PLAN.md) | The original phased implementation plan |
 
 ## Architecture
 

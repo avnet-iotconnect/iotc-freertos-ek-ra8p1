@@ -16,9 +16,9 @@
  *   4. A telemetry-shaped {"url": ...,"cf": ...} record on the identity's
  *      fu topic makes the file appear in the platform's Telemetry Files.
  *
- * Ported from the Avnet Zephyr SDK (zephyr-layer/iotc_file_upload.c):
- * Zephyr http_client -> coreHTTP, PSA hash/HMAC -> mbedTLS one-shots,
- * k_malloc -> pvPortMalloc.
+ * Ported from the Avnet IOTCONNECT reference implementation onto this
+ * project's stack: coreHTTP for the HTTP client, mbedTLS one-shots for
+ * hash/HMAC, FreeRTOS heap for allocation.
  */
 #include <stdbool.h>
 #include <stdio.h>

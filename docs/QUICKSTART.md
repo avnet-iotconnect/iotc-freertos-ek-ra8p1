@@ -21,7 +21,7 @@ minutes, using the prebuilt image in [firmware/](../firmware/) — no toolchain 
 
 <img src="media/ek-ra8p1-board.webp" alt="Renesas EK-RA8P1 board" width="320"/>
 
-*The EK-RA8P1 board (image: Zephyr Project documentation).*
+*The EK-RA8P1 board.*
 
 - EK-RA8P1 kit with the OV5640 camera board fitted (J35 / MIPI connector)
 - USB-C cable to the **DEBUG1** port (this is the on-board J-Link and the serial console)

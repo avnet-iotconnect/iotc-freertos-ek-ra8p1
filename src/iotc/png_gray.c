@@ -4,7 +4,7 @@
  *
  * Minimal PNG encoder (deflate "stored" blocks, no compression) for 8-bit
  * grayscale (1 channel) or RGB truecolor (3 channels) images. Ported from
- * the Avnet Zephyr vision-occupancy demo (grayscale) and generalized.
+ * the Avnet vision-occupancy reference demo (grayscale) and generalized.
  */
 #include <string.h>
 

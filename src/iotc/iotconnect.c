@@ -4,7 +4,7 @@
  *
  * IoTConnect SDK orchestrator, FSP/FreeRTOS port: credential provisioning
  * (PKCS#11 on LittleFS/OSPI) -> discovery/identity (DRA) -> MQTT connect ->
- * telemetry/c2d pump. Mirrors the iotc-zephyr-sdk lib/iotconnect.c flow.
+ * telemetry/c2d pump. Mirrors the IOTCONNECT generic-SDK orchestration flow.
  */
 
 #include "iotconnect.h"

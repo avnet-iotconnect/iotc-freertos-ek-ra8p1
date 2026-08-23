@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: MIT
  *
  * IOTV model envelope + persistence for cloud-pushed vision models
- * (ported from the Avnet Zephyr vision-occupancy demo, storage moved to
+ * (same envelope as the Avnet vision-occupancy reference demo, storage moved to
  * LittleFS on the EK-RA8P1's 64 MB OSPI flash).
  *
  * A model travels as an "IOTV" blob: 32-byte header (magic, format ver,

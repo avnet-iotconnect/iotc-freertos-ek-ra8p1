@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Pack a Vela-compiled .tflite model into an IOTV blob (+ platform upload zip).
 
-The IOTV envelope (same format as Avnet's Zephyr vision-occupancy demo): a
+The IOTV envelope (same format as Avnet's vision-occupancy reference demo): a
 32-byte header (magic, format version, model version, payload length, CRC32,
 display name) followed by the raw .tflite flatbuffer. The firmware validates
 the envelope before trial-loading the model into SDRAM and hot-swapping.

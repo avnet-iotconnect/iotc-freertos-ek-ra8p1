@@ -6,10 +6,10 @@
  *
  * This header mirrors the IOTCONNECT generic-SDK family contract
  * (IotConnectClientConfig + the init_config/init/connect/is_connected/
- * disconnect/deinit lifecycle and the OTA/command/status callbacks), ported
- * from the IOTCONNECT Zephyr SDK so applications move across the family with
- * minimal change. The underlying iotc-c-lib telemetry builder
- * (iotcl_telemetry_*) remains available for rich payloads.
+ * disconnect/deinit lifecycle and the OTA/command/status callbacks) so
+ * applications move across the SDK family with minimal change. The
+ * underlying iotc-c-lib telemetry builder (iotcl_telemetry_*) remains
+ * available for rich payloads.
  *
  * Ownership: the SDK is a global singleton. iotconnect_sdk_init() deep-copies
  * the caller's config strings, so the caller need not keep the struct alive
