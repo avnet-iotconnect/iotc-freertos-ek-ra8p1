@@ -1,49 +1,112 @@
 # /IOTCONNECT EK-RA8P1 Vision AI Demo
 
-On-device object detection on the Renesas EK-RA8P1 (1 GHz Arm Cortex-M85 + Ethos-U55 NPU),
+On-device vision AI on the Renesas **EK-RA8P1** (1 GHz Arm Cortex-M85 + Ethos-U55 NPU),
 connected to Avnet [/IOTCONNECT](https://www.iotconnect.io/) over Gigabit Ethernet, built on
-Renesas FSP with FreeRTOS.
+Renesas FSP with FreeRTOS — **no Linux, no MPU, everything on the microcontroller**.
 
-- The kit's 5 MP OV5640 MIPI CSI-2 camera feeds a TensorFlow Lite Micro model running on the
-  Ethos-U55 NPU; detections stream to /IOTCONNECT as telemetry.
-- A cloud **Take Snapshot** command uploads an annotated color JPEG to /IOTCONNECT
-  **Telemetry Files** — no display needed, the dashboard is the viewfinder.
-- **Live model deployment via /IOTCONNECT AI Model Management**: push a new Vela-compiled
-  model from the cloud and the device hot-swaps it in seconds — no reflash, no reboot.
-  Models are stored in the board's 64 MB OSPI flash.
-- The bundled 7" LCD (optional) shows live video with detection overlays when connected.
+The kit's OV5640 MIPI CSI-2 camera feeds TensorFlow Lite Micro models running on the
+Ethos-U55 NPU. Results stream to /IOTCONNECT as telemetry, annotated snapshots upload to
+Telemetry Files on demand, and — the headline — **models are deployed live from the cloud**:
+push a Vela-compiled model from /IOTCONNECT AI Model Management and the device hot-swaps it
+between two inferences, no reflash, no reboot. Pushed models persist in the 64 MB OSPI flash
+and survive power cycles.
 
-## Status
+All capabilities below are verified on hardware.
 
-Early development. See [docs/PLAN.md](docs/PLAN.md) for the phased implementation plan.
+## Capabilities
 
-## Requirements
-
-| Item | Version |
+| Capability | Detail |
 |---|---|
-| Board | Renesas EK-RA8P1 (RTK7EKA8P1S01001BE) with bundled OV5640 camera board |
-| e² studio | 2025-10 or later |
-| FSP | 6.3.1 or later (RA8P1 support requires ≥ 6.0.0) |
-| Toolchain | LLVM Embedded Toolchain for Arm (ATfE 21.x) |
-| Cloud | /IOTCONNECT account on the AWS backend |
+| Live inference | Camera at 55 fps, NPU inference 1.5–40 ms depending on model, LCD overlay at 29 fps |
+| Cloud telemetry | Detections, model identity, performance metrics, device vitals every 10 s (configurable) |
+| Snapshot to cloud | `snapshot` command uploads a 480×480 color PNG with detection boxes to Telemetry Files (SigV4 S3 upload signed on-device) |
+| **Model hot-swap** | Push from AI Model Management → download → validate → swap in seconds, uptime uninterrupted |
+| Model persistence | Active model stored in a raw OSPI slot, reloaded at boot; `model-revert` returns to the built-in model |
+| Multi-task | The device re-tasks itself by model shape: face detection (boxes), person/occupancy detection, or 1000-class ImageNet classification |
+| Commands | `snapshot`, `set-interval <s>`, `model-info`, `model-revert` |
+
+## The model library
+
+Five ready-to-push models ship in [tools/models/](tools/models/) (upload the `.zip` to
+/IOTCONNECT → AI Models):
+
+| Model | Task | Input | Inference | Size |
+|---|---|---|---|---|
+| `face-v3` | Face detection + boxes (YOLO Fastest) | 192×192 gray | ~5.8 ms (172 fps) | 441 KB |
+| `person-detect` | Person present / absent (visual wake words) | 96×96 gray | ~1.5 ms (666 fps) | 240 KB |
+| `mobilenet-025` | ImageNet classifier, speed tier | 224×224 RGB | ~4.5 ms (222 fps) | 432 KB |
+| `mobilenet-050` | ImageNet classifier, mid tier | 224×224 RGB | ~9 ms (110 fps) | 1.1 MB |
+| `mobilenet-v2` | ImageNet classifier, accuracy tier | 224×224 RGB | ~40 ms (25 fps) | 3.1 MB |
+
+Any model matching the input contract can be added with the workflow in the
+[Developer Guide](docs/DEVELOPER-GUIDE.md#adding-models): Vela-compile → `pack_model.py` →
+upload → push.
+
+## Documentation
+
+| Document | For |
+|---|---|
+| [docs/QUICKSTART.md](docs/QUICKSTART.md) | Flash a prebuilt image and see the vision pipeline run in minutes |
+| [docs/DEVELOPER-GUIDE.md](docs/DEVELOPER-GUIDE.md) | Build from source, connect to /IOTCONNECT, architecture, adding models |
+| [docs/DEMO-GUIDE.md](docs/DEMO-GUIDE.md) | The presenter's script: what to show, in what order, with expected results |
+| [docs/BUILD-NOTES.md](docs/BUILD-NOTES.md) | Raw engineering log: toolchain quirks, hardware gotchas, debugging recipes |
+| [docs/PLAN.md](docs/PLAN.md) | The original phased implementation plan |
+
+## Architecture
+
+```
+                 EK-RA8P1 (R7KA8P1, Cortex-M85 @ 1 GHz)
+  ┌────────────────────────────────────────────────────────────────┐
+  │  OV5640 camera ── MIPI CSI-2 ── r_vin ──► SDRAM frame ring     │
+  │                                             │                  │
+  │        camera_thread: crop/convert ──► 224×224 RGB staging     │
+  │                                             │                  │
+  │   ai_inference_thread: resample ──► TFLM + Ethos-U55 (rm_ethosu)
+  │        model flatbuffer in SDRAM staging ◄── hot-swap ◄─┐      │
+  │                                             │           │      │
+  │   display_thread: overlay boxes ──► GLCDC ──► 7" LCD    │      │
+  │                                                         │      │
+  │   net_thread: FreeRTOS+TCP ── r_rmac (RGMII GbE)        │      │
+  │      ├─ SNTP ─ DRA discovery/identity (coreHTTP+mbedTLS)│      │
+  │      ├─ coreMQTT mutual-TLS ──► /IOTCONNECT (AWS)       │      │
+  │      ├─ telemetry / commands / OTA ct:2 ────────────────┘      │
+  │      └─ snapshot: PNG encode ─ SigV4 S3 PUT ─ fu announce      │
+  │                                                                │
+  │   model_store: IOTV envelope ──► raw OSPI slot (+56 MB)        │
+  │   PKCS#11 credentials ──► LittleFS on OSPI (+32 MB)            │
+  └────────────────────────────────────────────────────────────────┘
+```
 
 ## Repository layout
 
 ```
-configuration.xml, ra_gen/, ra_cfg/, ra/   FSP Smart Configurator project
-iotc-c-lib/                                IoTConnect protocol library (submodule)
-src/iotc/                                  IoTConnect FSP transport layer (MQTT/TLS, HTTPS, SNTP, file upload)
-src/app/                                   Application: telemetry, commands, state machine
-src/vision/                                Camera capture, NPU inference, annotation, JPEG encode
-src/model_store/                           OSPI model slots, IOTV envelope, hot-swap
-src/display/                               Optional GLCDC display path
-tools/                                     Model packing (pack_model.py) and Vela compile scripts
-templates/                                 /IOTCONNECT device template
-dashboard/                                 /IOTCONNECT dashboard export
-docs/                                      Plan, quickstart, demo script
+configuration.xml, ra_gen/, ra_cfg/, ra/   FSP Smart Configurator project (vendor code + in-repo patches)
+iotc-c-lib/                                /IOTCONNECT protocol library, submodule (+ nested cJSON submodule)
+firmware/                                  Prebuilt local-demo image for the Quickstart
+src/iotc/                                  /IOTCONNECT transport + app layer (MQTT/TLS, DRA, SNTP, file upload, snapshot)
+src/ai_application/                        TFLM glue, model lifecycle + hot-swap, YOLO post-processing, labels
+src/model_store/                           IOTV envelope validation + raw OSPI model slot
+src/camera_layer/, src/display_layer/      OV5640/VIN capture, GLCDC output, detection overlay
+tools/pack_model.py                        Wrap a Vela .tflite as a pushable .iotv (+ STORED zip)
+tools/models/                              The five ready-to-push model zips
+templates/ra8p1-vision-ai-template.json    /IOTCONNECT device template (import this)
+docs/                                      Quickstart, developer guide, demo guide, build notes, plan
 ```
+
+## Requirements
+
+| Item | Version used |
+|---|---|
+| Board | Renesas EK-RA8P1 kit with bundled OV5640 camera (LCD optional) |
+| e² studio | 2025-10 (25.10.0) |
+| FSP | 6.3.1 packs |
+| Toolchain | LLVM Embedded Toolchain for Arm (ATfE) 21.1.1 |
+| Debug probe | On-board J-Link OB (SEGGER J-Link software V9.38+ — earlier versions lack RA8P1) |
+| Cloud | /IOTCONNECT account on the **AWS** backend |
+| Model tooling | Python 3.10+ with `ethos-u-vela` (only needed to add models) |
 
 ## Credentials
 
-Device certificate and private key are **never committed**. They are provisioned onto the
-device at setup time (see docs/QUICKSTART.md once available).
+The device certificate and private key are **never committed**. They live in
+`src/iotc/app_secrets.h`, which is gitignored; copy `app_secrets.h.example` and fill it in
+per the [Developer Guide](docs/DEVELOPER-GUIDE.md#iotconnect-setup).

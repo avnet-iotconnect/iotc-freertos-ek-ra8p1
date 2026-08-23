@@ -6,6 +6,8 @@
 *.map
 *.srec
 *.hex
+# ...except the prebuilt Quickstart image
+!firmware/*.hex
 
 # e2 studio / Eclipse local state
 /.settings/
