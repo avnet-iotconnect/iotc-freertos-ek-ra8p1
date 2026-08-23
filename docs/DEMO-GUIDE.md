@@ -12,6 +12,7 @@ telemetry and cloud-triggered snapshots as the only interface.
 
 ## Contents
 
+- [The dashboard](#the-dashboard)
 - [Before the demo](#before-the-demo)
 - [Part 1 — Live vision inference](#part-1--live-vision-inference-2-min)
 - [Part 2 — Snapshot to the cloud](#part-2--snapshot-to-the-cloud-2-min)
@@ -20,12 +21,32 @@ telemetry and cloud-triggered snapshots as the only interface.
 - [Command reference](#command-reference)
 - [Troubleshooting during a demo](#troubleshooting-during-a-demo)
 
+## The dashboard
+
+![Live dashboard](images/dashboard-live.png)
+
+*The demo dashboard, live: annotated snapshot with classification metadata, detection-state
+card, face/confidence gauges, tiles, the model-swap inference-time chart, model-source card,
+and the command panel with acknowledgment history.*
+
+One-time setup:
+
+1. Upload the artwork from [`dashboard/images/`](../dashboard/images/) to the public S3
+   bucket under `images/renesas/ek-ra8p1/` (keys are case-sensitive): `banner_vision_ai.png`
+   plus the eight `state_*.png` / `model_*.png` cards.
+2. **Create Dashboard → Import Dashboard**, select template **RA8P1 Vision AI** and your
+   device, and choose [`dashboard/ra8p1-vision-ai-dashboard.json`](../dashboard/ra8p1-vision-ai-dashboard.json).
+
+The detection-state card switches artwork for face / clear / person / no-person; any other
+value (an ImageNet class label) falls through to the CLASSIFYING card, with the label itself
+shown in the Detection/Class tile. The model-source card tracks builtin / flash / cloud.
+
 ## Before the demo
 
 - [ ] Board powered, Ethernet plugged, camera aimed at the demo area (LCD attached if
       using the on-screen portion; the demo also runs fully headless via the dashboard)
 - [ ] Serial console open (J-Link CDC COM port, 230400) — optional but adds credibility
-- [ ] /IOTCONNECT dashboard open on the device: live telemetry view + Telemetry Files panel
+- [ ] The demo dashboard imported and open (see [The dashboard](#the-dashboard))
 - [ ] All five models registered under AI Models (see table below)
 - [ ] Console shows `IOTC: connected` and `FU: selftest creds fetch -> 0 (OK)`
 - [ ] A couple of recognizable props nearby: coffee mug, banana, water bottle, keyboard

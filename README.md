@@ -17,7 +17,13 @@ cloud-triggered snapshot capture as the viewfinder.
 
 All capabilities below are verified on hardware.
 
-<img src="docs/media/ek-ra8p1-board.webp" alt="Renesas EK-RA8P1 board" width="360"/>
+![Live /IOTCONNECT dashboard](docs/images/dashboard-live.png)
+
+*The bundled /IOTCONNECT dashboard, live: annotated snapshot, detection state, gauges,
+model-swap history, and device commands. Import JSON and artwork are in
+[dashboard/](dashboard/).*
+
+<img src="docs/images/ek-ra8p1-board.webp" alt="Renesas EK-RA8P1 board" width="360"/>
 
 *Renesas EK-RA8P1 evaluation board. The kit also includes the OV5640 camera expansion
 board and a 7-inch parallel LCD.*
@@ -66,6 +72,7 @@ upload → push.
 | Document | For |
 |---|---|
 | [docs/QUICKSTART.md](docs/QUICKSTART.md) | Flash a prebuilt image, provision credentials over the serial terminal, and connect — no toolchain |
+| [docs/WORKSHOP.md](docs/WORKSHOP.md) | Hands-on workshop (~75 min): flash → provision → dashboard → snapshots → model hot-swap |
 | [docs/DEVELOPER-GUIDE.md](docs/DEVELOPER-GUIDE.md) | Build from source, connect to /IOTCONNECT, architecture, adding models |
 | [docs/DEMO-GUIDE.md](docs/DEMO-GUIDE.md) | The presenter's script: what to show, in what order, with expected results |
 | [docs/BUILD-NOTES.md](docs/BUILD-NOTES.md) | Raw engineering log: toolchain quirks, hardware gotchas, debugging recipes |
@@ -108,7 +115,8 @@ src/camera_layer/, src/display_layer/      OV5640/VIN capture, GLCDC output, det
 tools/pack_model.py                        Wrap a Vela .tflite as a pushable .iotv (+ STORED zip)
 tools/models/                              The five ready-to-push model zips
 templates/ra8p1-vision-ai-template.json    /IOTCONNECT device template (import this)
-docs/                                      Quickstart, developer guide, demo guide, build notes, plan
+dashboard/                                 /IOTCONNECT dashboard import JSON + widget artwork
+docs/                                      Quickstart, workshop, developer guide, demo guide, build notes
 ```
 
 ## Requirements

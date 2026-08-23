@@ -17,7 +17,7 @@ cycles.
 
 ## 1. What you need
 
-<img src="media/ek-ra8p1-board.webp" alt="Renesas EK-RA8P1 board" width="320"/>
+<img src="images/ek-ra8p1-board.webp" alt="Renesas EK-RA8P1 board" width="320"/>
 
 *The EK-RA8P1 board.*
 
