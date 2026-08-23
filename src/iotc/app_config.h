@@ -51,4 +51,17 @@
 #define IOTC_CFG_ENABLED 0
 #endif
 
+/* Build without the 441 KB built-in model array in MRAM (KVS/video builds
+ * need the flash). The device then boots from the OSPI model store and idles
+ * with a console hint if the store is empty. */
+#ifndef IOTC_CFG_NO_BUILTIN_MODEL
+#define IOTC_CFG_NO_BUILTIN_MODEL 0
+#endif
+
+/* One-shot on-target H.264 software-encode benchmark (minih264) printed to
+ * the console at boot. Requires IOTC_CFG_NO_BUILTIN_MODEL=1 for MRAM space. */
+#ifndef H264_BENCH
+#define H264_BENCH 0
+#endif
+
 #endif /* IOTC_APP_CONFIG_H */

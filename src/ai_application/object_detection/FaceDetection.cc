@@ -186,15 +186,20 @@ static bool prv_model_apply(size_t len)
     return true;
 }
 
-static void prv_load_builtin_to_staging(void)
+/* Returns false when this build carries no built-in model. */
+static bool prv_load_builtin_to_staging(void)
 {
     const uint8_t *builtin = arm::app::object_detection::GetModelPointer();
     size_t len = arm::app::object_detection::GetModelLen();
+    if ((builtin == NULL) || (0 == len)) {
+        return false;
+    }
     memcpy(s_model_staging, builtin, len);
     s_model_len = len;
     strncpy(s_model_name, "builtin", sizeof(s_model_name) - 1);
     s_model_ver = 1;
     strncpy(s_model_src, "builtin", sizeof(s_model_src) - 1);
+    return true;
 }
 
 bool face_detection_init(void)
@@ -222,7 +227,15 @@ bool face_detection_init(void)
         FD_PRINT("FD: no stored model (%d); using builtin\r\n", rc);
     }
 
-    prv_load_builtin_to_staging();
+    if (!prv_load_builtin_to_staging()) {
+        FD_PRINT("FD: no built-in model in this build and no stored model - "
+                 "push one from IOTCONNECT AI Models\r\n");
+        strncpy(s_model_name, "none", sizeof(s_model_name) - 1);
+        strncpy(s_model_src, "none", sizeof(s_model_src) - 1);
+        s_model_ver = 0;
+        s_model_len = 0;
+        return true; /* vision idles; hot-swap can still arm a model */
+    }
     bool ok = prv_model_apply(s_model_len);
 
 #define MODEL_STORE_SELFTEST 0
@@ -280,6 +293,11 @@ extern "C" void face_detection_revert(void)
     (void) model_store_erase();
     const uint8_t *builtin = arm::app::object_detection::GetModelPointer();
     size_t len = arm::app::object_detection::GetModelLen();
+    if ((builtin == NULL) || (0 == len)) {
+        FD_PRINT("FD: no built-in model in this build; stored model erased - "
+                 "push a model from IOTCONNECT AI Models\r\n");
+        return;
+    }
     /* Wrap builtin as IOTV into pending so the swap path is uniform. */
     memcpy(s_model_pending + IOTV_HDR_LEN, builtin, len);
     iotv_wrap_in_place(s_model_pending, len, 1, "builtin");
@@ -372,7 +390,10 @@ vision_ai_app_err_t face_detection_run(void)
     prv_swap_if_pending();
 
     if (!s_model.IsInited()) {
-        return VISION_AI_APP_ERR_AI_INFERENCE;
+        /* No model loaded (builtin-free build with an empty store): idle
+         * quietly rather than tripping the AI thread's error handler. */
+        s_box_count = 0;
+        return VISION_AI_APP_SUCCESS;
     }
 
     TfLiteTensor *input = s_model.GetInputTensor(0);

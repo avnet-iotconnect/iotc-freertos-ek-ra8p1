@@ -19,6 +19,8 @@ extern const int channelsImageDisplayed = 3;
 extern const float anchor1[] = {38, 77, 47, 97, 61, 126};
 extern const float anchor2[] = {14, 26, 19, 37, 28, 55 };
 //__attribute__((aligned(16), section(".sdram"))
+#include "app_config.h"
+#if !IOTC_CFG_NO_BUILTIN_MODEL
 static const uint8_t nn_model[] __attribute__((aligned(16))) =
 {
    0x28, 0x00, 0x00, 0x00, 0x54, 0x46, 0x4c, 0x33, 0x00, 0x00, 0x00, 0x00,
@@ -36780,16 +36782,26 @@ static const uint8_t nn_model[] __attribute__((aligned(16))) =
    0x00, 0x00, 0x00, 0x20, 0x07, 0x00, 0x00, 0x00, 0x65, 0x74, 0x68, 0x6f,
    0x73, 0x2d, 0x75, 0x00
 };
+#endif /* !IOTC_CFG_NO_BUILTIN_MODEL */
+
 
 
 const uint8_t * GetModelPointer()
 {
+#if IOTC_CFG_NO_BUILTIN_MODEL
+    return nullptr; /* no built-in model in this build */
+#else
     return nn_model;
+#endif
 }
 
 size_t GetModelLen()
 {
+#if IOTC_CFG_NO_BUILTIN_MODEL
+    return 0;
+#else
     return sizeof(nn_model);
+#endif
 }
 
 } /* namespace arm */

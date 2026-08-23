@@ -16,6 +16,7 @@
 #include "ai_inference_thread.h"
 #include <stdio.h>
 #include "common_util.h"
+#include "app_config.h"
 #include "common_data.h"
 #include "ai_application_config.h"
 #include "time_counter.h"
@@ -120,6 +121,20 @@ void ai_inference_thread_entry(void *pvParameters)
     while (true)
     {
         xEventGroupWaitBits(g_ai_app_event, AI_INFERENCE_INPUT_IMAGE_READY, pdTRUE, pdTRUE, portMAX_DELAY);
+
+#if H264_BENCH
+        {
+            /* One-shot: measure software H.264 encode on live frames before
+             * inference starts competing for the CPU. */
+            extern void h264_bench_run(void);
+            static bool s_bench_done = false;
+            if (!s_bench_done)
+            {
+                s_bench_done = true;
+                h264_bench_run();
+            }
+        }
+#endif
 
         for(int i = 0; i < AI_MAX_DETECTION_NUM; i++)
         {
