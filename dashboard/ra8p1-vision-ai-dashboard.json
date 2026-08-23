@@ -1985,58 +1985,25 @@
             }
         },
         {
-            "widgetGuid": "A8CB394D-15B1-42C9-94FC-AD7BDC599E2A",
+            "widgetGuid": "F66A9747-6C71-40E5-8639-9F53233494D2",
             "widgetProperties": {
-                "i": "Image",
-                "background": "#FFFFFF",
-                "fontColor": "#000000",
+                "i": "Label",
+                "background": "#6a1b9a",
+                "fontColor": "#ffffff",
                 "fontFamily": "Proxima Nova",
-                "fontSize": "18",
-                "title": "",
-                "titleAlign": "",
-                "contents": {
-                    "option": {
-                        "imageUpload": "false",
-                        "imageUrl": "true",
-                        "imageDevice": "false",
-                        "imageTelemetry": "false",
-                        "key": "option",
-                        "position": "center"
-                    },
-                    "upload": {
-                        "imageurl": "",
-                        "key": "upload"
-                    },
-                    "url": {
-                        "imageurl": "https://avnetpublicaccess.s3.us-east-1.amazonaws.com/images/renesas/ek-ra8p1/band_model_mgmt.png",
-                        "key": "url"
-                    },
-                    "device": {
-                        "deviceGuid": "",
-                        "deviceName": "",
-                        "imageurl": "",
-                        "key": "device"
-                    },
-                    "telemetry": {
-                        "deviceGuid": "",
-                        "deviceName": "",
-                        "imageurl": "",
-                        "key": "telemetry"
-                    },
-                    "classification": {
-                        "showClassification": "false",
-                        "key": "classification"
-                    }
-                }
+                "fontSize": "26",
+                "title": "AI MODEL MANAGEMENT - OVER-THE-AIR HOT-SWAP",
+                "titleAlign": ""
             },
             "properties": {
                 "x": "0",
                 "y": "19",
                 "w": "58",
-                "h": "5",
-                "i": "Image",
-                "minW": "5",
-                "minH": "5",
+                "h": "2",
+                "i": "Label",
+                "minW": "6",
+                "minH": "2",
+                "maxH": "2",
                 "isStatic": "false"
             }
         },
@@ -2178,7 +2145,7 @@
             },
             "properties": {
                 "x": "0",
-                "y": "24",
+                "y": "21",
                 "w": "20",
                 "h": "15",
                 "i": "LiveLineChart",
@@ -2384,7 +2351,7 @@
             },
             "properties": {
                 "x": "20",
-                "y": "24",
+                "y": "21",
                 "w": "10",
                 "h": "13",
                 "i": "Transformation",
@@ -2444,7 +2411,7 @@
             },
             "properties": {
                 "x": "30",
-                "y": "24",
+                "y": "21",
                 "w": "10",
                 "h": "9",
                 "i": "gauge",
@@ -2634,7 +2601,7 @@
             },
             "properties": {
                 "x": "30",
-                "y": "33",
+                "y": "30",
                 "w": "10",
                 "h": "4",
                 "i": "Live",
@@ -2697,7 +2664,7 @@
             },
             "properties": {
                 "x": "40",
-                "y": "24",
+                "y": "21",
                 "w": "15",
                 "h": "16",
                 "i": "DeviceLatestValue",
@@ -2709,58 +2676,25 @@
             }
         },
         {
-            "widgetGuid": "A8CB394D-15B1-42C9-94FC-AD7BDC599E2A",
+            "widgetGuid": "F66A9747-6C71-40E5-8639-9F53233494D2",
             "widgetProperties": {
-                "i": "Image",
-                "background": "#FFFFFF",
-                "fontColor": "#000000",
+                "i": "Label",
+                "background": "#455a64",
+                "fontColor": "#ffffff",
                 "fontFamily": "Proxima Nova",
-                "fontSize": "18",
-                "title": "",
-                "titleAlign": "",
-                "contents": {
-                    "option": {
-                        "imageUpload": "false",
-                        "imageUrl": "true",
-                        "imageDevice": "false",
-                        "imageTelemetry": "false",
-                        "key": "option",
-                        "position": "center"
-                    },
-                    "upload": {
-                        "imageurl": "",
-                        "key": "upload"
-                    },
-                    "url": {
-                        "imageurl": "https://avnetpublicaccess.s3.us-east-1.amazonaws.com/images/renesas/ek-ra8p1/band_commands.png",
-                        "key": "url"
-                    },
-                    "device": {
-                        "deviceGuid": "",
-                        "deviceName": "",
-                        "imageurl": "",
-                        "key": "device"
-                    },
-                    "telemetry": {
-                        "deviceGuid": "",
-                        "deviceName": "",
-                        "imageurl": "",
-                        "key": "telemetry"
-                    },
-                    "classification": {
-                        "showClassification": "false",
-                        "key": "classification"
-                    }
-                }
+                "fontSize": "26",
+                "title": "COMMANDS + TELEMETRY",
+                "titleAlign": ""
             },
             "properties": {
                 "x": "0",
-                "y": "40",
+                "y": "37",
                 "w": "58",
-                "h": "5",
-                "i": "Image",
-                "minW": "5",
-                "minH": "5",
+                "h": "2",
+                "i": "Label",
+                "minW": "6",
+                "minH": "2",
+                "maxH": "2",
                 "isStatic": "false"
             }
         },
@@ -2797,7 +2731,7 @@
             },
             "properties": {
                 "x": "0",
-                "y": "45",
+                "y": "39",
                 "w": "9",
                 "h": "6",
                 "i": "Control",
@@ -2841,7 +2775,7 @@
             },
             "properties": {
                 "x": "9",
-                "y": "45",
+                "y": "39",
                 "w": "9",
                 "h": "6",
                 "i": "Control",
@@ -2872,7 +2806,7 @@
             },
             "properties": {
                 "x": "18",
-                "y": "45",
+                "y": "39",
                 "w": "22",
                 "h": "10",
                 "i": "DeviceCommand",
@@ -3055,7 +2989,7 @@
             },
             "properties": {
                 "x": "40",
-                "y": "45",
+                "y": "39",
                 "w": "18",
                 "h": "10",
                 "i": "Telemetry",
