@@ -29,6 +29,8 @@ static volatile bool s_dhcp_bound = false;
 
 /* IoTConnect application glue (src/iotc/iotc_app.c). */
 extern void iotc_app_poll(bool network_up);
+/* Serial provisioning CLI (src/iotc/iotc_cli.c). */
+extern void iotc_cli_start(void);
 
 /* Debug breadcrumb, read via J-Link when the console is quiet. */
 volatile uint32_t g_net_step;
@@ -131,6 +133,8 @@ void net_thread_entry(void *pvParameters)
     FSP_PARAMETER_NOT_USED(pvParameters);
 
     NET_PRINT("\r\nEthernet: initializing FreeRTOS+TCP\r\n");
+
+    iotc_cli_start();
 
     if (pdFALSE == FreeRTOS_IPInit(s_ip, s_netmask, s_gateway, s_dns, s_mac))
     {

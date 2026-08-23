@@ -56,11 +56,16 @@ git clone --recurse-submodules <repo-url>
    **File Support** (required for snapshot upload).
 2. **Device → Create Device** on that template, auth type X.509 ("Auto-generated" is
    easiest). Download the device's certificate/key zip and the `iotcDeviceConfig.json`.
-3. Copy `src/iotc/app_secrets.h.example` → `src/iotc/app_secrets.h` (gitignored) and fill
-   in:
-   - `IOTC_CFG_ENV`, `IOTC_CFG_CPID` — from the config JSON (or Settings → Key Vault)
-   - `IOTC_CFG_DUID` — the device's unique ID
-   - the certificate and private key PEMs, one `"...\n"` string literal per line
+3. Provide the identity to the device — two options:
+   - **Runtime provisioning (default, no rebuild)**: the serial CLI stores env, CPID,
+     DUID, and the certificate/key PEMs on LittleFS (OSPI flash); they survive power
+     cycles and take precedence over anything compiled in. The walkthrough is in the
+     [Quickstart §5](QUICKSTART.md#5-provision-credentials-over-the-serial-terminal); the
+     implementation is `src/iotc/iotc_cli.c` + `src/iotc/iotc_config.c`.
+   - **Compile-time (development convenience)**: copy `src/iotc/app_secrets.h.example` →
+     `src/iotc/app_secrets.h` (gitignored) and fill in `IOTC_CFG_ENV`/`CPID`/`DUID` and
+     the PEMs, one `"...\n"` string literal per line, with `IOTC_CFG_ENABLED 1`. Used only
+     when no runtime configuration is stored.
 4. To register the bundled models for pushing: **AI Models → Create Model**, Model Type
    "AI Model", Variant "Renesas", and upload a zip from `tools/models/`. Codes must be
    3–10 characters. Name/Code are platform bookkeeping only — the name the device displays
@@ -100,9 +105,11 @@ JLink.exe -device R7KA8P1KF_CPU0 -if SWD -speed 4000 -AutoConnect 1 -CommandFile
   appeared** — a J-Link session conflict occasionally exits early and leaves stale firmware.
 - Serial console = the J-Link OB CDC UART at **230400 8N1**.
 
-A healthy cloud boot prints, in order: DHCP lease → `IOTC: time synced` → identity
+A healthy cloud boot prints, in order: DHCP lease →
+`IOTC: starting (…, credentials: stored|compiled)` → `IOTC: time synced` → identity
 provisioned → `FU: file upload ready (bucket …)` → `IOTC: connected` →
-`FU: selftest creds fetch -> 0 (OK)` → telemetry every 10 s.
+`FU: selftest creds fetch -> 0 (OK)` → telemetry every 10 s. With no stored or compiled
+identity the device runs the vision pipeline and prints a provisioning hint instead.
 
 ## 6. Architecture
 

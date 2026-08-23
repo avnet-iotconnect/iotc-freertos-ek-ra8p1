@@ -1,20 +1,18 @@
-# Quickstart — flash a prebuilt image
+# Quickstart — flash a prebuilt image and connect to /IOTCONNECT
 
-Run the vision pipeline (camera → Ethos-U55 NPU inference) on your EK-RA8P1 in about five
-minutes, using the prebuilt image in [firmware/](../firmware/) — no toolchain required.
-
-> The prebuilt image runs the **local** demo only: live face detection with serial output
-> and, if the LCD is attached, on-screen overlays. It contains no cloud credentials, so
-> /IOTCONNECT connectivity stays off. To connect your own device to the cloud (telemetry,
-> snapshots, model push) build once from source with your device's certificate — see the
-> [Developer Guide](DEVELOPER-GUIDE.md).
+Get the EK-RA8P1 running the vision pipeline in about five minutes, then connect it to your
+/IOTCONNECT account by typing credentials into a serial terminal — **no toolchain and no
+source build required**. Credentials are stored in the board's OSPI flash and survive power
+cycles.
 
 ## Contents
 
 - [1. What you need](#1-what-you-need)
-- [2. Flash](#2-flash)
-- [3. What you should see](#3-what-you-should-see)
-- [4. Next steps](#4-next-steps)
+- [2. Flash the prebuilt image](#2-flash-the-prebuilt-image)
+- [3. Verify the vision pipeline](#3-verify-the-vision-pipeline)
+- [4. Create the device in /IOTCONNECT](#4-create-the-device-in-iotconnect)
+- [5. Provision credentials over the serial terminal](#5-provision-credentials-over-the-serial-terminal)
+- [6. Next steps](#6-next-steps)
 - [Troubleshooting](#troubleshooting)
 
 ## 1. What you need
@@ -24,21 +22,25 @@ minutes, using the prebuilt image in [firmware/](../firmware/) — no toolchain 
 *The EK-RA8P1 board.*
 
 - EK-RA8P1 kit with the OV5640 camera board fitted (J35 / MIPI connector)
-- USB-C cable to the **DEBUG1** port (this is the on-board J-Link and the serial console)
+- Ethernet cable to a network with DHCP and internet access (the board is wired Gigabit
+  Ethernet — there are no network credentials to configure)
+- USB-C cable to the **DEBUG1** port (this is the on-board J-Link debug probe and the
+  serial console)
 - [SEGGER J-Link Software](https://www.segger.com/downloads/jlink/) **V9.38 or later**
   (earlier versions do not support the RA8P1)
-- The bundled 7" LCD, **optional**: with it attached you see live video and overlays on the
-  panel; without it, results are available on the serial console — and once
-  cloud-connected, the intended headless workflow is to view detections as telemetry and
-  capture images on demand through the /IOTCONNECT dashboard
+- A serial terminal program (Tera Term, PuTTY, or similar)
+- A /IOTCONNECT account on the **AWS** backend
+- The bundled 7" LCD, **optional**: with it attached you see live video and overlays;
+  without it the device runs headless, with the /IOTCONNECT dashboard as the interface —
+  telemetry as the data feed and cloud-triggered snapshot capture as the viewfinder
 
-## 2. Flash
+## 2. Flash the prebuilt image
 
 ### Option A — J-Flash Lite (GUI, easiest)
 
 1. Start **J-Flash Lite** (installed with the J-Link software).
 2. Device: **R7KA8P1KF_CPU0** · Interface: **SWD** · Speed: 4000 kHz.
-3. Data File: `firmware/iotc-vision-ai-ek-ra8p1-local-demo.hex`
+3. Data File: `firmware/iotc-vision-ai-ek-ra8p1-demo.hex`
 4. **Program Device**. When it finishes, press the board's RESET button.
 
 ### Option B — J-Link Commander (CLI)
@@ -46,12 +48,12 @@ minutes, using the prebuilt image in [firmware/](../firmware/) — no toolchain 
 Create `flash.jlink` with the following J-Link Commander script (one command per line):
 
 ```
-r                                                       // reset the MCU
-h                                                       // halt the core
-loadfile firmware/iotc-vision-ai-ek-ra8p1-local-demo.hex  // program MRAM (~10 s)
-r                                                       // reset again so the new image boots cleanly
-g                                                       // go (release the core)
-q                                                       // quit, leaving the target running
+r                                                  // reset the MCU
+h                                                  // halt the core
+loadfile firmware/iotc-vision-ai-ek-ra8p1-demo.hex // program MRAM (~10 s)
+r                                                  // reset again so the new image boots cleanly
+g                                                  // go (release the core)
+q                                                  // quit, leaving the target running
 ```
 
 then:
@@ -60,39 +62,100 @@ then:
 JLink.exe -device R7KA8P1KF_CPU0 -if SWD -speed 4000 -AutoConnect 1 -CommandFile flash.jlink
 ```
 
-## 3. What you should see
+## 3. Verify the vision pipeline
 
-- **LCD (if attached)**: live camera video with an information panel. Point the camera at a
-  face — green boxes track it, and the panel shows the model name, face count, best score,
-  NPU inference time in microseconds, and the camera frame rate.
-- **Serial console** (the J-Link OB enumerates a COM port; **230400 baud**, 8N1):
+Open the serial terminal on the J-Link CDC COM port at **230400 baud**, 8N1. Within a few
+seconds of reset you should see face-detection output and the periodic processing report:
 
-  ```
-  FD: model "builtin" v1 (builtin, 441088 bytes) loaded: face detector, ethos-u: yes
-  FD: 1 face(s): [25,63 49x58 90%]
-  Processing time:
-    Camera image capture vsync period :   18 ms,   55 fps
-    AI inference time (Ethos-U55)     : 5800 us,  172 fps
-  ```
+```
+FD: model "builtin" v1 (builtin, 441088 bytes) loaded: face detector, ethos-u: yes
+FD: 1 face(s): [25,63 49x58 90%]
+Processing time:
+  Camera image capture vsync period :   18 ms,   55 fps
+  AI inference time (Ethos-U55)     : 5800 us,  172 fps
+```
 
-Reference figures: the camera delivers 55 fps and the NPU completes a full YOLO-Fastest
-face detection in approximately 5.8 ms, leaving substantial compute headroom for larger
-models.
+If the LCD is attached it shows the live camera image with detection boxes and the
+performance panel. Until credentials are provisioned, the console also prints:
 
-## 4. Next steps
+```
+IOTC: no credentials provisioned - use the serial CLI (type 'help') ...
+```
 
-- **Connect it to /IOTCONNECT** — telemetry, cloud snapshots, and over-the-air model
-  hot-swap: follow the [Developer Guide](DEVELOPER-GUIDE.md). You will import the device
-  template, create a device with an X.509 certificate, drop the credentials into one
-  gitignored header, and rebuild.
-- **Run the full demo** — once cloud-connected, the [Demo Guide](DEMO-GUIDE.md) is the
-  presenter's script, including pushing all five bundled models live.
+## 4. Create the device in /IOTCONNECT
+
+In your /IOTCONNECT account (AWS backend):
+
+1. **Device → Templates → Import** and import
+   [`templates/ra8p1-vision-ai-template.json`](../templates/ra8p1-vision-ai-template.json)
+   from this repository.
+2. **Device → Create Device** using that template, auth type **X.509**
+   ("Auto-generated certificate" is easiest). Note the **Unique ID** you choose.
+3. Download the device's certificate package (contains the certificate and private key PEM
+   files).
+4. Find your **CPID** and **Environment** under **Settings → Key Vault** (they are also in
+   the downloadable `iotcDeviceConfig.json`).
+
+## 5. Provision credentials over the serial terminal
+
+In the serial terminal, press Enter, then type `help` to see the provisioning CLI. Enter
+your values (press Enter after each command):
+
+```
+set env poc
+set cpid <your CPID>
+set duid <your device Unique ID>
+```
+
+Now store the certificate. Type:
+
+```
+set cert
+```
+
+then **paste the entire device certificate PEM** (from `-----BEGIN CERTIFICATE-----` to
+`-----END CERTIFICATE-----`) into the terminal. Capture ends automatically at the END line
+and the device replies `certificate stored`. Repeat for the key:
+
+```
+set key
+```
+
+and paste the private key PEM. Check the result and connect:
+
+```
+show
+apply
+```
+
+Within roughly 30 seconds the console shows:
+
+```
+IOTC: starting (env=poc duid=<your id>, credentials: stored)
+IOTC: connected
+FU: selftest creds fetch -> 0 (OK)
+```
+
+and the device appears **connected** on the /IOTCONNECT dashboard with telemetry arriving
+every 10 seconds. The stored credentials persist across power cycles — from now on the
+device connects automatically at boot. Useful maintenance commands: `show` (review, key
+redacted), `erase` (remove stored credentials), `reboot`.
+
+## 6. Next steps
+
+- Run the full demonstration — snapshots to Telemetry Files and over-the-air model
+  hot-swap with the five bundled models: [Demo Guide](DEMO-GUIDE.md).
+- Build from source, explore the architecture, or add your own models:
+  [Developer Guide](DEVELOPER-GUIDE.md).
 
 ## Troubleshooting
 
 | Symptom | Fix |
 |---|---|
 | J-Link cannot find the device | Update J-Link software to V9.38+; select `R7KA8P1KF_CPU0` (CPU0 = the Cortex-M85), not `_CPU1` |
-| Blank LCD | Check both LCD flat cables; the panel backlight only turns on once the app boots |
 | No serial output | Pick the J-Link CDC UART COM port; the baud rate is **230400**, not 115200 |
+| Typed characters not accepted | Ensure the terminal sends CR or CR+LF line endings |
+| PEM paste rejected as too large | Paste only one PEM block per command (certificate and key separately) |
+| `apply` connects but dashboard shows nulls | Template attribute types — import the bundled template rather than creating one manually |
 | No camera image | Re-seat the OV5640 camera board on J35; the flex cable must be fully latched |
+| Blank LCD | The LCD is optional; if attached, check both flat cables |

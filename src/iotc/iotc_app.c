@@ -28,6 +28,7 @@
 
 #include "iotc_dra_client.h"
 #include "iotc_snapshot.h"
+#include "iotc_config.h"
 #include "iotcl_util.h"
 #include "model_store/model_store.h"
 
@@ -286,22 +287,60 @@ static void prv_publish_telemetry(void)
     iotcl_telemetry_destroy(msg);
 }
 
+/* Credentials resolved at connect time: the runtime-provisioned identity on
+ * LittleFS (serial CLI, survives power cycles) takes precedence over any
+ * identity compiled in via app_secrets.h. */
+static iotc_config_identity_t s_stored;
+static bool s_no_creds_reported;
+static volatile bool s_restart_req;
+
+/* Called by the CLI after configuration changes: reconnect with the
+ * currently stored identity, no reboot needed. */
+void iotc_app_request_restart(void)
+{
+    s_restart_req = true;
+}
+
 /* Called from net_thread each loop iteration once the network is up. */
 void iotc_app_poll(bool network_up)
 {
-#if !IOTC_CFG_ENABLED
-    (void) network_up;
-    return;
-#else
+    if (s_restart_req)
+    {
+        s_restart_req = false;
+        iotconnect_sdk_deinit();
+        s_state = IOTC_APP_IDLE;
+        s_no_creds_reported = false;
+    }
+
     switch (s_state)
     {
         case IOTC_APP_IDLE:
+        {
             if (!network_up)
             {
                 break;
             }
+
+            /* Resolve the identity source. */
+            iotc_config_identity_free(&s_stored);
+            bool use_stored = (0 == iotc_config_load(&s_stored));
+            if (!use_stored && !IOTC_CFG_ENABLED)
+            {
+                if (!s_no_creds_reported)
+                {
+                    s_no_creds_reported = true;
+                    IOTC_PRINT("IOTC: no credentials provisioned - use the serial "
+                               "CLI (type 'help') to set env/cpid/duid/cert/key, "
+                               "then 'apply'\r\n");
+                }
+                break;
+            }
+
             s_state = IOTC_APP_STARTING;
-            IOTC_PRINT("IOTC: starting (env=%s duid=%s)\r\n", IOTC_CFG_ENV, IOTC_CFG_DUID);
+            IOTC_PRINT("IOTC: starting (env=%s duid=%s, credentials: %s)\r\n",
+                       use_stored ? s_stored.env : IOTC_CFG_ENV,
+                       use_stored ? s_stored.duid : IOTC_CFG_DUID,
+                       use_stored ? "stored" : "compiled");
 
             if (0 != iotc_time_sync(IOTC_CFG_SNTP_SERVER, 10000))
             {
@@ -314,12 +353,14 @@ void iotc_app_poll(bool network_up)
             {
                 IotConnectClientConfig cfg;
                 iotconnect_sdk_init_config(&cfg);
-                cfg.env = IOTC_CFG_ENV;
-                cfg.cpid = IOTC_CFG_CPID;
-                cfg.duid = IOTC_CFG_DUID;
+                cfg.env = use_stored ? s_stored.env : IOTC_CFG_ENV;
+                cfg.cpid = use_stored ? s_stored.cpid : IOTC_CFG_CPID;
+                cfg.duid = use_stored ? s_stored.duid : IOTC_CFG_DUID;
                 cfg.auth_info.type = IOTC_AT_X509;
-                cfg.auth_info.cert_info.device_cert = IOTC_CFG_DEVICE_CERT_PEM;
-                cfg.auth_info.cert_info.device_key = IOTC_CFG_DEVICE_KEY_PEM;
+                cfg.auth_info.cert_info.device_cert =
+                    use_stored ? s_stored.cert_pem : IOTC_CFG_DEVICE_CERT_PEM;
+                cfg.auth_info.cert_info.device_key =
+                    use_stored ? s_stored.key_pem : IOTC_CFG_DEVICE_KEY_PEM;
                 cfg.cmd_cb = prv_on_command;
                 cfg.ota_cb = prv_on_ota;
 
@@ -340,6 +381,7 @@ void iotc_app_poll(bool network_up)
             s_state = IOTC_APP_RUNNING;
             s_last_pub = 0;
             break;
+        }
 
         case IOTC_APP_RUNNING:
             if (!iotconnect_sdk_is_connected())
@@ -406,5 +448,4 @@ void iotc_app_poll(bool network_up)
         default:
             break;
     }
-#endif /* IOTC_CFG_ENABLED */
 }

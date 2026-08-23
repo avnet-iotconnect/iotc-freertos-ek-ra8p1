@@ -43,9 +43,13 @@ char sprintf_buffer[BUFFER_LINE_LENGTH] = {};
  ***************************************************************************************************************************/
 static uint8_t s_rx_buf;
 
+/* Interrupt-fed receive ring for the provisioning CLI. Sized so a pasted
+ * PEM block at 230400 baud cannot overrun between reader wakeups. */
+#define CONSOLE_RX_RING_SIZE 1024
+static volatile uint8_t  s_rx_ring[CONSOLE_RX_RING_SIZE];
+static volatile uint32_t s_rx_head;
+static volatile uint32_t s_rx_tail;
 
-static uint8_t  g_out_of_band_received[BUFFER_LINE_LENGTH];
-static uint32_t g_out_of_band_index = 0;
 static volatile uint32_t g_transfer_complete = 0;
 static volatile uint32_t g_receive_complete  = 0;
 
@@ -160,6 +164,28 @@ static fsp_err_t console_output_write(const char *buffer)
 }
 
 /*********************************************************************************************************************
+ *  Read one received character from the interrupt-fed ring.
+ *  @param[IN]   timeout_ms: how long to wait for a character
+ *  @retval      the character (0..255), or -1 on timeout
+***********************************************************************************************************************/
+int console_read_char(uint32_t timeout_ms)
+{
+    uint32_t waited = 0;
+    while (s_rx_tail == s_rx_head)
+    {
+        if (waited >= timeout_ms)
+        {
+            return -1;
+        }
+        vTaskDelay(pdMS_TO_TICKS(10));
+        waited += 10;
+    }
+    uint8_t c = s_rx_ring[s_rx_tail % CONSOLE_RX_RING_SIZE];
+    s_rx_tail++;
+    return (int) c;
+}
+
+/*********************************************************************************************************************
  *  Get key pressed
  *  @param[IN]   None
  *  @retval      uint8_t: key ascii
@@ -190,23 +216,13 @@ void console_output_uart_callback(uart_callback_args_t *p_args)
     /* Handle the UART event */
     switch (p_args->event)
     {
-        /* Received a character */
+        /* Received a character: push into the CLI ring (drop on overflow) */
         case UART_EVENT_RX_CHAR:
         {
-            /* Only put the next character in the receive buffer if there is space for it */
-            if (sizeof(g_out_of_band_received) > g_out_of_band_index)
+            if ((s_rx_head - s_rx_tail) < CONSOLE_RX_RING_SIZE)
             {
-                /* Write either the next one or two bytes depending on the receive data size */
-                if (UART_DATA_BITS_8 >= g_console_output_uart_cfg.data_bits)
-                {
-                    g_out_of_band_received[g_out_of_band_index++] = (uint8_t) p_args->data;
-                }
-                else
-                {
-                    uint16_t * p_dest = (uint16_t *) &g_out_of_band_received[g_out_of_band_index];
-                    *p_dest              = (uint16_t) p_args->data;
-                    g_out_of_band_index += 2;
-                }
+                s_rx_ring[s_rx_head % CONSOLE_RX_RING_SIZE] = (uint8_t) p_args->data;
+                s_rx_head++;
             }
             break;
         }

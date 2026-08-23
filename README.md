@@ -65,7 +65,7 @@ upload → push.
 
 | Document | For |
 |---|---|
-| [docs/QUICKSTART.md](docs/QUICKSTART.md) | Flash a prebuilt image and see the vision pipeline run in minutes |
+| [docs/QUICKSTART.md](docs/QUICKSTART.md) | Flash a prebuilt image, provision credentials over the serial terminal, and connect — no toolchain |
 | [docs/DEVELOPER-GUIDE.md](docs/DEVELOPER-GUIDE.md) | Build from source, connect to /IOTCONNECT, architecture, adding models |
 | [docs/DEMO-GUIDE.md](docs/DEMO-GUIDE.md) | The presenter's script: what to show, in what order, with expected results |
 | [docs/BUILD-NOTES.md](docs/BUILD-NOTES.md) | Raw engineering log: toolchain quirks, hardware gotchas, debugging recipes |
@@ -125,6 +125,13 @@ docs/                                      Quickstart, developer guide, demo gui
 
 ## Credentials
 
-The device certificate and private key are **never committed**. They live in
-`src/iotc/app_secrets.h`, which is gitignored; copy `app_secrets.h.example` and fill it in
-per the [Developer Guide](docs/DEVELOPER-GUIDE.md#iotconnect-setup).
+The /IOTCONNECT identity (environment, CPID, device ID, X.509 certificate and key) is
+**provisioned at runtime** through a serial CLI and stored on the OSPI flash, where it
+survives power cycles — the prebuilt image connects to your account without any source
+build (see the [Quickstart](docs/QUICKSTART.md)). Networking is wired Ethernet with DHCP,
+so there is no network configuration.
+
+For development, an identity can alternatively be compiled in via the gitignored
+`src/iotc/app_secrets.h` (see the
+[Developer Guide](docs/DEVELOPER-GUIDE.md#3-iotconnect-setup)); stored runtime credentials
+always take precedence. Credentials are never committed to the repository.

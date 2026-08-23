@@ -35,4 +35,8 @@ extern fsp_err_t console_output_init (void);
 extern fsp_err_t print_to_console(char * p_data);
 extern int8_t input_from_console (void);
 
+/* Read one received character from the interrupt-fed ring buffer.
+ * Returns the character, or -1 after timeout_ms with nothing received. */
+extern int console_read_char(uint32_t timeout_ms);
+
 #endif /* CONSOLE_OUTPUT_H_ */
