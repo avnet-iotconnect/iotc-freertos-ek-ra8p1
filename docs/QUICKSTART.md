@@ -1,22 +1,36 @@
 # Quickstart — flash a prebuilt image
 
-Goal: see the vision pipeline (camera → Ethos-U55 NPU → LCD) running on your EK-RA8P1 in
-about five minutes, using the prebuilt image in [firmware/](../firmware/) — no toolchain
-required.
+Run the vision pipeline (camera → Ethos-U55 NPU inference) on your EK-RA8P1 in about five
+minutes, using the prebuilt image in [firmware/](../firmware/) — no toolchain required.
 
-> The prebuilt image runs the **local** demo only: live face detection with LCD overlays and
-> serial output. It contains no cloud credentials, so /IOTCONNECT connectivity stays off.
-> To connect your own device to the cloud (telemetry, snapshots, model push) you build once
-> from source with your device's certificate — 30–45 minutes with the
+> The prebuilt image runs the **local** demo only: live face detection with serial output
+> and, if the LCD is attached, on-screen overlays. It contains no cloud credentials, so
+> /IOTCONNECT connectivity stays off. To connect your own device to the cloud (telemetry,
+> snapshots, model push) build once from source with your device's certificate — see the
 > [Developer Guide](DEVELOPER-GUIDE.md).
+
+## Contents
+
+- [1. What you need](#1-what-you-need)
+- [2. Flash](#2-flash)
+- [3. What you should see](#3-what-you-should-see)
+- [4. Next steps](#4-next-steps)
+- [Troubleshooting](#troubleshooting)
 
 ## 1. What you need
 
+<img src="media/ek-ra8p1-board.webp" alt="Renesas EK-RA8P1 board" width="320"/>
+
+*The EK-RA8P1 board (image: Zephyr Project documentation).*
+
 - EK-RA8P1 kit with the OV5640 camera board fitted (J35 / MIPI connector)
-- The bundled 7" LCD attached (recommended — it is the demo's output)
 - USB-C cable to the **DEBUG1** port (this is the on-board J-Link and the serial console)
 - [SEGGER J-Link Software](https://www.segger.com/downloads/jlink/) **V9.38 or later**
-  (earlier versions do not know the RA8P1)
+  (earlier versions do not support the RA8P1)
+- The bundled 7" LCD, **optional**: with it attached you see live video and overlays on the
+  panel; without it, results are available on the serial console — and once
+  cloud-connected, the intended headless workflow is to view detections as telemetry and
+  capture images on demand through the /IOTCONNECT dashboard
 
 ## 2. Flash
 
@@ -29,15 +43,15 @@ required.
 
 ### Option B — J-Link Commander (CLI)
 
-Create `flash.jlink`:
+Create `flash.jlink` with the following J-Link Commander script (one command per line):
 
 ```
-r
-h
-loadfile firmware/iotc-vision-ai-ek-ra8p1-local-demo.hex
-r
-g
-q
+r                                                       // reset the MCU
+h                                                       // halt the core
+loadfile firmware/iotc-vision-ai-ek-ra8p1-local-demo.hex  // program MRAM (~10 s)
+r                                                       // reset again so the new image boots cleanly
+g                                                       // go (release the core)
+q                                                       // quit, leaving the target running
 ```
 
 then:
@@ -48,9 +62,9 @@ JLink.exe -device R7KA8P1KF_CPU0 -if SWD -speed 4000 -AutoConnect 1 -CommandFile
 
 ## 3. What you should see
 
-- **LCD**: live camera video with an information panel. Point the camera at a face — green
-  boxes track it, and the panel shows the model name, face count, best score, NPU inference
-  time in microseconds, and the camera frame rate.
+- **LCD (if attached)**: live camera video with an information panel. Point the camera at a
+  face — green boxes track it, and the panel shows the model name, face count, best score,
+  NPU inference time in microseconds, and the camera frame rate.
 - **Serial console** (the J-Link OB enumerates a COM port; **230400 baud**, 8N1):
 
   ```
@@ -61,8 +75,9 @@ JLink.exe -device R7KA8P1KF_CPU0 -if SWD -speed 4000 -AutoConnect 1 -CommandFile
     AI inference time (Ethos-U55)     : 5800 us,  172 fps
   ```
 
-The numbers are the story: the camera delivers 55 fps and the NPU completes a full
-YOLO-Fastest face detection in ~5.8 ms — the accelerator is barely working.
+Reference figures: the camera delivers 55 fps and the NPU completes a full YOLO-Fastest
+face detection in approximately 5.8 ms, leaving substantial compute headroom for larger
+models.
 
 ## 4. Next steps
 

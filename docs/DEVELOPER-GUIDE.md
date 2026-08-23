@@ -6,6 +6,19 @@ extend it — including adding your own pushable models.
 For the raw engineering log (every toolchain quirk and hardware gotcha found during bring-up,
 with the reasoning), see [BUILD-NOTES.md](BUILD-NOTES.md). This guide is the distilled path.
 
+## Contents
+
+- [1. Prerequisites](#1-prerequisites)
+- [2. Clone](#2-clone)
+- [3. /IOTCONNECT setup](#3-iotconnect-setup)
+- [4. Build](#4-build)
+- [5. Flash and console](#5-flash-and-console)
+- [6. Architecture](#6-architecture)
+- [7. Memory budget](#7-memory-budget)
+- [8. Vendor patches](#8-vendor-patches-survive-with-care)
+- [9. Adding models](#9-adding-models)
+- [10. Troubleshooting](#10-troubleshooting)
+
 ---
 
 ## 1. Prerequisites

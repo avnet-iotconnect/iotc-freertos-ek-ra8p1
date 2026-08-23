@@ -6,12 +6,31 @@ Renesas FSP with FreeRTOS — **no Linux, no MPU, everything on the microcontrol
 
 The kit's OV5640 MIPI CSI-2 camera feeds TensorFlow Lite Micro models running on the
 Ethos-U55 NPU. Results stream to /IOTCONNECT as telemetry, annotated snapshots upload to
-Telemetry Files on demand, and — the headline — **models are deployed live from the cloud**:
-push a Vela-compiled model from /IOTCONNECT AI Model Management and the device hot-swaps it
-between two inferences, no reflash, no reboot. Pushed models persist in the 64 MB OSPI flash
-and survive power cycles.
+Telemetry Files on demand, and **models are deployed live from the cloud**: push a
+Vela-compiled model from /IOTCONNECT AI Model Management and the device hot-swaps it
+between two inferences, with no reflash and no reboot. Pushed models persist in the 64 MB
+OSPI flash and survive power cycles.
+
+The LCD is **optional**. A key use case is fully headless operation: no display attached,
+with the /IOTCONNECT dashboard as the interface — live telemetry as the data feed and
+cloud-triggered snapshot capture as the viewfinder.
 
 All capabilities below are verified on hardware.
+
+<img src="docs/media/ek-ra8p1-board.webp" alt="Renesas EK-RA8P1 board" width="360"/>
+
+*Renesas EK-RA8P1 evaluation board (image: Zephyr Project documentation). The kit also
+includes the OV5640 camera expansion board and a 7-inch parallel LCD.*
+
+## Contents
+
+- [Capabilities](#capabilities)
+- [The model library](#the-model-library)
+- [Documentation](#documentation)
+- [Architecture](#architecture)
+- [Repository layout](#repository-layout)
+- [Requirements](#requirements)
+- [Credentials](#credentials)
 
 ## Capabilities
 
