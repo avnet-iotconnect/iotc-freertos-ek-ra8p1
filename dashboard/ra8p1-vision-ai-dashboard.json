@@ -1,0 +1,3068 @@
+{
+    "ddType": 2,
+    "items": [
+        {
+            "widgetGuid": "A8CB394D-15B1-42C9-94FC-AD7BDC599E2A",
+            "widgetProperties": {
+                "i": "Image",
+                "background": "#FFFFFF",
+                "fontColor": "#000000",
+                "fontFamily": "Proxima Nova",
+                "fontSize": "18",
+                "title": "",
+                "titleAlign": "",
+                "contents": {
+                    "option": {
+                        "imageUpload": "false",
+                        "imageUrl": "true",
+                        "imageDevice": "false",
+                        "imageTelemetry": "false",
+                        "key": "option",
+                        "position": "center"
+                    },
+                    "upload": {
+                        "imageurl": "",
+                        "key": "upload"
+                    },
+                    "url": {
+                        "imageurl": "https://avnetpublicaccess.s3.us-east-1.amazonaws.com/images/renesas/ek-ra8p1/banner_vision_ai.png",
+                        "key": "url"
+                    },
+                    "device": {
+                        "deviceGuid": "",
+                        "deviceName": "",
+                        "imageurl": "",
+                        "key": "device"
+                    },
+                    "telemetry": {
+                        "deviceGuid": "",
+                        "deviceName": "",
+                        "imageurl": "",
+                        "key": "telemetry"
+                    },
+                    "classification": {
+                        "showClassification": "false",
+                        "key": "classification"
+                    }
+                }
+            },
+            "properties": {
+                "x": "0",
+                "y": "0",
+                "w": "58",
+                "h": "6",
+                "i": "Image",
+                "minW": "5",
+                "minH": "5",
+                "isStatic": "false"
+            }
+        },
+        {
+            "widgetGuid": "A8CB394D-15B1-42C9-94FC-AD7BDC599E2A",
+            "widgetProperties": {
+                "i": "Image",
+                "background": "#FFFFFF",
+                "fontColor": "#0088cc",
+                "fontFamily": "Proxima Nova",
+                "fontSize": "18",
+                "title": "Latest Snapshot",
+                "titleAlign": "",
+                "contents": {
+                    "option": {
+                        "imageUpload": "false",
+                        "imageUrl": "false",
+                        "imageDevice": "false",
+                        "imageTelemetry": "true",
+                        "key": "option",
+                        "position": "center"
+                    },
+                    "upload": {
+                        "imageurl": "",
+                        "key": "upload"
+                    },
+                    "url": {
+                        "imageurl": "",
+                        "key": "url"
+                    },
+                    "device": {
+                        "deviceGuid": "",
+                        "deviceName": "",
+                        "imageurl": "",
+                        "key": "device"
+                    },
+                    "telemetry": {
+                        "deviceGuid": "E1762101-FA36-4ACB-B94E-ED2C7D861C85",
+                        "deviceName": "RA8P1-mcl",
+                        "imageurl": "",
+                        "key": "telemetry"
+                    },
+                    "classification": {
+                        "showClassification": "true",
+                        "key": "classification"
+                    }
+                }
+            },
+            "properties": {
+                "x": "0",
+                "y": "6",
+                "w": "14",
+                "h": "13",
+                "i": "Image",
+                "minW": "5",
+                "minH": "5",
+                "isStatic": "false"
+            }
+        },
+        {
+            "widgetGuid": "6FEFF6B7-15C4-4095-A156-87A1B38D2FF5",
+            "widgetProperties": {
+                "i": "Transformation",
+                "background": "#0b1226",
+                "fontColor": "#ffffff",
+                "fontFamily": "Proxima Nova",
+                "fontSize": "18",
+                "title": "Detection State",
+                "titleAlign": "",
+                "contents": {
+                    "Transformation": {
+                        "device": {
+                            "deviceGuid": "E1762101-FA36-4ACB-B94E-ED2C7D861C85",
+                            "deviceUniqueId": "RA8P1-mcl"
+                        },
+                        "attributes": {
+                            "attribute": [
+                                {
+                                    "attributeGuid": "F5142BC2-E2A2-44A8-810A-F29F9D912B7C",
+                                    "attributeName": "vision.face_count",
+                                    "displayName": "Faces detected",
+                                    "checked": "false",
+                                    "dataType": "DECIMAL",
+                                    "attributeLatestValue": "",
+                                    "deviceUpdatedDate": "1900-01-01T00:00:00.000Z",
+                                    "gatewayUpdatedDate": "NA",
+                                    "attributeValue": "NA"
+                                },
+                                {
+                                    "attributeGuid": "5C746F7D-E740-4C16-A2B1-E2B667786295",
+                                    "attributeName": "vision.score",
+                                    "displayName": "Best score",
+                                    "checked": "false",
+                                    "dataType": "DECIMAL",
+                                    "attributeLatestValue": "",
+                                    "deviceUpdatedDate": "1900-01-01T00:00:00.000Z",
+                                    "gatewayUpdatedDate": "NA",
+                                    "attributeValue": "NA"
+                                },
+                                {
+                                    "attributeGuid": "DE7645B5-AB09-4A25-A102-6A027A40E781",
+                                    "attributeName": "vision.state",
+                                    "displayName": "Detection state",
+                                    "checked": "true",
+                                    "dataType": "STRING",
+                                    "attributeLatestValue": "",
+                                    "deviceUpdatedDate": "1900-01-01T00:00:00.000Z",
+                                    "gatewayUpdatedDate": "NA",
+                                    "attributeValue": "NA"
+                                },
+                                {
+                                    "attributeGuid": "CBDD13CB-4C55-432D-9139-673D6FF90489",
+                                    "attributeName": "model.name",
+                                    "displayName": "Model name",
+                                    "checked": "false",
+                                    "dataType": "STRING",
+                                    "attributeLatestValue": "",
+                                    "deviceUpdatedDate": "1900-01-01T00:00:00.000Z",
+                                    "gatewayUpdatedDate": "NA",
+                                    "attributeValue": "NA"
+                                },
+                                {
+                                    "attributeGuid": "85E20E94-77A5-441E-AA47-5F789DDD66D6",
+                                    "attributeName": "model.ver",
+                                    "displayName": "Model version",
+                                    "checked": "false",
+                                    "dataType": "DECIMAL",
+                                    "attributeLatestValue": "",
+                                    "deviceUpdatedDate": "1900-01-01T00:00:00.000Z",
+                                    "gatewayUpdatedDate": "NA",
+                                    "attributeValue": "NA"
+                                },
+                                {
+                                    "attributeGuid": "3BC02B9C-DB6F-4017-97AC-323384258D8B",
+                                    "attributeName": "model.src",
+                                    "displayName": "Model source",
+                                    "checked": "false",
+                                    "dataType": "STRING",
+                                    "attributeLatestValue": "",
+                                    "deviceUpdatedDate": "1900-01-01T00:00:00.000Z",
+                                    "gatewayUpdatedDate": "NA",
+                                    "attributeValue": "NA"
+                                },
+                                {
+                                    "attributeGuid": "842828D5-45DF-46B5-B6A0-D5EBBE0D3B32",
+                                    "attributeName": "model.size_b",
+                                    "displayName": "Model size",
+                                    "checked": "false",
+                                    "dataType": "DECIMAL",
+                                    "attributeLatestValue": "",
+                                    "deviceUpdatedDate": "1900-01-01T00:00:00.000Z",
+                                    "gatewayUpdatedDate": "NA",
+                                    "attributeValue": "NA"
+                                },
+                                {
+                                    "attributeGuid": "8C3EB5AB-EAE1-4DE4-9F20-EF93E49BE45D",
+                                    "attributeName": "sys.uptime_s",
+                                    "displayName": "Uptime",
+                                    "checked": "false",
+                                    "dataType": "DECIMAL",
+                                    "attributeLatestValue": "",
+                                    "deviceUpdatedDate": "1900-01-01T00:00:00.000Z",
+                                    "gatewayUpdatedDate": "NA",
+                                    "attributeValue": "NA"
+                                },
+                                {
+                                    "attributeGuid": "184D2F31-C6E6-421F-B767-3AC2DE3B1CBC",
+                                    "attributeName": "sys.free_heap",
+                                    "displayName": "FreeRTOS heap free",
+                                    "checked": "false",
+                                    "dataType": "DECIMAL",
+                                    "attributeLatestValue": "",
+                                    "deviceUpdatedDate": "1900-01-01T00:00:00.000Z",
+                                    "gatewayUpdatedDate": "NA",
+                                    "attributeValue": "NA"
+                                },
+                                {
+                                    "attributeGuid": "B7EF1595-1712-442E-A565-B1C4DF517D3E",
+                                    "attributeName": "sys.msgs_sent",
+                                    "displayName": "Telemetry messages sent",
+                                    "checked": "false",
+                                    "dataType": "DECIMAL",
+                                    "attributeLatestValue": "",
+                                    "deviceUpdatedDate": "1900-01-01T00:00:00.000Z",
+                                    "gatewayUpdatedDate": "NA",
+                                    "attributeValue": "NA"
+                                },
+                                {
+                                    "attributeGuid": "17DF9BA1-78F8-459E-8054-E1C4A5920951",
+                                    "attributeName": "perf.infer_us",
+                                    "displayName": "",
+                                    "checked": "false",
+                                    "dataType": "INTEGER",
+                                    "attributeLatestValue": "",
+                                    "deviceUpdatedDate": "1900-01-01T00:00:00.000Z",
+                                    "gatewayUpdatedDate": "NA",
+                                    "attributeValue": "NA"
+                                },
+                                {
+                                    "attributeGuid": "9CBEF04D-9856-49B4-96BB-1A9A22A8D7F4",
+                                    "attributeName": "perf.infer_fps",
+                                    "displayName": "",
+                                    "checked": "false",
+                                    "dataType": "INTEGER",
+                                    "attributeLatestValue": "",
+                                    "deviceUpdatedDate": "1900-01-01T00:00:00.000Z",
+                                    "gatewayUpdatedDate": "NA",
+                                    "attributeValue": "NA"
+                                },
+                                {
+                                    "attributeGuid": "5CA7BE0B-F45C-4644-BDA0-EB667BEE1838",
+                                    "attributeName": "perf.cam_fps",
+                                    "displayName": "",
+                                    "checked": "false",
+                                    "dataType": "INTEGER",
+                                    "attributeLatestValue": "",
+                                    "deviceUpdatedDate": "1900-01-01T00:00:00.000Z",
+                                    "gatewayUpdatedDate": "NA",
+                                    "attributeValue": "NA"
+                                }
+                            ]
+                        },
+                        "attrType": "1",
+                        "key": "Transformation",
+                        "transformations": [
+                            {
+                                "condition": "eq",
+                                "conditionValue": "face",
+                                "type": "Url",
+                                "errors": "",
+                                "typeValue": "https://avnetpublicaccess.s3.us-east-1.amazonaws.com/images/renesas/ek-ra8p1/state_face.png",
+                                "isShowLiveFontColor": "false"
+                            },
+                            {
+                                "condition": "eq",
+                                "conditionValue": "clear",
+                                "type": "Url",
+                                "errors": "",
+                                "typeValue": "https://avnetpublicaccess.s3.us-east-1.amazonaws.com/images/renesas/ek-ra8p1/state_clear.png",
+                                "isShowLiveFontColor": "false"
+                            },
+                            {
+                                "condition": "eq",
+                                "conditionValue": "person",
+                                "type": "Url",
+                                "errors": "",
+                                "typeValue": "https://avnetpublicaccess.s3.us-east-1.amazonaws.com/images/renesas/ek-ra8p1/state_person.png",
+                                "isShowLiveFontColor": "false"
+                            },
+                            {
+                                "condition": "eq",
+                                "conditionValue": "no person",
+                                "type": "Url",
+                                "errors": "",
+                                "typeValue": "https://avnetpublicaccess.s3.us-east-1.amazonaws.com/images/renesas/ek-ra8p1/state_no_person.png",
+                                "isShowLiveFontColor": "false"
+                            },
+                            {
+                                "condition": "ne",
+                                "conditionValue": "~none~",
+                                "type": "Url",
+                                "errors": "",
+                                "typeValue": "https://avnetpublicaccess.s3.us-east-1.amazonaws.com/images/renesas/ek-ra8p1/state_classifying.png",
+                                "isShowLiveFontColor": "false"
+                            }
+                        ],
+                        "position": "center"
+                    }
+                }
+            },
+            "properties": {
+                "x": "14",
+                "y": "6",
+                "w": "10",
+                "h": "13",
+                "i": "Transformation",
+                "minW": "7",
+                "minH": "4",
+                "isStatic": "false"
+            }
+        },
+        {
+            "widgetGuid": "21A18C90-2DBC-4283-89D2-B01E1B70E363",
+            "widgetProperties": {
+                "i": "gauge",
+                "background": "#000000",
+                "fontColor": "#ffffff",
+                "fontFamily": "Proxima Nova",
+                "fontSize": "18",
+                "title": "Faces Detected",
+                "titleAlign": "",
+                "contents": {
+                    "gauge": {
+                        "device": {
+                            "deviceGuid": "E1762101-FA36-4ACB-B94E-ED2C7D861C85",
+                            "deviceUniqueId": "RA8P1-mcl"
+                        },
+                        "attributes": {
+                            "attribute": {
+                                "attributeGuid": "F5142BC2-E2A2-44A8-810A-F29F9D912B7C",
+                                "attributeName": "vision.face_count",
+                                "displayName": "Faces detected",
+                                "checked": "true",
+                                "dataType": "DECIMAL",
+                                "attributeLatestValue": "",
+                                "deviceUpdatedDate": "1900-01-01T00:00:00.000Z",
+                                "gatewayUpdatedDate": "NA",
+                                "attributeValue": "NA"
+                            }
+                        },
+                        "minValue": "0",
+                        "maxValue": "8",
+                        "version": "2.0",
+                        "zones": [
+                            {
+                                "zoneColor": "#455a64",
+                                "zoneName": "clear",
+                                "upToValue": "1"
+                            },
+                            {
+                                "zoneColor": "#2e7d32",
+                                "zoneName": "detected",
+                                "upToValue": "8"
+                            }
+                        ],
+                        "attrType": "1",
+                        "key": "gauge"
+                    }
+                }
+            },
+            "properties": {
+                "x": "24",
+                "y": "6",
+                "w": "10",
+                "h": "9",
+                "i": "gauge",
+                "minW": "10",
+                "minH": "9",
+                "maxW": "16",
+                "maxH": "15",
+                "isStatic": "false"
+            }
+        },
+        {
+            "widgetGuid": "21A18C90-2DBC-4283-89D2-B01E1B70E363",
+            "widgetProperties": {
+                "i": "gauge",
+                "background": "#000000",
+                "fontColor": "#ffffff",
+                "fontFamily": "Proxima Nova",
+                "fontSize": "18",
+                "title": "Confidence (%)",
+                "titleAlign": "",
+                "contents": {
+                    "gauge": {
+                        "device": {
+                            "deviceGuid": "E1762101-FA36-4ACB-B94E-ED2C7D861C85",
+                            "deviceUniqueId": "RA8P1-mcl"
+                        },
+                        "attributes": {
+                            "attribute": {
+                                "attributeGuid": "5C746F7D-E740-4C16-A2B1-E2B667786295",
+                                "attributeName": "vision.score",
+                                "displayName": "Best score",
+                                "checked": "true",
+                                "dataType": "DECIMAL",
+                                "attributeLatestValue": "",
+                                "deviceUpdatedDate": "1900-01-01T00:00:00.000Z",
+                                "gatewayUpdatedDate": "NA",
+                                "attributeValue": "NA"
+                            }
+                        },
+                        "minValue": "0",
+                        "maxValue": "100",
+                        "version": "2.0",
+                        "zones": [
+                            {
+                                "zoneColor": "#455a64",
+                                "zoneName": "low",
+                                "upToValue": "50"
+                            },
+                            {
+                                "zoneColor": "#cc8800",
+                                "zoneName": "medium",
+                                "upToValue": "80"
+                            },
+                            {
+                                "zoneColor": "#2e7d32",
+                                "zoneName": "high",
+                                "upToValue": "100"
+                            }
+                        ],
+                        "attrType": "1",
+                        "key": "gauge"
+                    }
+                }
+            },
+            "properties": {
+                "x": "34",
+                "y": "6",
+                "w": "10",
+                "h": "9",
+                "i": "gauge",
+                "minW": "10",
+                "minH": "9",
+                "maxW": "16",
+                "maxH": "15",
+                "isStatic": "false"
+            }
+        },
+        {
+            "widgetGuid": "F7979C1B-8637-4667-90A2-6961052C6E21",
+            "widgetProperties": {
+                "i": "Live",
+                "background": "#FFFFFF",
+                "fontColor": "#0088cc",
+                "fontFamily": "Proxima Nova",
+                "fontSize": "18",
+                "title": "Detection / Class",
+                "titleAlign": "",
+                "contents": {
+                    "attributeValue": {
+                        "attributeName": "vision.state",
+                        "key": "attributeValue"
+                    },
+                    "attributeTime": {
+                        "attributeName": "vision.state",
+                        "key": "attributeTime"
+                    },
+                    "live": {
+                        "device": {
+                            "deviceGuid": "E1762101-FA36-4ACB-B94E-ED2C7D861C85",
+                            "deviceUniqueId": "RA8P1-mcl"
+                        },
+                        "attributes": {
+                            "attribute": [
+                                {
+                                    "attributeGuid": "F5142BC2-E2A2-44A8-810A-F29F9D912B7C",
+                                    "attributeName": "vision.face_count",
+                                    "displayName": "Faces detected",
+                                    "checked": "false",
+                                    "dataType": "DECIMAL",
+                                    "attributeLatestValue": "",
+                                    "deviceUpdatedDate": "1900-01-01T00:00:00.000Z",
+                                    "gatewayUpdatedDate": "NA",
+                                    "attributeValue": "NA"
+                                },
+                                {
+                                    "attributeGuid": "5C746F7D-E740-4C16-A2B1-E2B667786295",
+                                    "attributeName": "vision.score",
+                                    "displayName": "Best score",
+                                    "checked": "false",
+                                    "dataType": "DECIMAL",
+                                    "attributeLatestValue": "",
+                                    "deviceUpdatedDate": "1900-01-01T00:00:00.000Z",
+                                    "gatewayUpdatedDate": "NA",
+                                    "attributeValue": "NA"
+                                },
+                                {
+                                    "attributeGuid": "DE7645B5-AB09-4A25-A102-6A027A40E781",
+                                    "attributeName": "vision.state",
+                                    "displayName": "Detection state",
+                                    "checked": "true",
+                                    "dataType": "STRING",
+                                    "attributeLatestValue": "",
+                                    "deviceUpdatedDate": "1900-01-01T00:00:00.000Z",
+                                    "gatewayUpdatedDate": "NA",
+                                    "attributeValue": "NA"
+                                },
+                                {
+                                    "attributeGuid": "CBDD13CB-4C55-432D-9139-673D6FF90489",
+                                    "attributeName": "model.name",
+                                    "displayName": "Model name",
+                                    "checked": "false",
+                                    "dataType": "STRING",
+                                    "attributeLatestValue": "",
+                                    "deviceUpdatedDate": "1900-01-01T00:00:00.000Z",
+                                    "gatewayUpdatedDate": "NA",
+                                    "attributeValue": "NA"
+                                },
+                                {
+                                    "attributeGuid": "85E20E94-77A5-441E-AA47-5F789DDD66D6",
+                                    "attributeName": "model.ver",
+                                    "displayName": "Model version",
+                                    "checked": "false",
+                                    "dataType": "DECIMAL",
+                                    "attributeLatestValue": "",
+                                    "deviceUpdatedDate": "1900-01-01T00:00:00.000Z",
+                                    "gatewayUpdatedDate": "NA",
+                                    "attributeValue": "NA"
+                                },
+                                {
+                                    "attributeGuid": "3BC02B9C-DB6F-4017-97AC-323384258D8B",
+                                    "attributeName": "model.src",
+                                    "displayName": "Model source",
+                                    "checked": "false",
+                                    "dataType": "STRING",
+                                    "attributeLatestValue": "",
+                                    "deviceUpdatedDate": "1900-01-01T00:00:00.000Z",
+                                    "gatewayUpdatedDate": "NA",
+                                    "attributeValue": "NA"
+                                },
+                                {
+                                    "attributeGuid": "842828D5-45DF-46B5-B6A0-D5EBBE0D3B32",
+                                    "attributeName": "model.size_b",
+                                    "displayName": "Model size",
+                                    "checked": "false",
+                                    "dataType": "DECIMAL",
+                                    "attributeLatestValue": "",
+                                    "deviceUpdatedDate": "1900-01-01T00:00:00.000Z",
+                                    "gatewayUpdatedDate": "NA",
+                                    "attributeValue": "NA"
+                                },
+                                {
+                                    "attributeGuid": "8C3EB5AB-EAE1-4DE4-9F20-EF93E49BE45D",
+                                    "attributeName": "sys.uptime_s",
+                                    "displayName": "Uptime",
+                                    "checked": "false",
+                                    "dataType": "DECIMAL",
+                                    "attributeLatestValue": "",
+                                    "deviceUpdatedDate": "1900-01-01T00:00:00.000Z",
+                                    "gatewayUpdatedDate": "NA",
+                                    "attributeValue": "NA"
+                                },
+                                {
+                                    "attributeGuid": "184D2F31-C6E6-421F-B767-3AC2DE3B1CBC",
+                                    "attributeName": "sys.free_heap",
+                                    "displayName": "FreeRTOS heap free",
+                                    "checked": "false",
+                                    "dataType": "DECIMAL",
+                                    "attributeLatestValue": "",
+                                    "deviceUpdatedDate": "1900-01-01T00:00:00.000Z",
+                                    "gatewayUpdatedDate": "NA",
+                                    "attributeValue": "NA"
+                                },
+                                {
+                                    "attributeGuid": "B7EF1595-1712-442E-A565-B1C4DF517D3E",
+                                    "attributeName": "sys.msgs_sent",
+                                    "displayName": "Telemetry messages sent",
+                                    "checked": "false",
+                                    "dataType": "DECIMAL",
+                                    "attributeLatestValue": "",
+                                    "deviceUpdatedDate": "1900-01-01T00:00:00.000Z",
+                                    "gatewayUpdatedDate": "NA",
+                                    "attributeValue": "NA"
+                                },
+                                {
+                                    "attributeGuid": "17DF9BA1-78F8-459E-8054-E1C4A5920951",
+                                    "attributeName": "perf.infer_us",
+                                    "displayName": "",
+                                    "checked": "false",
+                                    "dataType": "INTEGER",
+                                    "attributeLatestValue": "",
+                                    "deviceUpdatedDate": "1900-01-01T00:00:00.000Z",
+                                    "gatewayUpdatedDate": "NA",
+                                    "attributeValue": "NA"
+                                },
+                                {
+                                    "attributeGuid": "9CBEF04D-9856-49B4-96BB-1A9A22A8D7F4",
+                                    "attributeName": "perf.infer_fps",
+                                    "displayName": "",
+                                    "checked": "false",
+                                    "dataType": "INTEGER",
+                                    "attributeLatestValue": "",
+                                    "deviceUpdatedDate": "1900-01-01T00:00:00.000Z",
+                                    "gatewayUpdatedDate": "NA",
+                                    "attributeValue": "NA"
+                                },
+                                {
+                                    "attributeGuid": "5CA7BE0B-F45C-4644-BDA0-EB667BEE1838",
+                                    "attributeName": "perf.cam_fps",
+                                    "displayName": "",
+                                    "checked": "false",
+                                    "dataType": "INTEGER",
+                                    "attributeLatestValue": "",
+                                    "deviceUpdatedDate": "1900-01-01T00:00:00.000Z",
+                                    "gatewayUpdatedDate": "NA",
+                                    "attributeValue": "NA"
+                                }
+                            ]
+                        },
+                        "rules": "",
+                        "attrType": "1",
+                        "key": "live"
+                    }
+                }
+            },
+            "properties": {
+                "x": "44",
+                "y": "6",
+                "w": "7",
+                "h": "4",
+                "i": "Live",
+                "minW": "7",
+                "minH": "4",
+                "maxW": "20",
+                "maxH": "4",
+                "isStatic": "false"
+            }
+        },
+        {
+            "widgetGuid": "F7979C1B-8637-4667-90A2-6961052C6E21",
+            "widgetProperties": {
+                "i": "Live",
+                "background": "#FFFFFF",
+                "fontColor": "#00aa00",
+                "fontFamily": "Proxima Nova",
+                "fontSize": "18",
+                "title": "Camera FPS",
+                "titleAlign": "",
+                "contents": {
+                    "attributeValue": {
+                        "attributeName": "perf.cam_fps",
+                        "key": "attributeValue"
+                    },
+                    "attributeTime": {
+                        "attributeName": "perf.cam_fps",
+                        "key": "attributeTime"
+                    },
+                    "live": {
+                        "device": {
+                            "deviceGuid": "E1762101-FA36-4ACB-B94E-ED2C7D861C85",
+                            "deviceUniqueId": "RA8P1-mcl"
+                        },
+                        "attributes": {
+                            "attribute": [
+                                {
+                                    "attributeGuid": "F5142BC2-E2A2-44A8-810A-F29F9D912B7C",
+                                    "attributeName": "vision.face_count",
+                                    "displayName": "Faces detected",
+                                    "checked": "false",
+                                    "dataType": "DECIMAL",
+                                    "attributeLatestValue": "",
+                                    "deviceUpdatedDate": "1900-01-01T00:00:00.000Z",
+                                    "gatewayUpdatedDate": "NA",
+                                    "attributeValue": "NA"
+                                },
+                                {
+                                    "attributeGuid": "5C746F7D-E740-4C16-A2B1-E2B667786295",
+                                    "attributeName": "vision.score",
+                                    "displayName": "Best score",
+                                    "checked": "false",
+                                    "dataType": "DECIMAL",
+                                    "attributeLatestValue": "",
+                                    "deviceUpdatedDate": "1900-01-01T00:00:00.000Z",
+                                    "gatewayUpdatedDate": "NA",
+                                    "attributeValue": "NA"
+                                },
+                                {
+                                    "attributeGuid": "DE7645B5-AB09-4A25-A102-6A027A40E781",
+                                    "attributeName": "vision.state",
+                                    "displayName": "Detection state",
+                                    "checked": "false",
+                                    "dataType": "STRING",
+                                    "attributeLatestValue": "",
+                                    "deviceUpdatedDate": "1900-01-01T00:00:00.000Z",
+                                    "gatewayUpdatedDate": "NA",
+                                    "attributeValue": "NA"
+                                },
+                                {
+                                    "attributeGuid": "CBDD13CB-4C55-432D-9139-673D6FF90489",
+                                    "attributeName": "model.name",
+                                    "displayName": "Model name",
+                                    "checked": "false",
+                                    "dataType": "STRING",
+                                    "attributeLatestValue": "",
+                                    "deviceUpdatedDate": "1900-01-01T00:00:00.000Z",
+                                    "gatewayUpdatedDate": "NA",
+                                    "attributeValue": "NA"
+                                },
+                                {
+                                    "attributeGuid": "85E20E94-77A5-441E-AA47-5F789DDD66D6",
+                                    "attributeName": "model.ver",
+                                    "displayName": "Model version",
+                                    "checked": "false",
+                                    "dataType": "DECIMAL",
+                                    "attributeLatestValue": "",
+                                    "deviceUpdatedDate": "1900-01-01T00:00:00.000Z",
+                                    "gatewayUpdatedDate": "NA",
+                                    "attributeValue": "NA"
+                                },
+                                {
+                                    "attributeGuid": "3BC02B9C-DB6F-4017-97AC-323384258D8B",
+                                    "attributeName": "model.src",
+                                    "displayName": "Model source",
+                                    "checked": "false",
+                                    "dataType": "STRING",
+                                    "attributeLatestValue": "",
+                                    "deviceUpdatedDate": "1900-01-01T00:00:00.000Z",
+                                    "gatewayUpdatedDate": "NA",
+                                    "attributeValue": "NA"
+                                },
+                                {
+                                    "attributeGuid": "842828D5-45DF-46B5-B6A0-D5EBBE0D3B32",
+                                    "attributeName": "model.size_b",
+                                    "displayName": "Model size",
+                                    "checked": "false",
+                                    "dataType": "DECIMAL",
+                                    "attributeLatestValue": "",
+                                    "deviceUpdatedDate": "1900-01-01T00:00:00.000Z",
+                                    "gatewayUpdatedDate": "NA",
+                                    "attributeValue": "NA"
+                                },
+                                {
+                                    "attributeGuid": "8C3EB5AB-EAE1-4DE4-9F20-EF93E49BE45D",
+                                    "attributeName": "sys.uptime_s",
+                                    "displayName": "Uptime",
+                                    "checked": "false",
+                                    "dataType": "DECIMAL",
+                                    "attributeLatestValue": "",
+                                    "deviceUpdatedDate": "1900-01-01T00:00:00.000Z",
+                                    "gatewayUpdatedDate": "NA",
+                                    "attributeValue": "NA"
+                                },
+                                {
+                                    "attributeGuid": "184D2F31-C6E6-421F-B767-3AC2DE3B1CBC",
+                                    "attributeName": "sys.free_heap",
+                                    "displayName": "FreeRTOS heap free",
+                                    "checked": "false",
+                                    "dataType": "DECIMAL",
+                                    "attributeLatestValue": "",
+                                    "deviceUpdatedDate": "1900-01-01T00:00:00.000Z",
+                                    "gatewayUpdatedDate": "NA",
+                                    "attributeValue": "NA"
+                                },
+                                {
+                                    "attributeGuid": "B7EF1595-1712-442E-A565-B1C4DF517D3E",
+                                    "attributeName": "sys.msgs_sent",
+                                    "displayName": "Telemetry messages sent",
+                                    "checked": "false",
+                                    "dataType": "DECIMAL",
+                                    "attributeLatestValue": "",
+                                    "deviceUpdatedDate": "1900-01-01T00:00:00.000Z",
+                                    "gatewayUpdatedDate": "NA",
+                                    "attributeValue": "NA"
+                                },
+                                {
+                                    "attributeGuid": "17DF9BA1-78F8-459E-8054-E1C4A5920951",
+                                    "attributeName": "perf.infer_us",
+                                    "displayName": "",
+                                    "checked": "false",
+                                    "dataType": "INTEGER",
+                                    "attributeLatestValue": "",
+                                    "deviceUpdatedDate": "1900-01-01T00:00:00.000Z",
+                                    "gatewayUpdatedDate": "NA",
+                                    "attributeValue": "NA"
+                                },
+                                {
+                                    "attributeGuid": "9CBEF04D-9856-49B4-96BB-1A9A22A8D7F4",
+                                    "attributeName": "perf.infer_fps",
+                                    "displayName": "",
+                                    "checked": "false",
+                                    "dataType": "INTEGER",
+                                    "attributeLatestValue": "",
+                                    "deviceUpdatedDate": "1900-01-01T00:00:00.000Z",
+                                    "gatewayUpdatedDate": "NA",
+                                    "attributeValue": "NA"
+                                },
+                                {
+                                    "attributeGuid": "5CA7BE0B-F45C-4644-BDA0-EB667BEE1838",
+                                    "attributeName": "perf.cam_fps",
+                                    "displayName": "",
+                                    "checked": "true",
+                                    "dataType": "INTEGER",
+                                    "attributeLatestValue": "",
+                                    "deviceUpdatedDate": "1900-01-01T00:00:00.000Z",
+                                    "gatewayUpdatedDate": "NA",
+                                    "attributeValue": "NA"
+                                }
+                            ]
+                        },
+                        "rules": "",
+                        "attrType": "1",
+                        "key": "live"
+                    }
+                }
+            },
+            "properties": {
+                "x": "51",
+                "y": "6",
+                "w": "7",
+                "h": "4",
+                "i": "Live",
+                "minW": "7",
+                "minH": "4",
+                "maxW": "20",
+                "maxH": "4",
+                "isStatic": "false"
+            }
+        },
+        {
+            "widgetGuid": "F7979C1B-8637-4667-90A2-6961052C6E21",
+            "widgetProperties": {
+                "i": "Live",
+                "background": "#FFFFFF",
+                "fontColor": "#00aa00",
+                "fontFamily": "Proxima Nova",
+                "fontSize": "18",
+                "title": "NPU Capability (fps)",
+                "titleAlign": "",
+                "contents": {
+                    "attributeValue": {
+                        "attributeName": "perf.infer_fps",
+                        "key": "attributeValue"
+                    },
+                    "attributeTime": {
+                        "attributeName": "perf.infer_fps",
+                        "key": "attributeTime"
+                    },
+                    "live": {
+                        "device": {
+                            "deviceGuid": "E1762101-FA36-4ACB-B94E-ED2C7D861C85",
+                            "deviceUniqueId": "RA8P1-mcl"
+                        },
+                        "attributes": {
+                            "attribute": [
+                                {
+                                    "attributeGuid": "F5142BC2-E2A2-44A8-810A-F29F9D912B7C",
+                                    "attributeName": "vision.face_count",
+                                    "displayName": "Faces detected",
+                                    "checked": "false",
+                                    "dataType": "DECIMAL",
+                                    "attributeLatestValue": "",
+                                    "deviceUpdatedDate": "1900-01-01T00:00:00.000Z",
+                                    "gatewayUpdatedDate": "NA",
+                                    "attributeValue": "NA"
+                                },
+                                {
+                                    "attributeGuid": "5C746F7D-E740-4C16-A2B1-E2B667786295",
+                                    "attributeName": "vision.score",
+                                    "displayName": "Best score",
+                                    "checked": "false",
+                                    "dataType": "DECIMAL",
+                                    "attributeLatestValue": "",
+                                    "deviceUpdatedDate": "1900-01-01T00:00:00.000Z",
+                                    "gatewayUpdatedDate": "NA",
+                                    "attributeValue": "NA"
+                                },
+                                {
+                                    "attributeGuid": "DE7645B5-AB09-4A25-A102-6A027A40E781",
+                                    "attributeName": "vision.state",
+                                    "displayName": "Detection state",
+                                    "checked": "false",
+                                    "dataType": "STRING",
+                                    "attributeLatestValue": "",
+                                    "deviceUpdatedDate": "1900-01-01T00:00:00.000Z",
+                                    "gatewayUpdatedDate": "NA",
+                                    "attributeValue": "NA"
+                                },
+                                {
+                                    "attributeGuid": "CBDD13CB-4C55-432D-9139-673D6FF90489",
+                                    "attributeName": "model.name",
+                                    "displayName": "Model name",
+                                    "checked": "false",
+                                    "dataType": "STRING",
+                                    "attributeLatestValue": "",
+                                    "deviceUpdatedDate": "1900-01-01T00:00:00.000Z",
+                                    "gatewayUpdatedDate": "NA",
+                                    "attributeValue": "NA"
+                                },
+                                {
+                                    "attributeGuid": "85E20E94-77A5-441E-AA47-5F789DDD66D6",
+                                    "attributeName": "model.ver",
+                                    "displayName": "Model version",
+                                    "checked": "false",
+                                    "dataType": "DECIMAL",
+                                    "attributeLatestValue": "",
+                                    "deviceUpdatedDate": "1900-01-01T00:00:00.000Z",
+                                    "gatewayUpdatedDate": "NA",
+                                    "attributeValue": "NA"
+                                },
+                                {
+                                    "attributeGuid": "3BC02B9C-DB6F-4017-97AC-323384258D8B",
+                                    "attributeName": "model.src",
+                                    "displayName": "Model source",
+                                    "checked": "false",
+                                    "dataType": "STRING",
+                                    "attributeLatestValue": "",
+                                    "deviceUpdatedDate": "1900-01-01T00:00:00.000Z",
+                                    "gatewayUpdatedDate": "NA",
+                                    "attributeValue": "NA"
+                                },
+                                {
+                                    "attributeGuid": "842828D5-45DF-46B5-B6A0-D5EBBE0D3B32",
+                                    "attributeName": "model.size_b",
+                                    "displayName": "Model size",
+                                    "checked": "false",
+                                    "dataType": "DECIMAL",
+                                    "attributeLatestValue": "",
+                                    "deviceUpdatedDate": "1900-01-01T00:00:00.000Z",
+                                    "gatewayUpdatedDate": "NA",
+                                    "attributeValue": "NA"
+                                },
+                                {
+                                    "attributeGuid": "8C3EB5AB-EAE1-4DE4-9F20-EF93E49BE45D",
+                                    "attributeName": "sys.uptime_s",
+                                    "displayName": "Uptime",
+                                    "checked": "false",
+                                    "dataType": "DECIMAL",
+                                    "attributeLatestValue": "",
+                                    "deviceUpdatedDate": "1900-01-01T00:00:00.000Z",
+                                    "gatewayUpdatedDate": "NA",
+                                    "attributeValue": "NA"
+                                },
+                                {
+                                    "attributeGuid": "184D2F31-C6E6-421F-B767-3AC2DE3B1CBC",
+                                    "attributeName": "sys.free_heap",
+                                    "displayName": "FreeRTOS heap free",
+                                    "checked": "false",
+                                    "dataType": "DECIMAL",
+                                    "attributeLatestValue": "",
+                                    "deviceUpdatedDate": "1900-01-01T00:00:00.000Z",
+                                    "gatewayUpdatedDate": "NA",
+                                    "attributeValue": "NA"
+                                },
+                                {
+                                    "attributeGuid": "B7EF1595-1712-442E-A565-B1C4DF517D3E",
+                                    "attributeName": "sys.msgs_sent",
+                                    "displayName": "Telemetry messages sent",
+                                    "checked": "false",
+                                    "dataType": "DECIMAL",
+                                    "attributeLatestValue": "",
+                                    "deviceUpdatedDate": "1900-01-01T00:00:00.000Z",
+                                    "gatewayUpdatedDate": "NA",
+                                    "attributeValue": "NA"
+                                },
+                                {
+                                    "attributeGuid": "17DF9BA1-78F8-459E-8054-E1C4A5920951",
+                                    "attributeName": "perf.infer_us",
+                                    "displayName": "",
+                                    "checked": "false",
+                                    "dataType": "INTEGER",
+                                    "attributeLatestValue": "",
+                                    "deviceUpdatedDate": "1900-01-01T00:00:00.000Z",
+                                    "gatewayUpdatedDate": "NA",
+                                    "attributeValue": "NA"
+                                },
+                                {
+                                    "attributeGuid": "9CBEF04D-9856-49B4-96BB-1A9A22A8D7F4",
+                                    "attributeName": "perf.infer_fps",
+                                    "displayName": "",
+                                    "checked": "true",
+                                    "dataType": "INTEGER",
+                                    "attributeLatestValue": "",
+                                    "deviceUpdatedDate": "1900-01-01T00:00:00.000Z",
+                                    "gatewayUpdatedDate": "NA",
+                                    "attributeValue": "NA"
+                                },
+                                {
+                                    "attributeGuid": "5CA7BE0B-F45C-4644-BDA0-EB667BEE1838",
+                                    "attributeName": "perf.cam_fps",
+                                    "displayName": "",
+                                    "checked": "false",
+                                    "dataType": "INTEGER",
+                                    "attributeLatestValue": "",
+                                    "deviceUpdatedDate": "1900-01-01T00:00:00.000Z",
+                                    "gatewayUpdatedDate": "NA",
+                                    "attributeValue": "NA"
+                                }
+                            ]
+                        },
+                        "rules": "",
+                        "attrType": "1",
+                        "key": "live"
+                    }
+                }
+            },
+            "properties": {
+                "x": "44",
+                "y": "10",
+                "w": "7",
+                "h": "4",
+                "i": "Live",
+                "minW": "7",
+                "minH": "4",
+                "maxW": "20",
+                "maxH": "4",
+                "isStatic": "false"
+            }
+        },
+        {
+            "widgetGuid": "F7979C1B-8637-4667-90A2-6961052C6E21",
+            "widgetProperties": {
+                "i": "Live",
+                "background": "#FFFFFF",
+                "fontColor": "#0088cc",
+                "fontFamily": "Proxima Nova",
+                "fontSize": "18",
+                "title": "Uptime (s)",
+                "titleAlign": "",
+                "contents": {
+                    "attributeValue": {
+                        "attributeName": "sys.uptime_s",
+                        "key": "attributeValue"
+                    },
+                    "attributeTime": {
+                        "attributeName": "sys.uptime_s",
+                        "key": "attributeTime"
+                    },
+                    "live": {
+                        "device": {
+                            "deviceGuid": "E1762101-FA36-4ACB-B94E-ED2C7D861C85",
+                            "deviceUniqueId": "RA8P1-mcl"
+                        },
+                        "attributes": {
+                            "attribute": [
+                                {
+                                    "attributeGuid": "F5142BC2-E2A2-44A8-810A-F29F9D912B7C",
+                                    "attributeName": "vision.face_count",
+                                    "displayName": "Faces detected",
+                                    "checked": "false",
+                                    "dataType": "DECIMAL",
+                                    "attributeLatestValue": "",
+                                    "deviceUpdatedDate": "1900-01-01T00:00:00.000Z",
+                                    "gatewayUpdatedDate": "NA",
+                                    "attributeValue": "NA"
+                                },
+                                {
+                                    "attributeGuid": "5C746F7D-E740-4C16-A2B1-E2B667786295",
+                                    "attributeName": "vision.score",
+                                    "displayName": "Best score",
+                                    "checked": "false",
+                                    "dataType": "DECIMAL",
+                                    "attributeLatestValue": "",
+                                    "deviceUpdatedDate": "1900-01-01T00:00:00.000Z",
+                                    "gatewayUpdatedDate": "NA",
+                                    "attributeValue": "NA"
+                                },
+                                {
+                                    "attributeGuid": "DE7645B5-AB09-4A25-A102-6A027A40E781",
+                                    "attributeName": "vision.state",
+                                    "displayName": "Detection state",
+                                    "checked": "false",
+                                    "dataType": "STRING",
+                                    "attributeLatestValue": "",
+                                    "deviceUpdatedDate": "1900-01-01T00:00:00.000Z",
+                                    "gatewayUpdatedDate": "NA",
+                                    "attributeValue": "NA"
+                                },
+                                {
+                                    "attributeGuid": "CBDD13CB-4C55-432D-9139-673D6FF90489",
+                                    "attributeName": "model.name",
+                                    "displayName": "Model name",
+                                    "checked": "false",
+                                    "dataType": "STRING",
+                                    "attributeLatestValue": "",
+                                    "deviceUpdatedDate": "1900-01-01T00:00:00.000Z",
+                                    "gatewayUpdatedDate": "NA",
+                                    "attributeValue": "NA"
+                                },
+                                {
+                                    "attributeGuid": "85E20E94-77A5-441E-AA47-5F789DDD66D6",
+                                    "attributeName": "model.ver",
+                                    "displayName": "Model version",
+                                    "checked": "false",
+                                    "dataType": "DECIMAL",
+                                    "attributeLatestValue": "",
+                                    "deviceUpdatedDate": "1900-01-01T00:00:00.000Z",
+                                    "gatewayUpdatedDate": "NA",
+                                    "attributeValue": "NA"
+                                },
+                                {
+                                    "attributeGuid": "3BC02B9C-DB6F-4017-97AC-323384258D8B",
+                                    "attributeName": "model.src",
+                                    "displayName": "Model source",
+                                    "checked": "false",
+                                    "dataType": "STRING",
+                                    "attributeLatestValue": "",
+                                    "deviceUpdatedDate": "1900-01-01T00:00:00.000Z",
+                                    "gatewayUpdatedDate": "NA",
+                                    "attributeValue": "NA"
+                                },
+                                {
+                                    "attributeGuid": "842828D5-45DF-46B5-B6A0-D5EBBE0D3B32",
+                                    "attributeName": "model.size_b",
+                                    "displayName": "Model size",
+                                    "checked": "false",
+                                    "dataType": "DECIMAL",
+                                    "attributeLatestValue": "",
+                                    "deviceUpdatedDate": "1900-01-01T00:00:00.000Z",
+                                    "gatewayUpdatedDate": "NA",
+                                    "attributeValue": "NA"
+                                },
+                                {
+                                    "attributeGuid": "8C3EB5AB-EAE1-4DE4-9F20-EF93E49BE45D",
+                                    "attributeName": "sys.uptime_s",
+                                    "displayName": "Uptime",
+                                    "checked": "true",
+                                    "dataType": "DECIMAL",
+                                    "attributeLatestValue": "",
+                                    "deviceUpdatedDate": "1900-01-01T00:00:00.000Z",
+                                    "gatewayUpdatedDate": "NA",
+                                    "attributeValue": "NA"
+                                },
+                                {
+                                    "attributeGuid": "184D2F31-C6E6-421F-B767-3AC2DE3B1CBC",
+                                    "attributeName": "sys.free_heap",
+                                    "displayName": "FreeRTOS heap free",
+                                    "checked": "false",
+                                    "dataType": "DECIMAL",
+                                    "attributeLatestValue": "",
+                                    "deviceUpdatedDate": "1900-01-01T00:00:00.000Z",
+                                    "gatewayUpdatedDate": "NA",
+                                    "attributeValue": "NA"
+                                },
+                                {
+                                    "attributeGuid": "B7EF1595-1712-442E-A565-B1C4DF517D3E",
+                                    "attributeName": "sys.msgs_sent",
+                                    "displayName": "Telemetry messages sent",
+                                    "checked": "false",
+                                    "dataType": "DECIMAL",
+                                    "attributeLatestValue": "",
+                                    "deviceUpdatedDate": "1900-01-01T00:00:00.000Z",
+                                    "gatewayUpdatedDate": "NA",
+                                    "attributeValue": "NA"
+                                },
+                                {
+                                    "attributeGuid": "17DF9BA1-78F8-459E-8054-E1C4A5920951",
+                                    "attributeName": "perf.infer_us",
+                                    "displayName": "",
+                                    "checked": "false",
+                                    "dataType": "INTEGER",
+                                    "attributeLatestValue": "",
+                                    "deviceUpdatedDate": "1900-01-01T00:00:00.000Z",
+                                    "gatewayUpdatedDate": "NA",
+                                    "attributeValue": "NA"
+                                },
+                                {
+                                    "attributeGuid": "9CBEF04D-9856-49B4-96BB-1A9A22A8D7F4",
+                                    "attributeName": "perf.infer_fps",
+                                    "displayName": "",
+                                    "checked": "false",
+                                    "dataType": "INTEGER",
+                                    "attributeLatestValue": "",
+                                    "deviceUpdatedDate": "1900-01-01T00:00:00.000Z",
+                                    "gatewayUpdatedDate": "NA",
+                                    "attributeValue": "NA"
+                                },
+                                {
+                                    "attributeGuid": "5CA7BE0B-F45C-4644-BDA0-EB667BEE1838",
+                                    "attributeName": "perf.cam_fps",
+                                    "displayName": "",
+                                    "checked": "false",
+                                    "dataType": "INTEGER",
+                                    "attributeLatestValue": "",
+                                    "deviceUpdatedDate": "1900-01-01T00:00:00.000Z",
+                                    "gatewayUpdatedDate": "NA",
+                                    "attributeValue": "NA"
+                                }
+                            ]
+                        },
+                        "rules": "",
+                        "attrType": "1",
+                        "key": "live"
+                    }
+                }
+            },
+            "properties": {
+                "x": "51",
+                "y": "10",
+                "w": "7",
+                "h": "4",
+                "i": "Live",
+                "minW": "7",
+                "minH": "4",
+                "maxW": "20",
+                "maxH": "4",
+                "isStatic": "false"
+            }
+        },
+        {
+            "widgetGuid": "F7979C1B-8637-4667-90A2-6961052C6E21",
+            "widgetProperties": {
+                "i": "Live",
+                "background": "#FFFFFF",
+                "fontColor": "#6a1b9a",
+                "fontFamily": "Proxima Nova",
+                "fontSize": "18",
+                "title": "Active Model",
+                "titleAlign": "",
+                "contents": {
+                    "attributeValue": {
+                        "attributeName": "model.name",
+                        "key": "attributeValue"
+                    },
+                    "attributeTime": {
+                        "attributeName": "model.name",
+                        "key": "attributeTime"
+                    },
+                    "live": {
+                        "device": {
+                            "deviceGuid": "E1762101-FA36-4ACB-B94E-ED2C7D861C85",
+                            "deviceUniqueId": "RA8P1-mcl"
+                        },
+                        "attributes": {
+                            "attribute": [
+                                {
+                                    "attributeGuid": "F5142BC2-E2A2-44A8-810A-F29F9D912B7C",
+                                    "attributeName": "vision.face_count",
+                                    "displayName": "Faces detected",
+                                    "checked": "false",
+                                    "dataType": "DECIMAL",
+                                    "attributeLatestValue": "",
+                                    "deviceUpdatedDate": "1900-01-01T00:00:00.000Z",
+                                    "gatewayUpdatedDate": "NA",
+                                    "attributeValue": "NA"
+                                },
+                                {
+                                    "attributeGuid": "5C746F7D-E740-4C16-A2B1-E2B667786295",
+                                    "attributeName": "vision.score",
+                                    "displayName": "Best score",
+                                    "checked": "false",
+                                    "dataType": "DECIMAL",
+                                    "attributeLatestValue": "",
+                                    "deviceUpdatedDate": "1900-01-01T00:00:00.000Z",
+                                    "gatewayUpdatedDate": "NA",
+                                    "attributeValue": "NA"
+                                },
+                                {
+                                    "attributeGuid": "DE7645B5-AB09-4A25-A102-6A027A40E781",
+                                    "attributeName": "vision.state",
+                                    "displayName": "Detection state",
+                                    "checked": "false",
+                                    "dataType": "STRING",
+                                    "attributeLatestValue": "",
+                                    "deviceUpdatedDate": "1900-01-01T00:00:00.000Z",
+                                    "gatewayUpdatedDate": "NA",
+                                    "attributeValue": "NA"
+                                },
+                                {
+                                    "attributeGuid": "CBDD13CB-4C55-432D-9139-673D6FF90489",
+                                    "attributeName": "model.name",
+                                    "displayName": "Model name",
+                                    "checked": "true",
+                                    "dataType": "STRING",
+                                    "attributeLatestValue": "",
+                                    "deviceUpdatedDate": "1900-01-01T00:00:00.000Z",
+                                    "gatewayUpdatedDate": "NA",
+                                    "attributeValue": "NA"
+                                },
+                                {
+                                    "attributeGuid": "85E20E94-77A5-441E-AA47-5F789DDD66D6",
+                                    "attributeName": "model.ver",
+                                    "displayName": "Model version",
+                                    "checked": "false",
+                                    "dataType": "DECIMAL",
+                                    "attributeLatestValue": "",
+                                    "deviceUpdatedDate": "1900-01-01T00:00:00.000Z",
+                                    "gatewayUpdatedDate": "NA",
+                                    "attributeValue": "NA"
+                                },
+                                {
+                                    "attributeGuid": "3BC02B9C-DB6F-4017-97AC-323384258D8B",
+                                    "attributeName": "model.src",
+                                    "displayName": "Model source",
+                                    "checked": "false",
+                                    "dataType": "STRING",
+                                    "attributeLatestValue": "",
+                                    "deviceUpdatedDate": "1900-01-01T00:00:00.000Z",
+                                    "gatewayUpdatedDate": "NA",
+                                    "attributeValue": "NA"
+                                },
+                                {
+                                    "attributeGuid": "842828D5-45DF-46B5-B6A0-D5EBBE0D3B32",
+                                    "attributeName": "model.size_b",
+                                    "displayName": "Model size",
+                                    "checked": "false",
+                                    "dataType": "DECIMAL",
+                                    "attributeLatestValue": "",
+                                    "deviceUpdatedDate": "1900-01-01T00:00:00.000Z",
+                                    "gatewayUpdatedDate": "NA",
+                                    "attributeValue": "NA"
+                                },
+                                {
+                                    "attributeGuid": "8C3EB5AB-EAE1-4DE4-9F20-EF93E49BE45D",
+                                    "attributeName": "sys.uptime_s",
+                                    "displayName": "Uptime",
+                                    "checked": "false",
+                                    "dataType": "DECIMAL",
+                                    "attributeLatestValue": "",
+                                    "deviceUpdatedDate": "1900-01-01T00:00:00.000Z",
+                                    "gatewayUpdatedDate": "NA",
+                                    "attributeValue": "NA"
+                                },
+                                {
+                                    "attributeGuid": "184D2F31-C6E6-421F-B767-3AC2DE3B1CBC",
+                                    "attributeName": "sys.free_heap",
+                                    "displayName": "FreeRTOS heap free",
+                                    "checked": "false",
+                                    "dataType": "DECIMAL",
+                                    "attributeLatestValue": "",
+                                    "deviceUpdatedDate": "1900-01-01T00:00:00.000Z",
+                                    "gatewayUpdatedDate": "NA",
+                                    "attributeValue": "NA"
+                                },
+                                {
+                                    "attributeGuid": "B7EF1595-1712-442E-A565-B1C4DF517D3E",
+                                    "attributeName": "sys.msgs_sent",
+                                    "displayName": "Telemetry messages sent",
+                                    "checked": "false",
+                                    "dataType": "DECIMAL",
+                                    "attributeLatestValue": "",
+                                    "deviceUpdatedDate": "1900-01-01T00:00:00.000Z",
+                                    "gatewayUpdatedDate": "NA",
+                                    "attributeValue": "NA"
+                                },
+                                {
+                                    "attributeGuid": "17DF9BA1-78F8-459E-8054-E1C4A5920951",
+                                    "attributeName": "perf.infer_us",
+                                    "displayName": "",
+                                    "checked": "false",
+                                    "dataType": "INTEGER",
+                                    "attributeLatestValue": "",
+                                    "deviceUpdatedDate": "1900-01-01T00:00:00.000Z",
+                                    "gatewayUpdatedDate": "NA",
+                                    "attributeValue": "NA"
+                                },
+                                {
+                                    "attributeGuid": "9CBEF04D-9856-49B4-96BB-1A9A22A8D7F4",
+                                    "attributeName": "perf.infer_fps",
+                                    "displayName": "",
+                                    "checked": "false",
+                                    "dataType": "INTEGER",
+                                    "attributeLatestValue": "",
+                                    "deviceUpdatedDate": "1900-01-01T00:00:00.000Z",
+                                    "gatewayUpdatedDate": "NA",
+                                    "attributeValue": "NA"
+                                },
+                                {
+                                    "attributeGuid": "5CA7BE0B-F45C-4644-BDA0-EB667BEE1838",
+                                    "attributeName": "perf.cam_fps",
+                                    "displayName": "",
+                                    "checked": "false",
+                                    "dataType": "INTEGER",
+                                    "attributeLatestValue": "",
+                                    "deviceUpdatedDate": "1900-01-01T00:00:00.000Z",
+                                    "gatewayUpdatedDate": "NA",
+                                    "attributeValue": "NA"
+                                }
+                            ]
+                        },
+                        "rules": "",
+                        "attrType": "1",
+                        "key": "live"
+                    }
+                }
+            },
+            "properties": {
+                "x": "44",
+                "y": "14",
+                "w": "7",
+                "h": "4",
+                "i": "Live",
+                "minW": "7",
+                "minH": "4",
+                "maxW": "20",
+                "maxH": "4",
+                "isStatic": "false"
+            }
+        },
+        {
+            "widgetGuid": "F7979C1B-8637-4667-90A2-6961052C6E21",
+            "widgetProperties": {
+                "i": "Live",
+                "background": "#FFFFFF",
+                "fontColor": "#455a64",
+                "fontFamily": "Proxima Nova",
+                "fontSize": "18",
+                "title": "Messages Sent",
+                "titleAlign": "",
+                "contents": {
+                    "attributeValue": {
+                        "attributeName": "sys.msgs_sent",
+                        "key": "attributeValue"
+                    },
+                    "attributeTime": {
+                        "attributeName": "sys.msgs_sent",
+                        "key": "attributeTime"
+                    },
+                    "live": {
+                        "device": {
+                            "deviceGuid": "E1762101-FA36-4ACB-B94E-ED2C7D861C85",
+                            "deviceUniqueId": "RA8P1-mcl"
+                        },
+                        "attributes": {
+                            "attribute": [
+                                {
+                                    "attributeGuid": "F5142BC2-E2A2-44A8-810A-F29F9D912B7C",
+                                    "attributeName": "vision.face_count",
+                                    "displayName": "Faces detected",
+                                    "checked": "false",
+                                    "dataType": "DECIMAL",
+                                    "attributeLatestValue": "",
+                                    "deviceUpdatedDate": "1900-01-01T00:00:00.000Z",
+                                    "gatewayUpdatedDate": "NA",
+                                    "attributeValue": "NA"
+                                },
+                                {
+                                    "attributeGuid": "5C746F7D-E740-4C16-A2B1-E2B667786295",
+                                    "attributeName": "vision.score",
+                                    "displayName": "Best score",
+                                    "checked": "false",
+                                    "dataType": "DECIMAL",
+                                    "attributeLatestValue": "",
+                                    "deviceUpdatedDate": "1900-01-01T00:00:00.000Z",
+                                    "gatewayUpdatedDate": "NA",
+                                    "attributeValue": "NA"
+                                },
+                                {
+                                    "attributeGuid": "DE7645B5-AB09-4A25-A102-6A027A40E781",
+                                    "attributeName": "vision.state",
+                                    "displayName": "Detection state",
+                                    "checked": "false",
+                                    "dataType": "STRING",
+                                    "attributeLatestValue": "",
+                                    "deviceUpdatedDate": "1900-01-01T00:00:00.000Z",
+                                    "gatewayUpdatedDate": "NA",
+                                    "attributeValue": "NA"
+                                },
+                                {
+                                    "attributeGuid": "CBDD13CB-4C55-432D-9139-673D6FF90489",
+                                    "attributeName": "model.name",
+                                    "displayName": "Model name",
+                                    "checked": "false",
+                                    "dataType": "STRING",
+                                    "attributeLatestValue": "",
+                                    "deviceUpdatedDate": "1900-01-01T00:00:00.000Z",
+                                    "gatewayUpdatedDate": "NA",
+                                    "attributeValue": "NA"
+                                },
+                                {
+                                    "attributeGuid": "85E20E94-77A5-441E-AA47-5F789DDD66D6",
+                                    "attributeName": "model.ver",
+                                    "displayName": "Model version",
+                                    "checked": "false",
+                                    "dataType": "DECIMAL",
+                                    "attributeLatestValue": "",
+                                    "deviceUpdatedDate": "1900-01-01T00:00:00.000Z",
+                                    "gatewayUpdatedDate": "NA",
+                                    "attributeValue": "NA"
+                                },
+                                {
+                                    "attributeGuid": "3BC02B9C-DB6F-4017-97AC-323384258D8B",
+                                    "attributeName": "model.src",
+                                    "displayName": "Model source",
+                                    "checked": "false",
+                                    "dataType": "STRING",
+                                    "attributeLatestValue": "",
+                                    "deviceUpdatedDate": "1900-01-01T00:00:00.000Z",
+                                    "gatewayUpdatedDate": "NA",
+                                    "attributeValue": "NA"
+                                },
+                                {
+                                    "attributeGuid": "842828D5-45DF-46B5-B6A0-D5EBBE0D3B32",
+                                    "attributeName": "model.size_b",
+                                    "displayName": "Model size",
+                                    "checked": "false",
+                                    "dataType": "DECIMAL",
+                                    "attributeLatestValue": "",
+                                    "deviceUpdatedDate": "1900-01-01T00:00:00.000Z",
+                                    "gatewayUpdatedDate": "NA",
+                                    "attributeValue": "NA"
+                                },
+                                {
+                                    "attributeGuid": "8C3EB5AB-EAE1-4DE4-9F20-EF93E49BE45D",
+                                    "attributeName": "sys.uptime_s",
+                                    "displayName": "Uptime",
+                                    "checked": "false",
+                                    "dataType": "DECIMAL",
+                                    "attributeLatestValue": "",
+                                    "deviceUpdatedDate": "1900-01-01T00:00:00.000Z",
+                                    "gatewayUpdatedDate": "NA",
+                                    "attributeValue": "NA"
+                                },
+                                {
+                                    "attributeGuid": "184D2F31-C6E6-421F-B767-3AC2DE3B1CBC",
+                                    "attributeName": "sys.free_heap",
+                                    "displayName": "FreeRTOS heap free",
+                                    "checked": "false",
+                                    "dataType": "DECIMAL",
+                                    "attributeLatestValue": "",
+                                    "deviceUpdatedDate": "1900-01-01T00:00:00.000Z",
+                                    "gatewayUpdatedDate": "NA",
+                                    "attributeValue": "NA"
+                                },
+                                {
+                                    "attributeGuid": "B7EF1595-1712-442E-A565-B1C4DF517D3E",
+                                    "attributeName": "sys.msgs_sent",
+                                    "displayName": "Telemetry messages sent",
+                                    "checked": "true",
+                                    "dataType": "DECIMAL",
+                                    "attributeLatestValue": "",
+                                    "deviceUpdatedDate": "1900-01-01T00:00:00.000Z",
+                                    "gatewayUpdatedDate": "NA",
+                                    "attributeValue": "NA"
+                                },
+                                {
+                                    "attributeGuid": "17DF9BA1-78F8-459E-8054-E1C4A5920951",
+                                    "attributeName": "perf.infer_us",
+                                    "displayName": "",
+                                    "checked": "false",
+                                    "dataType": "INTEGER",
+                                    "attributeLatestValue": "",
+                                    "deviceUpdatedDate": "1900-01-01T00:00:00.000Z",
+                                    "gatewayUpdatedDate": "NA",
+                                    "attributeValue": "NA"
+                                },
+                                {
+                                    "attributeGuid": "9CBEF04D-9856-49B4-96BB-1A9A22A8D7F4",
+                                    "attributeName": "perf.infer_fps",
+                                    "displayName": "",
+                                    "checked": "false",
+                                    "dataType": "INTEGER",
+                                    "attributeLatestValue": "",
+                                    "deviceUpdatedDate": "1900-01-01T00:00:00.000Z",
+                                    "gatewayUpdatedDate": "NA",
+                                    "attributeValue": "NA"
+                                },
+                                {
+                                    "attributeGuid": "5CA7BE0B-F45C-4644-BDA0-EB667BEE1838",
+                                    "attributeName": "perf.cam_fps",
+                                    "displayName": "",
+                                    "checked": "false",
+                                    "dataType": "INTEGER",
+                                    "attributeLatestValue": "",
+                                    "deviceUpdatedDate": "1900-01-01T00:00:00.000Z",
+                                    "gatewayUpdatedDate": "NA",
+                                    "attributeValue": "NA"
+                                }
+                            ]
+                        },
+                        "rules": "",
+                        "attrType": "1",
+                        "key": "live"
+                    }
+                }
+            },
+            "properties": {
+                "x": "51",
+                "y": "14",
+                "w": "7",
+                "h": "4",
+                "i": "Live",
+                "minW": "7",
+                "minH": "4",
+                "maxW": "20",
+                "maxH": "4",
+                "isStatic": "false"
+            }
+        },
+        {
+            "widgetGuid": "F7979C1B-8637-4667-90A2-6961052C6E21",
+            "widgetProperties": {
+                "i": "Live",
+                "background": "#FFFFFF",
+                "fontColor": "#cc8800",
+                "fontFamily": "Proxima Nova",
+                "fontSize": "18",
+                "title": "Model Version",
+                "titleAlign": "",
+                "contents": {
+                    "attributeValue": {
+                        "attributeName": "model.ver",
+                        "key": "attributeValue"
+                    },
+                    "attributeTime": {
+                        "attributeName": "model.ver",
+                        "key": "attributeTime"
+                    },
+                    "live": {
+                        "device": {
+                            "deviceGuid": "E1762101-FA36-4ACB-B94E-ED2C7D861C85",
+                            "deviceUniqueId": "RA8P1-mcl"
+                        },
+                        "attributes": {
+                            "attribute": [
+                                {
+                                    "attributeGuid": "F5142BC2-E2A2-44A8-810A-F29F9D912B7C",
+                                    "attributeName": "vision.face_count",
+                                    "displayName": "Faces detected",
+                                    "checked": "false",
+                                    "dataType": "DECIMAL",
+                                    "attributeLatestValue": "",
+                                    "deviceUpdatedDate": "1900-01-01T00:00:00.000Z",
+                                    "gatewayUpdatedDate": "NA",
+                                    "attributeValue": "NA"
+                                },
+                                {
+                                    "attributeGuid": "5C746F7D-E740-4C16-A2B1-E2B667786295",
+                                    "attributeName": "vision.score",
+                                    "displayName": "Best score",
+                                    "checked": "false",
+                                    "dataType": "DECIMAL",
+                                    "attributeLatestValue": "",
+                                    "deviceUpdatedDate": "1900-01-01T00:00:00.000Z",
+                                    "gatewayUpdatedDate": "NA",
+                                    "attributeValue": "NA"
+                                },
+                                {
+                                    "attributeGuid": "DE7645B5-AB09-4A25-A102-6A027A40E781",
+                                    "attributeName": "vision.state",
+                                    "displayName": "Detection state",
+                                    "checked": "false",
+                                    "dataType": "STRING",
+                                    "attributeLatestValue": "",
+                                    "deviceUpdatedDate": "1900-01-01T00:00:00.000Z",
+                                    "gatewayUpdatedDate": "NA",
+                                    "attributeValue": "NA"
+                                },
+                                {
+                                    "attributeGuid": "CBDD13CB-4C55-432D-9139-673D6FF90489",
+                                    "attributeName": "model.name",
+                                    "displayName": "Model name",
+                                    "checked": "false",
+                                    "dataType": "STRING",
+                                    "attributeLatestValue": "",
+                                    "deviceUpdatedDate": "1900-01-01T00:00:00.000Z",
+                                    "gatewayUpdatedDate": "NA",
+                                    "attributeValue": "NA"
+                                },
+                                {
+                                    "attributeGuid": "85E20E94-77A5-441E-AA47-5F789DDD66D6",
+                                    "attributeName": "model.ver",
+                                    "displayName": "Model version",
+                                    "checked": "true",
+                                    "dataType": "DECIMAL",
+                                    "attributeLatestValue": "",
+                                    "deviceUpdatedDate": "1900-01-01T00:00:00.000Z",
+                                    "gatewayUpdatedDate": "NA",
+                                    "attributeValue": "NA"
+                                },
+                                {
+                                    "attributeGuid": "3BC02B9C-DB6F-4017-97AC-323384258D8B",
+                                    "attributeName": "model.src",
+                                    "displayName": "Model source",
+                                    "checked": "false",
+                                    "dataType": "STRING",
+                                    "attributeLatestValue": "",
+                                    "deviceUpdatedDate": "1900-01-01T00:00:00.000Z",
+                                    "gatewayUpdatedDate": "NA",
+                                    "attributeValue": "NA"
+                                },
+                                {
+                                    "attributeGuid": "842828D5-45DF-46B5-B6A0-D5EBBE0D3B32",
+                                    "attributeName": "model.size_b",
+                                    "displayName": "Model size",
+                                    "checked": "false",
+                                    "dataType": "DECIMAL",
+                                    "attributeLatestValue": "",
+                                    "deviceUpdatedDate": "1900-01-01T00:00:00.000Z",
+                                    "gatewayUpdatedDate": "NA",
+                                    "attributeValue": "NA"
+                                },
+                                {
+                                    "attributeGuid": "8C3EB5AB-EAE1-4DE4-9F20-EF93E49BE45D",
+                                    "attributeName": "sys.uptime_s",
+                                    "displayName": "Uptime",
+                                    "checked": "false",
+                                    "dataType": "DECIMAL",
+                                    "attributeLatestValue": "",
+                                    "deviceUpdatedDate": "1900-01-01T00:00:00.000Z",
+                                    "gatewayUpdatedDate": "NA",
+                                    "attributeValue": "NA"
+                                },
+                                {
+                                    "attributeGuid": "184D2F31-C6E6-421F-B767-3AC2DE3B1CBC",
+                                    "attributeName": "sys.free_heap",
+                                    "displayName": "FreeRTOS heap free",
+                                    "checked": "false",
+                                    "dataType": "DECIMAL",
+                                    "attributeLatestValue": "",
+                                    "deviceUpdatedDate": "1900-01-01T00:00:00.000Z",
+                                    "gatewayUpdatedDate": "NA",
+                                    "attributeValue": "NA"
+                                },
+                                {
+                                    "attributeGuid": "B7EF1595-1712-442E-A565-B1C4DF517D3E",
+                                    "attributeName": "sys.msgs_sent",
+                                    "displayName": "Telemetry messages sent",
+                                    "checked": "false",
+                                    "dataType": "DECIMAL",
+                                    "attributeLatestValue": "",
+                                    "deviceUpdatedDate": "1900-01-01T00:00:00.000Z",
+                                    "gatewayUpdatedDate": "NA",
+                                    "attributeValue": "NA"
+                                },
+                                {
+                                    "attributeGuid": "17DF9BA1-78F8-459E-8054-E1C4A5920951",
+                                    "attributeName": "perf.infer_us",
+                                    "displayName": "",
+                                    "checked": "false",
+                                    "dataType": "INTEGER",
+                                    "attributeLatestValue": "",
+                                    "deviceUpdatedDate": "1900-01-01T00:00:00.000Z",
+                                    "gatewayUpdatedDate": "NA",
+                                    "attributeValue": "NA"
+                                },
+                                {
+                                    "attributeGuid": "9CBEF04D-9856-49B4-96BB-1A9A22A8D7F4",
+                                    "attributeName": "perf.infer_fps",
+                                    "displayName": "",
+                                    "checked": "false",
+                                    "dataType": "INTEGER",
+                                    "attributeLatestValue": "",
+                                    "deviceUpdatedDate": "1900-01-01T00:00:00.000Z",
+                                    "gatewayUpdatedDate": "NA",
+                                    "attributeValue": "NA"
+                                },
+                                {
+                                    "attributeGuid": "5CA7BE0B-F45C-4644-BDA0-EB667BEE1838",
+                                    "attributeName": "perf.cam_fps",
+                                    "displayName": "",
+                                    "checked": "false",
+                                    "dataType": "INTEGER",
+                                    "attributeLatestValue": "",
+                                    "deviceUpdatedDate": "1900-01-01T00:00:00.000Z",
+                                    "gatewayUpdatedDate": "NA",
+                                    "attributeValue": "NA"
+                                }
+                            ]
+                        },
+                        "rules": "",
+                        "attrType": "1",
+                        "key": "live"
+                    }
+                }
+            },
+            "properties": {
+                "x": "24",
+                "y": "15",
+                "w": "10",
+                "h": "4",
+                "i": "Live",
+                "minW": "7",
+                "minH": "4",
+                "maxW": "20",
+                "maxH": "4",
+                "isStatic": "false"
+            }
+        },
+        {
+            "widgetGuid": "F7979C1B-8637-4667-90A2-6961052C6E21",
+            "widgetProperties": {
+                "i": "Live",
+                "background": "#FFFFFF",
+                "fontColor": "#455a64",
+                "fontFamily": "Proxima Nova",
+                "fontSize": "18",
+                "title": "Heap Free (B)",
+                "titleAlign": "",
+                "contents": {
+                    "attributeValue": {
+                        "attributeName": "sys.free_heap",
+                        "key": "attributeValue"
+                    },
+                    "attributeTime": {
+                        "attributeName": "sys.free_heap",
+                        "key": "attributeTime"
+                    },
+                    "live": {
+                        "device": {
+                            "deviceGuid": "E1762101-FA36-4ACB-B94E-ED2C7D861C85",
+                            "deviceUniqueId": "RA8P1-mcl"
+                        },
+                        "attributes": {
+                            "attribute": [
+                                {
+                                    "attributeGuid": "F5142BC2-E2A2-44A8-810A-F29F9D912B7C",
+                                    "attributeName": "vision.face_count",
+                                    "displayName": "Faces detected",
+                                    "checked": "false",
+                                    "dataType": "DECIMAL",
+                                    "attributeLatestValue": "",
+                                    "deviceUpdatedDate": "1900-01-01T00:00:00.000Z",
+                                    "gatewayUpdatedDate": "NA",
+                                    "attributeValue": "NA"
+                                },
+                                {
+                                    "attributeGuid": "5C746F7D-E740-4C16-A2B1-E2B667786295",
+                                    "attributeName": "vision.score",
+                                    "displayName": "Best score",
+                                    "checked": "false",
+                                    "dataType": "DECIMAL",
+                                    "attributeLatestValue": "",
+                                    "deviceUpdatedDate": "1900-01-01T00:00:00.000Z",
+                                    "gatewayUpdatedDate": "NA",
+                                    "attributeValue": "NA"
+                                },
+                                {
+                                    "attributeGuid": "DE7645B5-AB09-4A25-A102-6A027A40E781",
+                                    "attributeName": "vision.state",
+                                    "displayName": "Detection state",
+                                    "checked": "false",
+                                    "dataType": "STRING",
+                                    "attributeLatestValue": "",
+                                    "deviceUpdatedDate": "1900-01-01T00:00:00.000Z",
+                                    "gatewayUpdatedDate": "NA",
+                                    "attributeValue": "NA"
+                                },
+                                {
+                                    "attributeGuid": "CBDD13CB-4C55-432D-9139-673D6FF90489",
+                                    "attributeName": "model.name",
+                                    "displayName": "Model name",
+                                    "checked": "false",
+                                    "dataType": "STRING",
+                                    "attributeLatestValue": "",
+                                    "deviceUpdatedDate": "1900-01-01T00:00:00.000Z",
+                                    "gatewayUpdatedDate": "NA",
+                                    "attributeValue": "NA"
+                                },
+                                {
+                                    "attributeGuid": "85E20E94-77A5-441E-AA47-5F789DDD66D6",
+                                    "attributeName": "model.ver",
+                                    "displayName": "Model version",
+                                    "checked": "false",
+                                    "dataType": "DECIMAL",
+                                    "attributeLatestValue": "",
+                                    "deviceUpdatedDate": "1900-01-01T00:00:00.000Z",
+                                    "gatewayUpdatedDate": "NA",
+                                    "attributeValue": "NA"
+                                },
+                                {
+                                    "attributeGuid": "3BC02B9C-DB6F-4017-97AC-323384258D8B",
+                                    "attributeName": "model.src",
+                                    "displayName": "Model source",
+                                    "checked": "false",
+                                    "dataType": "STRING",
+                                    "attributeLatestValue": "",
+                                    "deviceUpdatedDate": "1900-01-01T00:00:00.000Z",
+                                    "gatewayUpdatedDate": "NA",
+                                    "attributeValue": "NA"
+                                },
+                                {
+                                    "attributeGuid": "842828D5-45DF-46B5-B6A0-D5EBBE0D3B32",
+                                    "attributeName": "model.size_b",
+                                    "displayName": "Model size",
+                                    "checked": "false",
+                                    "dataType": "DECIMAL",
+                                    "attributeLatestValue": "",
+                                    "deviceUpdatedDate": "1900-01-01T00:00:00.000Z",
+                                    "gatewayUpdatedDate": "NA",
+                                    "attributeValue": "NA"
+                                },
+                                {
+                                    "attributeGuid": "8C3EB5AB-EAE1-4DE4-9F20-EF93E49BE45D",
+                                    "attributeName": "sys.uptime_s",
+                                    "displayName": "Uptime",
+                                    "checked": "false",
+                                    "dataType": "DECIMAL",
+                                    "attributeLatestValue": "",
+                                    "deviceUpdatedDate": "1900-01-01T00:00:00.000Z",
+                                    "gatewayUpdatedDate": "NA",
+                                    "attributeValue": "NA"
+                                },
+                                {
+                                    "attributeGuid": "184D2F31-C6E6-421F-B767-3AC2DE3B1CBC",
+                                    "attributeName": "sys.free_heap",
+                                    "displayName": "FreeRTOS heap free",
+                                    "checked": "true",
+                                    "dataType": "DECIMAL",
+                                    "attributeLatestValue": "",
+                                    "deviceUpdatedDate": "1900-01-01T00:00:00.000Z",
+                                    "gatewayUpdatedDate": "NA",
+                                    "attributeValue": "NA"
+                                },
+                                {
+                                    "attributeGuid": "B7EF1595-1712-442E-A565-B1C4DF517D3E",
+                                    "attributeName": "sys.msgs_sent",
+                                    "displayName": "Telemetry messages sent",
+                                    "checked": "false",
+                                    "dataType": "DECIMAL",
+                                    "attributeLatestValue": "",
+                                    "deviceUpdatedDate": "1900-01-01T00:00:00.000Z",
+                                    "gatewayUpdatedDate": "NA",
+                                    "attributeValue": "NA"
+                                },
+                                {
+                                    "attributeGuid": "17DF9BA1-78F8-459E-8054-E1C4A5920951",
+                                    "attributeName": "perf.infer_us",
+                                    "displayName": "",
+                                    "checked": "false",
+                                    "dataType": "INTEGER",
+                                    "attributeLatestValue": "",
+                                    "deviceUpdatedDate": "1900-01-01T00:00:00.000Z",
+                                    "gatewayUpdatedDate": "NA",
+                                    "attributeValue": "NA"
+                                },
+                                {
+                                    "attributeGuid": "9CBEF04D-9856-49B4-96BB-1A9A22A8D7F4",
+                                    "attributeName": "perf.infer_fps",
+                                    "displayName": "",
+                                    "checked": "false",
+                                    "dataType": "INTEGER",
+                                    "attributeLatestValue": "",
+                                    "deviceUpdatedDate": "1900-01-01T00:00:00.000Z",
+                                    "gatewayUpdatedDate": "NA",
+                                    "attributeValue": "NA"
+                                },
+                                {
+                                    "attributeGuid": "5CA7BE0B-F45C-4644-BDA0-EB667BEE1838",
+                                    "attributeName": "perf.cam_fps",
+                                    "displayName": "",
+                                    "checked": "false",
+                                    "dataType": "INTEGER",
+                                    "attributeLatestValue": "",
+                                    "deviceUpdatedDate": "1900-01-01T00:00:00.000Z",
+                                    "gatewayUpdatedDate": "NA",
+                                    "attributeValue": "NA"
+                                }
+                            ]
+                        },
+                        "rules": "",
+                        "attrType": "1",
+                        "key": "live"
+                    }
+                }
+            },
+            "properties": {
+                "x": "34",
+                "y": "15",
+                "w": "10",
+                "h": "4",
+                "i": "Live",
+                "minW": "7",
+                "minH": "4",
+                "maxW": "20",
+                "maxH": "4",
+                "isStatic": "false"
+            }
+        },
+        {
+            "widgetGuid": "A8CB394D-15B1-42C9-94FC-AD7BDC599E2A",
+            "widgetProperties": {
+                "i": "Image",
+                "background": "#FFFFFF",
+                "fontColor": "#000000",
+                "fontFamily": "Proxima Nova",
+                "fontSize": "18",
+                "title": "",
+                "titleAlign": "",
+                "contents": {
+                    "option": {
+                        "imageUpload": "false",
+                        "imageUrl": "true",
+                        "imageDevice": "false",
+                        "imageTelemetry": "false",
+                        "key": "option",
+                        "position": "center"
+                    },
+                    "upload": {
+                        "imageurl": "",
+                        "key": "upload"
+                    },
+                    "url": {
+                        "imageurl": "https://avnetpublicaccess.s3.us-east-1.amazonaws.com/images/renesas/ek-ra8p1/band_model_mgmt.png",
+                        "key": "url"
+                    },
+                    "device": {
+                        "deviceGuid": "",
+                        "deviceName": "",
+                        "imageurl": "",
+                        "key": "device"
+                    },
+                    "telemetry": {
+                        "deviceGuid": "",
+                        "deviceName": "",
+                        "imageurl": "",
+                        "key": "telemetry"
+                    },
+                    "classification": {
+                        "showClassification": "false",
+                        "key": "classification"
+                    }
+                }
+            },
+            "properties": {
+                "x": "0",
+                "y": "19",
+                "w": "58",
+                "h": "5",
+                "i": "Image",
+                "minW": "5",
+                "minH": "5",
+                "isStatic": "false"
+            }
+        },
+        {
+            "widgetGuid": "8BF5A2DF-51FA-479B-B5D8-8413DC425CFF",
+            "widgetProperties": {
+                "i": "LiveLineChart",
+                "background": "#fff",
+                "fontColor": "#343434",
+                "fontFamily": "Proxima Nova",
+                "fontSize": "18",
+                "title": "NPU Inference Time (us) - model swap history",
+                "titleAlign": "",
+                "contents": {
+                    "liveChart": {
+                        "device": {
+                            "deviceGuid": "E1762101-FA36-4ACB-B94E-ED2C7D861C85",
+                            "deviceUniqueId": "RA8P1-mcl"
+                        },
+                        "attributes": {
+                            "attribute": [
+                                {
+                                    "attributeGuid": "F5142BC2-E2A2-44A8-810A-F29F9D912B7C",
+                                    "attributeName": "vision.face_count",
+                                    "displayName": "Faces detected",
+                                    "checked": "false",
+                                    "dataType": "DECIMAL",
+                                    "attributeLatestValue": "",
+                                    "deviceUpdatedDate": "1900-01-01T00:00:00.000Z",
+                                    "gatewayUpdatedDate": "NA",
+                                    "attributeValue": "NA"
+                                },
+                                {
+                                    "attributeGuid": "5C746F7D-E740-4C16-A2B1-E2B667786295",
+                                    "attributeName": "vision.score",
+                                    "displayName": "Best score",
+                                    "checked": "false",
+                                    "dataType": "DECIMAL",
+                                    "attributeLatestValue": "",
+                                    "deviceUpdatedDate": "1900-01-01T00:00:00.000Z",
+                                    "gatewayUpdatedDate": "NA",
+                                    "attributeValue": "NA"
+                                },
+                                {
+                                    "attributeGuid": "85E20E94-77A5-441E-AA47-5F789DDD66D6",
+                                    "attributeName": "model.ver",
+                                    "displayName": "Model version",
+                                    "checked": "false",
+                                    "dataType": "DECIMAL",
+                                    "attributeLatestValue": "",
+                                    "deviceUpdatedDate": "1900-01-01T00:00:00.000Z",
+                                    "gatewayUpdatedDate": "NA",
+                                    "attributeValue": "NA"
+                                },
+                                {
+                                    "attributeGuid": "842828D5-45DF-46B5-B6A0-D5EBBE0D3B32",
+                                    "attributeName": "model.size_b",
+                                    "displayName": "Model size",
+                                    "checked": "false",
+                                    "dataType": "DECIMAL",
+                                    "attributeLatestValue": "",
+                                    "deviceUpdatedDate": "1900-01-01T00:00:00.000Z",
+                                    "gatewayUpdatedDate": "NA",
+                                    "attributeValue": "NA"
+                                },
+                                {
+                                    "attributeGuid": "8C3EB5AB-EAE1-4DE4-9F20-EF93E49BE45D",
+                                    "attributeName": "sys.uptime_s",
+                                    "displayName": "Uptime",
+                                    "checked": "false",
+                                    "dataType": "DECIMAL",
+                                    "attributeLatestValue": "",
+                                    "deviceUpdatedDate": "1900-01-01T00:00:00.000Z",
+                                    "gatewayUpdatedDate": "NA",
+                                    "attributeValue": "NA"
+                                },
+                                {
+                                    "attributeGuid": "184D2F31-C6E6-421F-B767-3AC2DE3B1CBC",
+                                    "attributeName": "sys.free_heap",
+                                    "displayName": "FreeRTOS heap free",
+                                    "checked": "false",
+                                    "dataType": "DECIMAL",
+                                    "attributeLatestValue": "",
+                                    "deviceUpdatedDate": "1900-01-01T00:00:00.000Z",
+                                    "gatewayUpdatedDate": "NA",
+                                    "attributeValue": "NA"
+                                },
+                                {
+                                    "attributeGuid": "B7EF1595-1712-442E-A565-B1C4DF517D3E",
+                                    "attributeName": "sys.msgs_sent",
+                                    "displayName": "Telemetry messages sent",
+                                    "checked": "false",
+                                    "dataType": "DECIMAL",
+                                    "attributeLatestValue": "",
+                                    "deviceUpdatedDate": "1900-01-01T00:00:00.000Z",
+                                    "gatewayUpdatedDate": "NA",
+                                    "attributeValue": "NA"
+                                },
+                                {
+                                    "attributeGuid": "17DF9BA1-78F8-459E-8054-E1C4A5920951",
+                                    "attributeName": "perf.infer_us",
+                                    "displayName": "",
+                                    "checked": "true",
+                                    "dataType": "INTEGER",
+                                    "attributeLatestValue": "",
+                                    "deviceUpdatedDate": "1900-01-01T00:00:00.000Z",
+                                    "gatewayUpdatedDate": "NA",
+                                    "attributeValue": "NA"
+                                },
+                                {
+                                    "attributeGuid": "9CBEF04D-9856-49B4-96BB-1A9A22A8D7F4",
+                                    "attributeName": "perf.infer_fps",
+                                    "displayName": "",
+                                    "checked": "false",
+                                    "dataType": "INTEGER",
+                                    "attributeLatestValue": "",
+                                    "deviceUpdatedDate": "1900-01-01T00:00:00.000Z",
+                                    "gatewayUpdatedDate": "NA",
+                                    "attributeValue": "NA"
+                                },
+                                {
+                                    "attributeGuid": "5CA7BE0B-F45C-4644-BDA0-EB667BEE1838",
+                                    "attributeName": "perf.cam_fps",
+                                    "displayName": "",
+                                    "checked": "false",
+                                    "dataType": "INTEGER",
+                                    "attributeLatestValue": "",
+                                    "deviceUpdatedDate": "1900-01-01T00:00:00.000Z",
+                                    "gatewayUpdatedDate": "NA",
+                                    "attributeValue": "NA"
+                                }
+                            ]
+                        },
+                        "attrType": "1",
+                        "key": "liveChart",
+                        "recentEndPoints": "60"
+                    }
+                }
+            },
+            "properties": {
+                "x": "0",
+                "y": "24",
+                "w": "20",
+                "h": "15",
+                "i": "LiveLineChart",
+                "minW": "15",
+                "minH": "15",
+                "isStatic": "false"
+            }
+        },
+        {
+            "widgetGuid": "6FEFF6B7-15C4-4095-A156-87A1B38D2FF5",
+            "widgetProperties": {
+                "i": "Transformation",
+                "background": "#0b1226",
+                "fontColor": "#ffffff",
+                "fontFamily": "Proxima Nova",
+                "fontSize": "18",
+                "title": "Model Source",
+                "titleAlign": "",
+                "contents": {
+                    "Transformation": {
+                        "device": {
+                            "deviceGuid": "E1762101-FA36-4ACB-B94E-ED2C7D861C85",
+                            "deviceUniqueId": "RA8P1-mcl"
+                        },
+                        "attributes": {
+                            "attribute": [
+                                {
+                                    "attributeGuid": "F5142BC2-E2A2-44A8-810A-F29F9D912B7C",
+                                    "attributeName": "vision.face_count",
+                                    "displayName": "Faces detected",
+                                    "checked": "false",
+                                    "dataType": "DECIMAL",
+                                    "attributeLatestValue": "",
+                                    "deviceUpdatedDate": "1900-01-01T00:00:00.000Z",
+                                    "gatewayUpdatedDate": "NA",
+                                    "attributeValue": "NA"
+                                },
+                                {
+                                    "attributeGuid": "5C746F7D-E740-4C16-A2B1-E2B667786295",
+                                    "attributeName": "vision.score",
+                                    "displayName": "Best score",
+                                    "checked": "false",
+                                    "dataType": "DECIMAL",
+                                    "attributeLatestValue": "",
+                                    "deviceUpdatedDate": "1900-01-01T00:00:00.000Z",
+                                    "gatewayUpdatedDate": "NA",
+                                    "attributeValue": "NA"
+                                },
+                                {
+                                    "attributeGuid": "DE7645B5-AB09-4A25-A102-6A027A40E781",
+                                    "attributeName": "vision.state",
+                                    "displayName": "Detection state",
+                                    "checked": "false",
+                                    "dataType": "STRING",
+                                    "attributeLatestValue": "",
+                                    "deviceUpdatedDate": "1900-01-01T00:00:00.000Z",
+                                    "gatewayUpdatedDate": "NA",
+                                    "attributeValue": "NA"
+                                },
+                                {
+                                    "attributeGuid": "CBDD13CB-4C55-432D-9139-673D6FF90489",
+                                    "attributeName": "model.name",
+                                    "displayName": "Model name",
+                                    "checked": "false",
+                                    "dataType": "STRING",
+                                    "attributeLatestValue": "",
+                                    "deviceUpdatedDate": "1900-01-01T00:00:00.000Z",
+                                    "gatewayUpdatedDate": "NA",
+                                    "attributeValue": "NA"
+                                },
+                                {
+                                    "attributeGuid": "85E20E94-77A5-441E-AA47-5F789DDD66D6",
+                                    "attributeName": "model.ver",
+                                    "displayName": "Model version",
+                                    "checked": "false",
+                                    "dataType": "DECIMAL",
+                                    "attributeLatestValue": "",
+                                    "deviceUpdatedDate": "1900-01-01T00:00:00.000Z",
+                                    "gatewayUpdatedDate": "NA",
+                                    "attributeValue": "NA"
+                                },
+                                {
+                                    "attributeGuid": "3BC02B9C-DB6F-4017-97AC-323384258D8B",
+                                    "attributeName": "model.src",
+                                    "displayName": "Model source",
+                                    "checked": "true",
+                                    "dataType": "STRING",
+                                    "attributeLatestValue": "",
+                                    "deviceUpdatedDate": "1900-01-01T00:00:00.000Z",
+                                    "gatewayUpdatedDate": "NA",
+                                    "attributeValue": "NA"
+                                },
+                                {
+                                    "attributeGuid": "842828D5-45DF-46B5-B6A0-D5EBBE0D3B32",
+                                    "attributeName": "model.size_b",
+                                    "displayName": "Model size",
+                                    "checked": "false",
+                                    "dataType": "DECIMAL",
+                                    "attributeLatestValue": "",
+                                    "deviceUpdatedDate": "1900-01-01T00:00:00.000Z",
+                                    "gatewayUpdatedDate": "NA",
+                                    "attributeValue": "NA"
+                                },
+                                {
+                                    "attributeGuid": "8C3EB5AB-EAE1-4DE4-9F20-EF93E49BE45D",
+                                    "attributeName": "sys.uptime_s",
+                                    "displayName": "Uptime",
+                                    "checked": "false",
+                                    "dataType": "DECIMAL",
+                                    "attributeLatestValue": "",
+                                    "deviceUpdatedDate": "1900-01-01T00:00:00.000Z",
+                                    "gatewayUpdatedDate": "NA",
+                                    "attributeValue": "NA"
+                                },
+                                {
+                                    "attributeGuid": "184D2F31-C6E6-421F-B767-3AC2DE3B1CBC",
+                                    "attributeName": "sys.free_heap",
+                                    "displayName": "FreeRTOS heap free",
+                                    "checked": "false",
+                                    "dataType": "DECIMAL",
+                                    "attributeLatestValue": "",
+                                    "deviceUpdatedDate": "1900-01-01T00:00:00.000Z",
+                                    "gatewayUpdatedDate": "NA",
+                                    "attributeValue": "NA"
+                                },
+                                {
+                                    "attributeGuid": "B7EF1595-1712-442E-A565-B1C4DF517D3E",
+                                    "attributeName": "sys.msgs_sent",
+                                    "displayName": "Telemetry messages sent",
+                                    "checked": "false",
+                                    "dataType": "DECIMAL",
+                                    "attributeLatestValue": "",
+                                    "deviceUpdatedDate": "1900-01-01T00:00:00.000Z",
+                                    "gatewayUpdatedDate": "NA",
+                                    "attributeValue": "NA"
+                                },
+                                {
+                                    "attributeGuid": "17DF9BA1-78F8-459E-8054-E1C4A5920951",
+                                    "attributeName": "perf.infer_us",
+                                    "displayName": "",
+                                    "checked": "false",
+                                    "dataType": "INTEGER",
+                                    "attributeLatestValue": "",
+                                    "deviceUpdatedDate": "1900-01-01T00:00:00.000Z",
+                                    "gatewayUpdatedDate": "NA",
+                                    "attributeValue": "NA"
+                                },
+                                {
+                                    "attributeGuid": "9CBEF04D-9856-49B4-96BB-1A9A22A8D7F4",
+                                    "attributeName": "perf.infer_fps",
+                                    "displayName": "",
+                                    "checked": "false",
+                                    "dataType": "INTEGER",
+                                    "attributeLatestValue": "",
+                                    "deviceUpdatedDate": "1900-01-01T00:00:00.000Z",
+                                    "gatewayUpdatedDate": "NA",
+                                    "attributeValue": "NA"
+                                },
+                                {
+                                    "attributeGuid": "5CA7BE0B-F45C-4644-BDA0-EB667BEE1838",
+                                    "attributeName": "perf.cam_fps",
+                                    "displayName": "",
+                                    "checked": "false",
+                                    "dataType": "INTEGER",
+                                    "attributeLatestValue": "",
+                                    "deviceUpdatedDate": "1900-01-01T00:00:00.000Z",
+                                    "gatewayUpdatedDate": "NA",
+                                    "attributeValue": "NA"
+                                }
+                            ]
+                        },
+                        "attrType": "1",
+                        "key": "Transformation",
+                        "transformations": [
+                            {
+                                "condition": "eq",
+                                "conditionValue": "builtin",
+                                "type": "Url",
+                                "errors": "",
+                                "typeValue": "https://avnetpublicaccess.s3.us-east-1.amazonaws.com/images/renesas/ek-ra8p1/model_builtin.png",
+                                "isShowLiveFontColor": "false"
+                            },
+                            {
+                                "condition": "eq",
+                                "conditionValue": "flash",
+                                "type": "Url",
+                                "errors": "",
+                                "typeValue": "https://avnetpublicaccess.s3.us-east-1.amazonaws.com/images/renesas/ek-ra8p1/model_flash.png",
+                                "isShowLiveFontColor": "false"
+                            },
+                            {
+                                "condition": "eq",
+                                "conditionValue": "cloud",
+                                "type": "Url",
+                                "errors": "",
+                                "typeValue": "https://avnetpublicaccess.s3.us-east-1.amazonaws.com/images/renesas/ek-ra8p1/model_cloud.png",
+                                "isShowLiveFontColor": "false"
+                            }
+                        ],
+                        "position": "center"
+                    }
+                }
+            },
+            "properties": {
+                "x": "20",
+                "y": "24",
+                "w": "10",
+                "h": "13",
+                "i": "Transformation",
+                "minW": "7",
+                "minH": "4",
+                "isStatic": "false"
+            }
+        },
+        {
+            "widgetGuid": "21A18C90-2DBC-4283-89D2-B01E1B70E363",
+            "widgetProperties": {
+                "i": "gauge",
+                "background": "#000000",
+                "fontColor": "#ffffff",
+                "fontFamily": "Proxima Nova",
+                "fontSize": "18",
+                "title": "NPU Capability (fps)",
+                "titleAlign": "",
+                "contents": {
+                    "gauge": {
+                        "device": {
+                            "deviceGuid": "E1762101-FA36-4ACB-B94E-ED2C7D861C85",
+                            "deviceUniqueId": "RA8P1-mcl"
+                        },
+                        "attributes": {
+                            "attribute": {
+                                "attributeGuid": "9CBEF04D-9856-49B4-96BB-1A9A22A8D7F4",
+                                "attributeName": "perf.infer_fps",
+                                "displayName": "",
+                                "checked": "true",
+                                "dataType": "INTEGER",
+                                "attributeLatestValue": "",
+                                "deviceUpdatedDate": "1900-01-01T00:00:00.000Z",
+                                "gatewayUpdatedDate": "NA",
+                                "attributeValue": "NA"
+                            }
+                        },
+                        "minValue": "0",
+                        "maxValue": "700",
+                        "version": "2.0",
+                        "zones": [
+                            {
+                                "zoneColor": "#cc8800",
+                                "zoneName": "heavy model",
+                                "upToValue": "60"
+                            },
+                            {
+                                "zoneColor": "#2e7d32",
+                                "zoneName": "headroom",
+                                "upToValue": "700"
+                            }
+                        ],
+                        "attrType": "1",
+                        "key": "gauge"
+                    }
+                }
+            },
+            "properties": {
+                "x": "30",
+                "y": "24",
+                "w": "10",
+                "h": "9",
+                "i": "gauge",
+                "minW": "10",
+                "minH": "9",
+                "maxW": "16",
+                "maxH": "15",
+                "isStatic": "false"
+            }
+        },
+        {
+            "widgetGuid": "F7979C1B-8637-4667-90A2-6961052C6E21",
+            "widgetProperties": {
+                "i": "Live",
+                "background": "#FFFFFF",
+                "fontColor": "#cc8800",
+                "fontFamily": "Proxima Nova",
+                "fontSize": "18",
+                "title": "Model Size (B)",
+                "titleAlign": "",
+                "contents": {
+                    "attributeValue": {
+                        "attributeName": "model.size_b",
+                        "key": "attributeValue"
+                    },
+                    "attributeTime": {
+                        "attributeName": "model.size_b",
+                        "key": "attributeTime"
+                    },
+                    "live": {
+                        "device": {
+                            "deviceGuid": "E1762101-FA36-4ACB-B94E-ED2C7D861C85",
+                            "deviceUniqueId": "RA8P1-mcl"
+                        },
+                        "attributes": {
+                            "attribute": [
+                                {
+                                    "attributeGuid": "F5142BC2-E2A2-44A8-810A-F29F9D912B7C",
+                                    "attributeName": "vision.face_count",
+                                    "displayName": "Faces detected",
+                                    "checked": "false",
+                                    "dataType": "DECIMAL",
+                                    "attributeLatestValue": "",
+                                    "deviceUpdatedDate": "1900-01-01T00:00:00.000Z",
+                                    "gatewayUpdatedDate": "NA",
+                                    "attributeValue": "NA"
+                                },
+                                {
+                                    "attributeGuid": "5C746F7D-E740-4C16-A2B1-E2B667786295",
+                                    "attributeName": "vision.score",
+                                    "displayName": "Best score",
+                                    "checked": "false",
+                                    "dataType": "DECIMAL",
+                                    "attributeLatestValue": "",
+                                    "deviceUpdatedDate": "1900-01-01T00:00:00.000Z",
+                                    "gatewayUpdatedDate": "NA",
+                                    "attributeValue": "NA"
+                                },
+                                {
+                                    "attributeGuid": "DE7645B5-AB09-4A25-A102-6A027A40E781",
+                                    "attributeName": "vision.state",
+                                    "displayName": "Detection state",
+                                    "checked": "false",
+                                    "dataType": "STRING",
+                                    "attributeLatestValue": "",
+                                    "deviceUpdatedDate": "1900-01-01T00:00:00.000Z",
+                                    "gatewayUpdatedDate": "NA",
+                                    "attributeValue": "NA"
+                                },
+                                {
+                                    "attributeGuid": "CBDD13CB-4C55-432D-9139-673D6FF90489",
+                                    "attributeName": "model.name",
+                                    "displayName": "Model name",
+                                    "checked": "false",
+                                    "dataType": "STRING",
+                                    "attributeLatestValue": "",
+                                    "deviceUpdatedDate": "1900-01-01T00:00:00.000Z",
+                                    "gatewayUpdatedDate": "NA",
+                                    "attributeValue": "NA"
+                                },
+                                {
+                                    "attributeGuid": "85E20E94-77A5-441E-AA47-5F789DDD66D6",
+                                    "attributeName": "model.ver",
+                                    "displayName": "Model version",
+                                    "checked": "false",
+                                    "dataType": "DECIMAL",
+                                    "attributeLatestValue": "",
+                                    "deviceUpdatedDate": "1900-01-01T00:00:00.000Z",
+                                    "gatewayUpdatedDate": "NA",
+                                    "attributeValue": "NA"
+                                },
+                                {
+                                    "attributeGuid": "3BC02B9C-DB6F-4017-97AC-323384258D8B",
+                                    "attributeName": "model.src",
+                                    "displayName": "Model source",
+                                    "checked": "false",
+                                    "dataType": "STRING",
+                                    "attributeLatestValue": "",
+                                    "deviceUpdatedDate": "1900-01-01T00:00:00.000Z",
+                                    "gatewayUpdatedDate": "NA",
+                                    "attributeValue": "NA"
+                                },
+                                {
+                                    "attributeGuid": "842828D5-45DF-46B5-B6A0-D5EBBE0D3B32",
+                                    "attributeName": "model.size_b",
+                                    "displayName": "Model size",
+                                    "checked": "true",
+                                    "dataType": "DECIMAL",
+                                    "attributeLatestValue": "",
+                                    "deviceUpdatedDate": "1900-01-01T00:00:00.000Z",
+                                    "gatewayUpdatedDate": "NA",
+                                    "attributeValue": "NA"
+                                },
+                                {
+                                    "attributeGuid": "8C3EB5AB-EAE1-4DE4-9F20-EF93E49BE45D",
+                                    "attributeName": "sys.uptime_s",
+                                    "displayName": "Uptime",
+                                    "checked": "false",
+                                    "dataType": "DECIMAL",
+                                    "attributeLatestValue": "",
+                                    "deviceUpdatedDate": "1900-01-01T00:00:00.000Z",
+                                    "gatewayUpdatedDate": "NA",
+                                    "attributeValue": "NA"
+                                },
+                                {
+                                    "attributeGuid": "184D2F31-C6E6-421F-B767-3AC2DE3B1CBC",
+                                    "attributeName": "sys.free_heap",
+                                    "displayName": "FreeRTOS heap free",
+                                    "checked": "false",
+                                    "dataType": "DECIMAL",
+                                    "attributeLatestValue": "",
+                                    "deviceUpdatedDate": "1900-01-01T00:00:00.000Z",
+                                    "gatewayUpdatedDate": "NA",
+                                    "attributeValue": "NA"
+                                },
+                                {
+                                    "attributeGuid": "B7EF1595-1712-442E-A565-B1C4DF517D3E",
+                                    "attributeName": "sys.msgs_sent",
+                                    "displayName": "Telemetry messages sent",
+                                    "checked": "false",
+                                    "dataType": "DECIMAL",
+                                    "attributeLatestValue": "",
+                                    "deviceUpdatedDate": "1900-01-01T00:00:00.000Z",
+                                    "gatewayUpdatedDate": "NA",
+                                    "attributeValue": "NA"
+                                },
+                                {
+                                    "attributeGuid": "17DF9BA1-78F8-459E-8054-E1C4A5920951",
+                                    "attributeName": "perf.infer_us",
+                                    "displayName": "",
+                                    "checked": "false",
+                                    "dataType": "INTEGER",
+                                    "attributeLatestValue": "",
+                                    "deviceUpdatedDate": "1900-01-01T00:00:00.000Z",
+                                    "gatewayUpdatedDate": "NA",
+                                    "attributeValue": "NA"
+                                },
+                                {
+                                    "attributeGuid": "9CBEF04D-9856-49B4-96BB-1A9A22A8D7F4",
+                                    "attributeName": "perf.infer_fps",
+                                    "displayName": "",
+                                    "checked": "false",
+                                    "dataType": "INTEGER",
+                                    "attributeLatestValue": "",
+                                    "deviceUpdatedDate": "1900-01-01T00:00:00.000Z",
+                                    "gatewayUpdatedDate": "NA",
+                                    "attributeValue": "NA"
+                                },
+                                {
+                                    "attributeGuid": "5CA7BE0B-F45C-4644-BDA0-EB667BEE1838",
+                                    "attributeName": "perf.cam_fps",
+                                    "displayName": "",
+                                    "checked": "false",
+                                    "dataType": "INTEGER",
+                                    "attributeLatestValue": "",
+                                    "deviceUpdatedDate": "1900-01-01T00:00:00.000Z",
+                                    "gatewayUpdatedDate": "NA",
+                                    "attributeValue": "NA"
+                                }
+                            ]
+                        },
+                        "rules": "",
+                        "attrType": "1",
+                        "key": "live"
+                    }
+                }
+            },
+            "properties": {
+                "x": "30",
+                "y": "33",
+                "w": "10",
+                "h": "4",
+                "i": "Live",
+                "minW": "7",
+                "minH": "4",
+                "maxW": "20",
+                "maxH": "4",
+                "isStatic": "false"
+            }
+        },
+        {
+            "widgetGuid": "6A7BB4C8-1763-41EB-A490-0764F72A527F",
+            "widgetProperties": {
+                "i": "DeviceLatestValue",
+                "background": "#fff",
+                "fontColor": "#343434",
+                "fontFamily": "Proxima Nova",
+                "fontSize": "18",
+                "title": "Latest Values",
+                "titleAlign": "",
+                "contents": {
+                    "devicelatestvalue": {
+                        "device": {
+                            "deviceGuid": "E1762101-FA36-4ACB-B94E-ED2C7D861C85",
+                            "deviceUniqueId": "RA8P1-mcl"
+                        },
+                        "boxtypes": "3",
+                        "attributes": {
+                            "attribute": [
+                                {
+                                    "attributeGuid": "vision.face_count",
+                                    "attributeName": "vision.face_count"
+                                },
+                                {
+                                    "attributeGuid": "vision.score",
+                                    "attributeName": "vision.score"
+                                },
+                                {
+                                    "attributeGuid": "vision.state",
+                                    "attributeName": "vision.state"
+                                },
+                                {
+                                    "attributeGuid": "model.name",
+                                    "attributeName": "model.name"
+                                },
+                                {
+                                    "attributeGuid": "model.ver",
+                                    "attributeName": "model.ver"
+                                },
+                                {
+                                    "attributeGuid": "model.src",
+                                    "attributeName": "model.src"
+                                }
+                            ]
+                        },
+                        "attrType": "1",
+                        "key": "devicelatestvalue"
+                    }
+                }
+            },
+            "properties": {
+                "x": "40",
+                "y": "24",
+                "w": "15",
+                "h": "16",
+                "i": "DeviceLatestValue",
+                "minW": "15",
+                "minH": "16",
+                "maxW": "15",
+                "maxH": "16",
+                "isStatic": "false"
+            }
+        },
+        {
+            "widgetGuid": "A8CB394D-15B1-42C9-94FC-AD7BDC599E2A",
+            "widgetProperties": {
+                "i": "Image",
+                "background": "#FFFFFF",
+                "fontColor": "#000000",
+                "fontFamily": "Proxima Nova",
+                "fontSize": "18",
+                "title": "",
+                "titleAlign": "",
+                "contents": {
+                    "option": {
+                        "imageUpload": "false",
+                        "imageUrl": "true",
+                        "imageDevice": "false",
+                        "imageTelemetry": "false",
+                        "key": "option",
+                        "position": "center"
+                    },
+                    "upload": {
+                        "imageurl": "",
+                        "key": "upload"
+                    },
+                    "url": {
+                        "imageurl": "https://avnetpublicaccess.s3.us-east-1.amazonaws.com/images/renesas/ek-ra8p1/band_commands.png",
+                        "key": "url"
+                    },
+                    "device": {
+                        "deviceGuid": "",
+                        "deviceName": "",
+                        "imageurl": "",
+                        "key": "device"
+                    },
+                    "telemetry": {
+                        "deviceGuid": "",
+                        "deviceName": "",
+                        "imageurl": "",
+                        "key": "telemetry"
+                    },
+                    "classification": {
+                        "showClassification": "false",
+                        "key": "classification"
+                    }
+                }
+            },
+            "properties": {
+                "x": "0",
+                "y": "40",
+                "w": "58",
+                "h": "5",
+                "i": "Image",
+                "minW": "5",
+                "minH": "5",
+                "isStatic": "false"
+            }
+        },
+        {
+            "widgetGuid": "C6C9FCF9-FAEF-49E1-B546-9E066BF9A02C",
+            "widgetProperties": {
+                "i": "Control",
+                "background": "#fff",
+                "fontColor": "#343434",
+                "fontFamily": "Proxima Nova",
+                "fontSize": "18",
+                "title": "Take Snapshot",
+                "titleAlign": "",
+                "contents": {
+                    "control": {
+                        "device": "RA8P1-mcl",
+                        "deviceGuid": "E1762101-FA36-4ACB-B94E-ED2C7D861C85",
+                        "controlType": "button",
+                        "leftText": "capture",
+                        "leftCommand": "snapshot",
+                        "leftSwitchColor": "",
+                        "leftBackgroundColor": "",
+                        "leftParam": "",
+                        "rightText": "capture",
+                        "rightCommand": "snapshot",
+                        "rightSwitchColor": "",
+                        "rightBackgroundColor": "",
+                        "rightParam": "",
+                        "showStatus": "true",
+                        "template": "B30D0A64-479F-4913-9BB1-E95ED8CC2E11",
+                        "key": "control"
+                    }
+                }
+            },
+            "properties": {
+                "x": "0",
+                "y": "45",
+                "w": "9",
+                "h": "6",
+                "i": "Control",
+                "minW": "9",
+                "minH": "6",
+                "maxW": "15",
+                "maxH": "15",
+                "isStatic": "false"
+            }
+        },
+        {
+            "widgetGuid": "C6C9FCF9-FAEF-49E1-B546-9E066BF9A02C",
+            "widgetProperties": {
+                "i": "Control",
+                "background": "#fff",
+                "fontColor": "#343434",
+                "fontFamily": "Proxima Nova",
+                "fontSize": "18",
+                "title": "Model",
+                "titleAlign": "",
+                "contents": {
+                    "control": {
+                        "device": "RA8P1-mcl",
+                        "deviceGuid": "E1762101-FA36-4ACB-B94E-ED2C7D861C85",
+                        "controlType": "button",
+                        "leftText": "revert",
+                        "leftCommand": "model-revert",
+                        "leftSwitchColor": "",
+                        "leftBackgroundColor": "",
+                        "leftParam": "",
+                        "rightText": "info",
+                        "rightCommand": "model-info",
+                        "rightSwitchColor": "",
+                        "rightBackgroundColor": "",
+                        "rightParam": "",
+                        "showStatus": "true",
+                        "template": "B30D0A64-479F-4913-9BB1-E95ED8CC2E11",
+                        "key": "control"
+                    }
+                }
+            },
+            "properties": {
+                "x": "9",
+                "y": "45",
+                "w": "9",
+                "h": "6",
+                "i": "Control",
+                "minW": "9",
+                "minH": "6",
+                "maxW": "15",
+                "maxH": "15",
+                "isStatic": "false"
+            }
+        },
+        {
+            "widgetGuid": "E413CDFD-54EB-465E-BA97-CE610867E440",
+            "widgetProperties": {
+                "i": "DeviceCommand",
+                "background": "#fff",
+                "fontColor": "#000",
+                "fontFamily": "Proxima Nova",
+                "fontSize": "18",
+                "title": "Send Command",
+                "titleAlign": "",
+                "contents": {
+                    "deviceCommand": {
+                        "template": "B30D0A64-479F-4913-9BB1-E95ED8CC2E11",
+                        "device": "RA8P1-mcl",
+                        "deviceGuid": "E1762101-FA36-4ACB-B94E-ED2C7D861C85"
+                    }
+                }
+            },
+            "properties": {
+                "x": "18",
+                "y": "45",
+                "w": "22",
+                "h": "10",
+                "i": "DeviceCommand",
+                "minW": "22",
+                "minH": "10",
+                "maxW": "35",
+                "maxH": "20",
+                "isStatic": "false"
+            }
+        },
+        {
+            "widgetGuid": "A0326788-ACC8-4C4C-8243-98112CAEB98B",
+            "widgetProperties": {
+                "i": "Telemetry",
+                "background": "#fff",
+                "fontColor": "#343434",
+                "fontFamily": "Proxima Nova",
+                "fontSize": "18",
+                "title": "Telemetry Stream",
+                "titleAlign": "",
+                "contents": {
+                    "telemetry": {
+                        "showHeader": "true",
+                        "showDate": "true",
+                        "device": {
+                            "deviceGuid": "E1762101-FA36-4ACB-B94E-ED2C7D861C85",
+                            "deviceUniqueId": "RA8P1-mcl"
+                        },
+                        "attributes": {
+                            "attribute": [
+                                {
+                                    "attributeGuid": "F5142BC2-E2A2-44A8-810A-F29F9D912B7C",
+                                    "attributeName": "vision.face_count",
+                                    "displayName": "Faces detected",
+                                    "checked": "true",
+                                    "dataType": "DECIMAL",
+                                    "attributeLatestValue": "",
+                                    "deviceUpdatedDate": "1900-01-01T00:00:00.000Z",
+                                    "gatewayUpdatedDate": "NA",
+                                    "attributeValue": "NA"
+                                },
+                                {
+                                    "attributeGuid": "5C746F7D-E740-4C16-A2B1-E2B667786295",
+                                    "attributeName": "vision.score",
+                                    "displayName": "Best score",
+                                    "checked": "false",
+                                    "dataType": "DECIMAL",
+                                    "attributeLatestValue": "",
+                                    "deviceUpdatedDate": "1900-01-01T00:00:00.000Z",
+                                    "gatewayUpdatedDate": "NA",
+                                    "attributeValue": "NA"
+                                },
+                                {
+                                    "attributeGuid": "DE7645B5-AB09-4A25-A102-6A027A40E781",
+                                    "attributeName": "vision.state",
+                                    "displayName": "Detection state",
+                                    "checked": "true",
+                                    "dataType": "STRING",
+                                    "attributeLatestValue": "",
+                                    "deviceUpdatedDate": "1900-01-01T00:00:00.000Z",
+                                    "gatewayUpdatedDate": "NA",
+                                    "attributeValue": "NA"
+                                },
+                                {
+                                    "attributeGuid": "CBDD13CB-4C55-432D-9139-673D6FF90489",
+                                    "attributeName": "model.name",
+                                    "displayName": "Model name",
+                                    "checked": "true",
+                                    "dataType": "STRING",
+                                    "attributeLatestValue": "",
+                                    "deviceUpdatedDate": "1900-01-01T00:00:00.000Z",
+                                    "gatewayUpdatedDate": "NA",
+                                    "attributeValue": "NA"
+                                },
+                                {
+                                    "attributeGuid": "85E20E94-77A5-441E-AA47-5F789DDD66D6",
+                                    "attributeName": "model.ver",
+                                    "displayName": "Model version",
+                                    "checked": "false",
+                                    "dataType": "DECIMAL",
+                                    "attributeLatestValue": "",
+                                    "deviceUpdatedDate": "1900-01-01T00:00:00.000Z",
+                                    "gatewayUpdatedDate": "NA",
+                                    "attributeValue": "NA"
+                                },
+                                {
+                                    "attributeGuid": "3BC02B9C-DB6F-4017-97AC-323384258D8B",
+                                    "attributeName": "model.src",
+                                    "displayName": "Model source",
+                                    "checked": "false",
+                                    "dataType": "STRING",
+                                    "attributeLatestValue": "",
+                                    "deviceUpdatedDate": "1900-01-01T00:00:00.000Z",
+                                    "gatewayUpdatedDate": "NA",
+                                    "attributeValue": "NA"
+                                },
+                                {
+                                    "attributeGuid": "842828D5-45DF-46B5-B6A0-D5EBBE0D3B32",
+                                    "attributeName": "model.size_b",
+                                    "displayName": "Model size",
+                                    "checked": "false",
+                                    "dataType": "DECIMAL",
+                                    "attributeLatestValue": "",
+                                    "deviceUpdatedDate": "1900-01-01T00:00:00.000Z",
+                                    "gatewayUpdatedDate": "NA",
+                                    "attributeValue": "NA"
+                                },
+                                {
+                                    "attributeGuid": "8C3EB5AB-EAE1-4DE4-9F20-EF93E49BE45D",
+                                    "attributeName": "sys.uptime_s",
+                                    "displayName": "Uptime",
+                                    "checked": "false",
+                                    "dataType": "DECIMAL",
+                                    "attributeLatestValue": "",
+                                    "deviceUpdatedDate": "1900-01-01T00:00:00.000Z",
+                                    "gatewayUpdatedDate": "NA",
+                                    "attributeValue": "NA"
+                                },
+                                {
+                                    "attributeGuid": "184D2F31-C6E6-421F-B767-3AC2DE3B1CBC",
+                                    "attributeName": "sys.free_heap",
+                                    "displayName": "FreeRTOS heap free",
+                                    "checked": "false",
+                                    "dataType": "DECIMAL",
+                                    "attributeLatestValue": "",
+                                    "deviceUpdatedDate": "1900-01-01T00:00:00.000Z",
+                                    "gatewayUpdatedDate": "NA",
+                                    "attributeValue": "NA"
+                                },
+                                {
+                                    "attributeGuid": "B7EF1595-1712-442E-A565-B1C4DF517D3E",
+                                    "attributeName": "sys.msgs_sent",
+                                    "displayName": "Telemetry messages sent",
+                                    "checked": "false",
+                                    "dataType": "DECIMAL",
+                                    "attributeLatestValue": "",
+                                    "deviceUpdatedDate": "1900-01-01T00:00:00.000Z",
+                                    "gatewayUpdatedDate": "NA",
+                                    "attributeValue": "NA"
+                                },
+                                {
+                                    "attributeGuid": "17DF9BA1-78F8-459E-8054-E1C4A5920951",
+                                    "attributeName": "perf.infer_us",
+                                    "displayName": "",
+                                    "checked": "true",
+                                    "dataType": "INTEGER",
+                                    "attributeLatestValue": "",
+                                    "deviceUpdatedDate": "1900-01-01T00:00:00.000Z",
+                                    "gatewayUpdatedDate": "NA",
+                                    "attributeValue": "NA"
+                                },
+                                {
+                                    "attributeGuid": "9CBEF04D-9856-49B4-96BB-1A9A22A8D7F4",
+                                    "attributeName": "perf.infer_fps",
+                                    "displayName": "",
+                                    "checked": "false",
+                                    "dataType": "INTEGER",
+                                    "attributeLatestValue": "",
+                                    "deviceUpdatedDate": "1900-01-01T00:00:00.000Z",
+                                    "gatewayUpdatedDate": "NA",
+                                    "attributeValue": "NA"
+                                },
+                                {
+                                    "attributeGuid": "5CA7BE0B-F45C-4644-BDA0-EB667BEE1838",
+                                    "attributeName": "perf.cam_fps",
+                                    "displayName": "",
+                                    "checked": "false",
+                                    "dataType": "INTEGER",
+                                    "attributeLatestValue": "",
+                                    "deviceUpdatedDate": "1900-01-01T00:00:00.000Z",
+                                    "gatewayUpdatedDate": "NA",
+                                    "attributeValue": "NA"
+                                }
+                            ]
+                        },
+                        "attrType": "1",
+                        "key": "telemetry"
+                    }
+                }
+            },
+            "properties": {
+                "x": "40",
+                "y": "45",
+                "w": "18",
+                "h": "10",
+                "i": "Telemetry",
+                "minW": "15",
+                "minH": "6",
+                "isStatic": "false"
+            }
+        }
+    ]
+}
