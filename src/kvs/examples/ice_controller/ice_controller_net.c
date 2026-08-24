@@ -41,15 +41,11 @@ static inline void icn_raw_putc( char c )
     ( void ) c;
     return;
 #endif
-    for( uint32_t i = 0; i < 600000UL; i++ )
+    /* RA8P1: no STM32 USART registers here - forward to the console. */
     {
-        if( *(volatile uint32_t *)0x56000C1CUL & ( 1UL << 7 ) )
-        {
-            *(volatile uint32_t *)0x56000C28UL = ( uint32_t ) c;
-            return;
-        }
+        extern void kvs_log_putc( char ch );
+        kvs_log_putc( c );
     }
-    vPetWatchdog();
 }
 static void icn_raw_puts( const char *s ) { while( *s ) icn_raw_putc( *s++ ); }
 static void icn_raw_putn( const char *s, int n ) { while( n-- > 0 ) icn_raw_putc( *s++ ); }
@@ -62,13 +58,10 @@ static void icn_raw_putn( const char *s, int n ) { while( n-- > 0 ) icn_raw_putc
  * are used only on failure exits (bounded to a few lines per second). */
 static inline void icn_diag_putc( char c )
 {
-    for( uint32_t i = 0; i < 600000UL; i++ )
+    /* RA8P1: no STM32 USART registers here - forward to the console. */
     {
-        if( *(volatile uint32_t *)0x56000C1CUL & ( 1UL << 7 ) )
-        {
-            *(volatile uint32_t *)0x56000C28UL = ( uint32_t ) c;
-            return;
-        }
+        extern void kvs_log_putc( char ch );
+        kvs_log_putc( c );
     }
 }
 static void icn_diag_puts( const char *s ) { while( *s ) icn_diag_putc( *s++ ); }
@@ -108,15 +101,11 @@ static void icn_raw_dec( int v )
  * TURN-allocation failures undiagnosable from field logs. */
 static inline void icn_gather_putc( char c )
 {
-    for( uint32_t gi = 0; gi < 600000UL; gi++ )
+    /* RA8P1: no STM32 USART registers here - forward to the console. */
     {
-        if( *(volatile uint32_t *)0x56000C1CUL & ( 1UL << 7 ) )
-        {
-            *(volatile uint32_t *)0x56000C28UL = ( uint32_t ) c;
-            return;
-        }
+        extern void kvs_log_putc( char ch );
+        kvs_log_putc( c );
     }
-    vPetWatchdog();
 }
 static void icn_gather_puts( const char *s ) { while( *s ) icn_gather_putc( *s++ ); }
 static void icn_gather_dec( int v )

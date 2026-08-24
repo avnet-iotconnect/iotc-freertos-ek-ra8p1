@@ -45,15 +45,11 @@ static inline void ic_raw_putc( char c )
     ( void ) c;
     return;
 #endif
-    for( uint32_t i = 0; i < 600000UL; i++ )
+    /* RA8P1: no STM32 USART registers here - forward to the console. */
     {
-        if( *(volatile uint32_t *)0x56000C1CUL & ( 1UL << 7 ) )
-        {
-            *(volatile uint32_t *)0x56000C28UL = ( uint32_t ) c;
-            return;
-        }
+        extern void kvs_log_putc( char ch );
+        kvs_log_putc( c );
     }
-    vPetWatchdog();
 }
 static void ic_raw_puts( const char *s ) { while( *s ) ic_raw_putc( *s++ ); }
 

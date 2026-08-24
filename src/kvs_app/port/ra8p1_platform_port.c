@@ -55,6 +55,34 @@ void kvs_log_printf( const char *fmt, ... )
     }
 }
 
+/* Character sink for the vendored stack's raw diagnostic traces (replaces
+ * the STM32 USART register pokes). Line-buffered; flushed on newline or
+ * when full. Diagnostic-only paths, so the shared buffer race is benign. */
+void kvs_log_putc( char ch )
+{
+    static char s_line[ 128 ];
+    static size_t s_len;
+
+    if( ( ch == '\n' ) || ( s_len >= sizeof( s_line ) - 2U ) )
+    {
+        if( ch != '\n' )
+        {
+            s_line[ s_len++ ] = ch;
+        }
+        s_line[ s_len ] = '\0';
+        if( s_len > 0U )
+        {
+            kvs_log_printf( "%s\r\n", s_line );
+        }
+        s_len = 0U;
+        return;
+    }
+    if( ch != '\r' )
+    {
+        s_line[ s_len++ ] = ch;
+    }
+}
+
 /* ── Wall clock ─────────────────────────────────────────────────────────── */
 /* iotc_time_now() gives whole UTC seconds (epoch offset + tick). Derive the
  * sub-second part from the tick counter so consecutive calls are monotonic

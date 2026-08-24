@@ -59,15 +59,17 @@
 extern void vPetWatchdog( void );
 static inline void pc_raw_putc( char c )
 {
-    for( uint32_t i = 0; i < 600000UL; i++ )
+    /* RA8P1: the STM32N6 USART1 registers poked below do not exist on this
+     * device; touching 0x56000C1C bus-faults. Traces stay compiled out. */
+#if !defined( KVS_RAW_TRACE ) || ( KVS_RAW_TRACE == 0 )
+    ( void ) c;
+    return;
+#endif
+    /* RA8P1: no STM32 USART registers here - forward to the console. */
     {
-        if( *(volatile uint32_t *)0x56000C1CUL & ( 1UL << 7 ) )
-        {
-            *(volatile uint32_t *)0x56000C28UL = ( uint32_t ) c;
-            return;
-        }
+        extern void kvs_log_putc( char ch );
+        kvs_log_putc( c );
     }
-    vPetWatchdog();
 }
 static void pc_raw_puts( const char *s ) { while( *s ) pc_raw_putc( *s++ ); }
 static void pc_raw_hex8( uint8_t v )
