@@ -171,6 +171,31 @@ static int iotcl_c2d_validate_data_and_type(
     return IOTCL_SUCCESS;
 }
 
+// The OTA schema delivers urls[] as {"url": ...} objects, but AI Model pushes
+// (ct:2 module commands) have been observed delivering other shapes. Accept a
+// plain URL string, an object with a "url" field, or -- failing that -- scan
+// the object for the first string member that looks like an https URL.
+// (Ported from the stock iotc-c-lib; the n6 override this file came from
+// predates the tolerant handling.)
+static const char *iotcl_c2d_url_from_array_item(cJSON *url_array_item) {
+    if (cJSON_IsString(url_array_item)) {
+        return cJSON_GetStringValue(url_array_item);
+    }
+    const char *url = iotcl_c2d_get_string_value(url_array_item, false, "url");
+    if (url) {
+        return url;
+    }
+    cJSON *child = NULL;
+    cJSON_ArrayForEach(child, url_array_item) {
+        const char *value = cJSON_GetStringValue(child);
+        if (value && strncmp(value, "https://", 8) == 0) {
+            return value;
+        }
+    }
+    IOTCL_ERROR(IOTCL_ERR_PARSING_ERROR, "no download URL found in the urls[] entry");
+    return NULL;
+}
+
 static cJSON *iotcl_c2d_get_ota_url_array_item(IotclC2dEventData data, int index) {
     if (IOTCL_SUCCESS != iotcl_c2d_validate_data_and_type(data, IOTCL_C2D_ET_DEVICE_OTA, "download URL")) {
         return NULL;
@@ -259,7 +284,7 @@ const char *iotcl_c2d_get_ota_url(IotclC2dEventData data, int index) {
         // called function logs the error
         return NULL;
     }
-    return iotcl_c2d_get_string_value(url_array_item, true, "url");
+    return iotcl_c2d_url_from_array_item(url_array_item);
 }
 
 const char *iotcl_c2d_get_ota_url_hostname(IotclC2dEventData data, int index) {
@@ -275,7 +300,7 @@ const char *iotcl_c2d_get_ota_url_hostname(IotclC2dEventData data, int index) {
         // called function logs the error
         return NULL;
     }
-    const char *url = iotcl_c2d_get_string_value(url_array_item, true, "url");
+    const char *url = iotcl_c2d_url_from_array_item(url_array_item);
     if (!url) {
         // called function logs the error
         return NULL;
@@ -312,7 +337,7 @@ const char *iotcl_c2d_get_ota_url_resource(IotclC2dEventData data, int index) {
         return NULL;
     }
 
-    const char *url = iotcl_c2d_get_string_value(url_array_item, true, "url");
+    const char *url = iotcl_c2d_url_from_array_item(url_array_item);
     if (!url) {
         // called function logs the error
         return NULL;
