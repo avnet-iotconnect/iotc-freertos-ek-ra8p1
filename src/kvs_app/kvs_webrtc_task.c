@@ -32,6 +32,11 @@
 #define LOG_LEVEL LOG_INFO
 #include "logging.h"
 
+/* Direct console logging: the LogXxx macros resolve inconsistently in
+ * this TU depending on include order; log via the port sink directly. */
+extern void kvs_log_printf( const char *fmt, ... );
+#define kvs_app_log( ... ) do { kvs_log_printf( __VA_ARGS__ ); kvs_log_printf( "\r\n" ); } while( 0 )
+
 #include "cJSON.h"
 #include "iotcl.h"
 #include "iotc_time.h"
@@ -132,8 +137,8 @@ void iotc_kvs_identity_hook( const char *identity_json )
     }
     if( !cJSON_IsObject( vs ) )
     {
-        LogInfo( ( "[KVS] identity has no vs block - video streaming not "
-                 "enabled for this device" ) );
+        kvs_app_log( "[KVS] identity has no vs block - video streaming not "
+                 "enabled for this device" );
         goto done;
     }
 
@@ -141,7 +146,7 @@ void iotc_kvs_identity_hook( const char *identity_json )
     url = cJSON_GetStringValue( cJSON_GetObjectItem( vs, "url" ) );
     if( ( carn == NULL ) || ( url == NULL ) )
     {
-        LogWarn( ( "[KVS] vs block missing carn/url" ) );
+        kvs_app_log( "[KVS] vs block missing carn/url" );
         goto done;
     }
     s_autostart = cJSON_IsTrue( cJSON_GetObjectItem( vs, "as" ) );
@@ -176,7 +181,7 @@ void iotc_kvs_identity_hook( const char *identity_json )
         }
         if( ( start == NULL ) || ( end == NULL ) || ( end <= start ) )
         {
-            LogWarn( ( "[KVS] cannot parse region from carn: %s", carn ) );
+            kvs_app_log( "[KVS] cannot parse region from carn: %s", carn );
             goto done;
         }
         s_region = prv_strdup_len( start, ( size_t ) ( end - start ) );
@@ -245,7 +250,7 @@ void iotc_kvs_identity_hook( const char *identity_json )
         ( s_endpoint == NULL ) || ( s_role_alias == NULL ) ||
         ( s_thing == NULL ) )
     {
-        LogWarn( ( "[KVS] vs parse incomplete" ) );
+        kvs_app_log( "[KVS] vs parse incomplete" );
         goto done;
     }
 
@@ -255,10 +260,10 @@ void iotc_kvs_identity_hook( const char *identity_json )
     pcKvsIotRoleAlias = s_role_alias;
     pcKvsIotThingName = s_thing;
 
-    LogInfo( ( "[KVS] config: region=%s channel=%s endpoint=%s role=%s "
+    kvs_app_log( "[KVS] config: region=%s channel=%s endpoint=%s role=%s "
              "thing=%s autostart=%d",
              s_region, s_channel, s_endpoint, s_role_alias, s_thing,
-             ( int ) s_autostart ) );
+             ( int ) s_autostart );
     s_config_ready = true;
 
 done:
@@ -358,7 +363,7 @@ static int32_t prv_on_media_sink( void *pvCustom, MediaFrame_t *pxFrame )
                                            transceiver, &pc_frame );
             if( r != PEER_CONNECTION_RESULT_OK )
             {
-                LogWarn( ( "[KVS] WriteFrame session %d: %d", i, ( int ) r ) );
+                kvs_app_log( "[KVS] WriteFrame session %d: %d", i, ( int ) r );
             }
         }
     }
@@ -373,7 +378,7 @@ static void prv_kvs_task( void *pvParameters )
     bool sdk_inited = false;
 
     ( void ) pvParameters;
-    LogInfo( ( "[KVS] task started" ) );
+    kvs_app_log( "[KVS] task started" );
     s_state = "wait";
 
     /* Wait until the identity flow delivered the vs config, credentials are
@@ -383,7 +388,7 @@ static void prv_kvs_task( void *pvParameters )
         vTaskDelay( pdMS_TO_TICKS( 1000U ) );
     }
 
-    LogInfo( ( "[KVS] config + credentials ready" ) );
+    kvs_app_log( "[KVS] config + credentials ready" );
 
     for( ; ; )
     {
@@ -398,7 +403,7 @@ static void prv_kvs_task( void *pvParameters )
                                       &s_app_ctx );
             if( rc != 0 )
             {
-                LogError( ( "[KVS] AppMediaSource_Init failed: %d", rc ) );
+                kvs_app_log( "[KVS] AppMediaSource_Init failed: %d", rc );
                 goto retry;
             }
 
@@ -406,7 +411,7 @@ static void prv_kvs_task( void *pvParameters )
                                  &s_media_ctx );
             if( rc != 0 )
             {
-                LogError( ( "[KVS] AppCommon_Init failed: %d", rc ) );
+                kvs_app_log( "[KVS] AppCommon_Init failed: %d", rc );
                 goto retry;
             }
             sdk_inited = true;
@@ -419,8 +424,8 @@ static void prv_kvs_task( void *pvParameters )
             s_app_ctx.signalingControllerRole = SIGNALING_ROLE_MASTER;
         }
 
-        LogInfo( ( "[KVS] connecting to signaling channel '%s' (%s)...",
-                 pcKvsChannelName, pcKvsAwsRegion ) );
+        kvs_app_log( "[KVS] connecting to signaling channel '%s' (%s)...",
+                 pcKvsChannelName, pcKvsAwsRegion );
         s_state = "ready";
 
         /* Blocks until the controller stops (error / disconnect). */
@@ -429,16 +434,16 @@ static void prv_kvs_task( void *pvParameters )
 
         if( rc != 0 )
         {
-            LogError( ( "[KVS] signaling controller exited: %d", rc ) );
+            kvs_app_log( "[KVS] signaling controller exited: %d", rc );
         }
         else
         {
-            LogInfo( ( "[KVS] signaling controller stopped" ) );
+            kvs_app_log( "[KVS] signaling controller stopped" );
         }
 
 retry:
         s_state = "wait";
-        LogInfo( ( "[KVS] retrying in %lu ms", ( unsigned long ) retry_ms ) );
+        kvs_app_log( "[KVS] retrying in %lu ms", ( unsigned long ) retry_ms );
         vTaskDelay( pdMS_TO_TICKS( retry_ms ) );
         retry_ms *= 2U;
         if( retry_ms > KVS_RETRY_MAX_DELAY_MS )
@@ -461,7 +466,7 @@ void iotc_kvs_start_task( void )
                                KVS_TASK_PRIORITY,
                                &s_task ) )
     {
-        LogError( ( "[KVS] task create failed" ) );
+        kvs_app_log( "[KVS] task create failed" );
         s_task = NULL;
     }
 }

@@ -34,6 +34,11 @@
 #define LOG_LEVEL LOG_INFO
 #include "logging.h"
 
+/* Direct console logging: the LogXxx macros resolve inconsistently in
+ * this TU depending on include order; log via the port sink directly. */
+extern void kvs_log_printf( const char *fmt, ... );
+#define kvs_app_log( ... ) do { kvs_log_printf( __VA_ARGS__ ); kvs_log_printf( "\r\n" ); } while( 0 )
+
 #define H264E_ENABLE_NEON 0
 #define MINIH264_IMPLEMENTATION
 #include "../../video/minih264e.h"
@@ -136,13 +141,13 @@ static int prv_encoder_init( void )
 
     if( 0 != H264E_sizeof( &cp, &persist_sz, &scratch_sz ) )
     {
-        LogError( ( "[KVSMedia] H264E_sizeof failed" ) );
+        kvs_app_log( "[KVSMedia] H264E_sizeof failed" );
         return -1;
     }
     if( ( size_t ) ( persist_sz + scratch_sz + 128 ) > sizeof( s_enc_pool_sram ) )
     {
-        LogError( ( "[KVSMedia] encoder pools %d+%d exceed SRAM pool",
-                  persist_sz, scratch_sz ) );
+        kvs_app_log( "[KVSMedia] encoder pools %d+%d exceed SRAM pool",
+                  persist_sz, scratch_sz );
         return -1;
     }
     s_ctx.pxPersist = ( H264E_persist_t * ) s_enc_pool_sram;
@@ -151,12 +156,12 @@ static int prv_encoder_init( void )
 
     if( 0 != H264E_init( s_ctx.pxPersist, &cp ) )
     {
-        LogError( ( "[KVSMedia] H264E_init failed" ) );
+        kvs_app_log( "[KVSMedia] H264E_init failed" );
         return -1;
     }
     s_ctx.ucEncInited = 1U;
-    LogInfo( ( "[KVSMedia] H.264 encoder ready (QVGA, persist %d KB scratch %d KB)",
-             persist_sz / 1024, scratch_sz / 1024 ) );
+    kvs_app_log( "[KVSMedia] H.264 encoder ready (QVGA, persist %d KB scratch %d KB)",
+             persist_sz / 1024, scratch_sz / 1024 );
     return 0;
 }
 
@@ -169,7 +174,7 @@ static void prv_media_task( void *pvParam )
     uint32_t frame_no = 0;
     TickType_t last_hb = xTaskGetTickCount();
 
-    LogInfo( ( "[KVSMedia] media task started" ) );
+    kvs_app_log( "[KVSMedia] media task started" );
 
     while( ctx->ucRunning )
     {
@@ -237,7 +242,7 @@ static void prv_media_task( void *pvParam )
         }
         else if( rc != 0 )
         {
-            LogWarn( ( "[KVSMedia] encode failed (%d)", rc ) );
+            kvs_app_log( "[KVSMedia] encode failed (%d)", rc );
         }
 
         /* Heartbeat every ~10 s of streaming. */
@@ -245,10 +250,10 @@ static void prv_media_task( void *pvParam )
         if( ( xTaskGetTickCount() - last_hb ) >= pdMS_TO_TICKS( 10000U ) )
         {
             last_hb = xTaskGetTickCount();
-            LogInfo( ( "[KVSMedia] f=%lu len=%d heap=%u hwm=%u",
+            kvs_app_log( "[KVSMedia] f=%lu len=%d heap=%u hwm=%u",
                      ( unsigned long ) frame_no, coded_sz,
                      ( unsigned ) xPortGetFreeHeapSize(),
-                     ( unsigned ) uxTaskGetStackHighWaterMark( NULL ) ) );
+                     ( unsigned ) uxTaskGetStackHighWaterMark( NULL ) );
         }
 
         /* Pace: never faster than ENC_MIN_FRAME_MS, and always yield. */
@@ -291,7 +296,7 @@ int32_t AppMediaSourcePort_Init( void )
                                MEDIA_TASK_PRIORITY,
                                &s_ctx.xTaskHandle ) )
     {
-        LogError( ( "[KVSMedia] media task create failed" ) );
+        kvs_app_log( "[KVSMedia] media task create failed" );
         s_ctx.ucRunning = 0U;
         return -1;
     }
@@ -310,14 +315,14 @@ int32_t AppMediaSourcePort_Start( OnFrameReadyToSend_t pfnOnVideoFrame,
     s_ctx.pvVideoCtx = pvVideoCtx;
     s_ctx.ucForceIdr = 1U; /* joining viewer needs SPS/PPS + IDR */
     s_ctx.ucStreaming = 1U;
-    LogInfo( ( "[KVSMedia] streaming ON" ) );
+    kvs_app_log( "[KVSMedia] streaming ON" );
     return 0;
 }
 
 void AppMediaSourcePort_Stop( void )
 {
     s_ctx.ucStreaming = 0U;
-    LogInfo( ( "[KVSMedia] streaming OFF" ) );
+    kvs_app_log( "[KVSMedia] streaming OFF" );
 }
 
 void AppMediaSourcePort_Destroy( void )
