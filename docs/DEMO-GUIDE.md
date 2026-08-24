@@ -18,6 +18,7 @@ telemetry and cloud-triggered snapshots as the only interface.
 - [Part 2 — Snapshot to the cloud](#part-2--snapshot-to-the-cloud-2-min)
 - [Part 3 — Cloud model deployment and hot-swap](#part-3--cloud-model-deployment-and-hot-swap-4-min)
 - [Part 4 — Persistence across power cycles](#part-4--persistence-across-power-cycles-1-min)
+- [Part 5 — Live video streaming](#part-5--live-video-streaming-2-min)
 - [Command reference](#command-reference)
 - [Troubleshooting during a demo](#troubleshooting-during-a-demo)
 
@@ -107,6 +108,20 @@ Start on the face detector (push `face-v3` beforehand, or `model-revert` to the 
 - **Key point**: pushed models are persisted, and `model-revert` returns to the factory
   model — model rollout with rollback semantics, on a microcontroller.
 
+## Part 5 — Live video streaming (2 min)
+
+- Open the device's **Video Streaming** tab and click **Start Video**. Within a few
+  seconds the camera's live view appears in the browser.
+- Wave at the camera; point out the latency (a second or two through the TURN relay is
+  normal).
+- **Key points**:
+  - There is no video hardware on this chip: H.264 is encoded in software on the
+    Cortex-M85 (QVGA, ~8–10 fps) while the NPU keeps running inference on the same
+    frames — telemetry continues uninterrupted during streaming.
+  - Transport is production WebRTC: AWS Kinesis Video Streams signaling, ICE/TURN
+    traversal, DTLS-SRTP encryption — negotiated on the microcontroller.
+- Close the tab (or Stop Video) and show telemetry `video.state` returning from `live`.
+
 ## Command reference
 
 | Command | Effect |
@@ -126,3 +141,4 @@ Start on the face detector (push `face-v3` beforehand, or `model-revert` to the 
 | Classifier confidence looks low (30–60%) | Normal for softmax over 1,000 classes; the label being *right* is the demo |
 | Telemetry nulls | Template attribute types (numerics must be DECIMAL) — re-import the bundled template |
 | Board unresponsive | Power cycle: it reboots into the stored model and reconnects in ~30 s |
+| Video tab shows no stream | Give it ~15 s (TURN allocation); retry once by Stop/Start. The device must have been created from the bundled template (video streaming is fixed at device creation) |

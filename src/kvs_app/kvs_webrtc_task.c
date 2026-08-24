@@ -295,6 +295,12 @@ bool iotc_kvs_config_ready( void )
 
 const char *iotc_kvs_state( void )
 {
+    extern bool kvs_media_is_streaming( void );
+
+    if( kvs_media_is_streaming() )
+    {
+        return "live";
+    }
     return s_state;
 }
 

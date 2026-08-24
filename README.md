@@ -11,6 +11,11 @@ Vela-compiled model from /IOTCONNECT AI Model Management and the device hot-swap
 between two inferences, with no reflash and no reboot. Pushed models persist in the 64 MB
 OSPI flash and survive power cycles.
 
+The device also streams **live WebRTC video** to the /IOTCONNECT Video Streaming tab:
+H.264 encoded in software on the Cortex-M85 (QVGA, ~8–10 fps) and delivered through AWS
+Kinesis Video Streams signaling with DTLS-SRTP encryption — the same camera that feeds
+the NPU, streaming to a browser with no video hardware on the chip.
+
 The LCD is **optional**. A key use case is fully headless operation: no display attached,
 with the /IOTCONNECT dashboard as the interface — live telemetry as the data feed and
 cloud-triggered snapshot capture as the viewfinder.
@@ -46,7 +51,8 @@ board and a 7-inch parallel LCD.*
 | Cloud telemetry | Detections, model identity, performance metrics, device vitals every 10 s (configurable) |
 | Snapshot to cloud | `snapshot` command uploads a 480×480 color PNG with detection boxes to Telemetry Files (SigV4 S3 upload signed on-device) |
 | **Model hot-swap** | Push from AI Model Management → download → validate → swap in seconds, uptime uninterrupted |
-| Model persistence | Active model stored in a raw OSPI slot, reloaded at boot; `model-revert` returns to the built-in model |
+| **Live video (KVS WebRTC)** | Open the device's Video Streaming tab and watch the camera live: software H.264 (QVGA) over DTLS-SRTP via the platform-provisioned Kinesis Video Streams channel |
+| Model persistence | Active model stored in a raw OSPI slot, reloaded at boot. The video-enabled build ships without a compiled-in model (the KVS stack and the 441 KB model array do not fit flash together): push any library model once and it persists |
 | Multi-task | The device re-tasks itself by model shape: face detection (boxes), person/occupancy detection, or 1000-class ImageNet classification |
 | Commands | `snapshot`, `set-interval <s>`, `model-info`, `model-revert` |
 
@@ -97,6 +103,10 @@ upload → push.
   │      ├─ telemetry / commands / OTA ct:2 ────────────────┘      │
   │      └─ snapshot: PNG encode ─ SigV4 S3 PUT ─ fu announce      │
   │                                                                │
+  │   KVS WebRTC video: camera ─► RGB565→I420 ─► minih264 (sw)     │
+  │      ─► RTP/SRTP ─► viewer;  signaling wss + ICE/TURN + DTLS   │
+  │      channel + role-alias creds from the identity d.p.vs block │
+  │                                                                │
   │   model_store: IOTV envelope ──► raw OSPI slot (+56 MB)        │
   │   PKCS#11 credentials ──► LittleFS on OSPI (+32 MB)            │
   └────────────────────────────────────────────────────────────────┘
@@ -109,6 +119,10 @@ configuration.xml, ra_gen/, ra_cfg/, ra/   FSP Smart Configurator project (vendo
 iotc-c-lib/                                /IOTCONNECT protocol library, submodule (+ nested cJSON submodule)
 firmware/                                  Prebuilt local-demo image for the Quickstart
 src/iotc/                                  /IOTCONNECT transport + app layer (MQTT/TLS, DRA, SNTP, file upload, snapshot)
+src/kvs/                                   AWS KVS WebRTC stack (signaling, ICE, RTP, DTLS-SRTP, libsrtp, wslay), vendored
+src/kvs_app/                               KVS video app layer: vs-config parsing, media pipeline, RA8P1 ports
+src/kvs_port/                              BSD-socket shim over FreeRTOS+TCP for the KVS stack
+src/video/                                 minih264 software H.264 encoder
 src/ai_application/                        TFLM glue, model lifecycle + hot-swap, YOLO post-processing, labels
 src/model_store/                           IOTV envelope validation + raw OSPI model slot
 src/camera_layer/, src/display_layer/      OV5640/VIN capture, GLCDC output, detection overlay

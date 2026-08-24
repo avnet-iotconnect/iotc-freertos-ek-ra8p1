@@ -23,6 +23,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdint.h>
+#include <stdbool.h>
 
 #include "bsp_api.h"
 #include "FreeRTOS.h"
@@ -317,6 +318,12 @@ int32_t AppMediaSourcePort_Start( OnFrameReadyToSend_t pfnOnVideoFrame,
     s_ctx.ucStreaming = 1U;
     kvs_app_log( "[KVSMedia] streaming ON" );
     return 0;
+}
+
+/* True while at least one WebRTC viewer is receiving video. */
+bool kvs_media_is_streaming( void )
+{
+    return s_ctx.ucStreaming != 0U;
 }
 
 void AppMediaSourcePort_Stop( void )

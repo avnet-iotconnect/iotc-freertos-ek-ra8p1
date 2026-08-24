@@ -17,7 +17,8 @@ with the reasoning), see [BUILD-NOTES.md](BUILD-NOTES.md). This guide is the dis
 - [7. Memory budget](#7-memory-budget)
 - [8. Vendor patches](#8-vendor-patches-survive-with-care)
 - [9. Adding models](#9-adding-models)
-- [10. Troubleshooting](#10-troubleshooting)
+- [10. Live video (KVS WebRTC)](#10-live-video-kvs-webrtc)
+- [11. Troubleshooting](#11-troubleshooting)
 
 ---
 
@@ -201,7 +202,50 @@ Note on quantized classifier outputs: models emitting post-softmax probabilities
 output scale 1/256) and models emitting logits (v2-style) are both handled — the firmware
 softmaxes automatically when the dequantized top value exceeds 1.
 
-## 10. Troubleshooting
+## 10. Live video (KVS WebRTC)
+
+The device streams live camera video to the /IOTCONNECT Video Streaming tab as a WebRTC
+master over an AWS Kinesis Video Streams signaling channel.
+
+**Provisioning.** The platform creates the KVS channel when a device is created from a
+template with `videoStreamResource: "1"` / `videoStreamType: "2"` (the bundled template
+has these). At runtime, the identity response carries a `d.p.vs` block:
+`carn` (the signaling channel ARN — region and channel name are parsed out of it) and
+`url` (the IoT credentials-provider role-alias URL used to fetch temporary AWS
+credentials with the device's X.509 certificate). Parsing lives in
+`src/kvs_app/kvs_webrtc_task.c` (`iotc_kvs_identity_hook`), called from the identity
+flow next to the file-upload hook.
+
+**Stack.** `src/kvs/` vendors the AWS modular KVS WebRTC components (signaling, ICE,
+STUN, SDP, RTP/RTCP), libsrtp, and the wslay websocket library; DTLS-SRTP runs on the
+FSP mbedTLS 3.6. `src/kvs_port/lwip_shim/` provides the BSD-socket API the stack expects
+on top of FreeRTOS+TCP (fd table, `select()` mapped to `FreeRTOS_select` with per-task
+socket sets, `getaddrinfo` over FreeRTOS DNS).
+
+**Media.** `src/kvs_app/port/ra8p1_media_port.c` converts the shared camera frame
+(640×480 RGB565) to I420 QVGA and encodes H.264 with minih264 (`src/video/minih264e.h`)
+— all in software: ~90 ms/frame with the encoder state in SRAM, so ~8–10 fps at around
+500 kbit/s. Encoding runs only while a viewer is connected; the vision pipeline is
+unaffected either way.
+
+**Port notes (hard-won, do not regress):**
+
+- libsrtp uses its **native software AES-ICM/HMAC ciphers** — the FSP hardware-AES
+  alternate implementation fails the AES-ICM known-answer self-test (wrapped-key CTR),
+  which leaves the srtp crypto kernel refusing all sessions.
+- `MBEDTLS_SSL_KEEP_PEER_CERTIFICATE` must stay enabled (FSP property): the DTLS
+  handshake verifies the peer certificate against the SDP fingerprint.
+- The shim's `select()` must keep one FreeRTOS socket set **per task**: the websocket
+  receive loop and the ICE socket listener block in `select()` concurrently.
+- The build carries no built-in model (`IOTC_CFG_NO_BUILTIN_MODEL=1`, `-Os`): the KVS
+  stack and the 441 KB model array do not fit the 1 MB code flash together.
+
+**Known limitations:** one viewer at a time (`AWS_MAX_VIEWER_NUM 1`); TURN-over-TLS
+(`turns:`) handshakes to the KVS TURN fleet currently fail (plain-UDP TURN and direct
+paths carry the session); role-alias credentials are refreshed by the signaling
+controller before expiry.
+
+## 11. Troubleshooting
 
 | Symptom | Cause / fix |
 |---|---|

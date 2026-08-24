@@ -12,7 +12,8 @@ cycles.
 - [3. Verify the vision pipeline](#3-verify-the-vision-pipeline)
 - [4. Create the device in /IOTCONNECT](#4-create-the-device-in-iotconnect)
 - [5. Provision credentials over the serial terminal](#5-provision-credentials-over-the-serial-terminal)
-- [6. Next steps](#6-next-steps)
+- [6. Watch the live video stream](#6-watch-the-live-video-stream)
+- [7. Next steps](#7-next-steps)
 - [Troubleshooting](#troubleshooting)
 
 ## 1. What you need
@@ -91,6 +92,9 @@ In your /IOTCONNECT account (AWS backend):
    from this repository.
 2. **Device → Create Device** using that template, auth type **X.509**
    ("Auto-generated certificate" is easiest). Note the **Unique ID** you choose.
+   The template enables **video streaming (WebRTC)**, so the platform provisions a
+   Kinesis Video Streams signaling channel for the device at creation time — this
+   cannot be added to an existing device later.
 3. Download the device's certificate package (contains the certificate and private key PEM
    files).
 4. Find your **CPID** and **Environment** under **Settings → Key Vault** (they are also in
@@ -141,7 +145,30 @@ every 10 seconds. The stored credentials persist across power cycles — from no
 device connects automatically at boot. Useful maintenance commands: `show` (review, key
 redacted), `erase` (remove stored credentials), `reboot`.
 
-## 6. Next steps
+## 6. Watch the live video stream
+
+Once the device is connected, open the device in /IOTCONNECT and select the
+**Video Streaming** tab. Click **Start Video**: within a few seconds the browser
+negotiates a WebRTC session with the board and the camera's live view appears —
+H.264 encoded in software on the Cortex-M85 at QVGA (320×240), roughly 8–10 frames
+per second.
+
+On the serial console a session start looks like:
+
+```
+[KVS] connecting to signaling channel '<your device id>' (us-east-1)...
+[KVSMedia] streaming ON
+```
+
+Notes:
+
+- The video stream and the vision pipeline share the camera; inference and telemetry
+  continue while streaming.
+- One viewer at a time is supported.
+- The stream stops when the tab is closed or **Stop Video** is clicked; the device
+  stays connected to the signaling channel and the next viewer can connect at any time.
+
+## 7. Next steps
 
 - Run the full demonstration — snapshots to Telemetry Files and over-the-air model
   hot-swap with the five bundled models: [Demo Guide](DEMO-GUIDE.md).

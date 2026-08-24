@@ -1,187 +1,205 @@
 {
- "code": "ra8p1vis",
- "name": "RA8P1 Vision AI",
- "authType": 3,
- "attributes": [
-  {
-   "name": "vision",
-   "displayName": "Vision Inference",
-   "type": "OBJECT",
-   "description": "On-device face detection (YOLO Fastest 192x192 on Ethos-U55)",
-   "childs": [
+  "code": "ra8p1vis",
+  "name": "RA8P1 Vision AI",
+  "authType": 3,
+  "attributes": [
     {
-     "name": "face_count",
-     "displayName": "Faces detected",
-     "type": "DECIMAL",
-     "description": "faces in the current frame",
-     "unit": "",
-     "attributeColor": ""
+      "name": "vision",
+      "displayName": "Vision Inference",
+      "type": "OBJECT",
+      "description": "On-device face detection (YOLO Fastest 192x192 on Ethos-U55)",
+      "childs": [
+        {
+          "name": "face_count",
+          "displayName": "Faces detected",
+          "type": "DECIMAL",
+          "description": "faces in the current frame",
+          "unit": "",
+          "attributeColor": ""
+        },
+        {
+          "name": "score",
+          "displayName": "Best score",
+          "type": "DECIMAL",
+          "description": "confidence of the strongest detection",
+          "unit": "%",
+          "attributeColor": ""
+        },
+        {
+          "name": "state",
+          "displayName": "Detection state",
+          "type": "STRING",
+          "description": "face / clear",
+          "unit": "",
+          "attributeColor": ""
+        }
+      ]
     },
     {
-     "name": "score",
-     "displayName": "Best score",
-     "type": "DECIMAL",
-     "description": "confidence of the strongest detection",
-     "unit": "%",
-     "attributeColor": ""
+      "name": "model",
+      "displayName": "Vision Model",
+      "type": "OBJECT",
+      "description": "Active IOTV-enveloped Vela .tflite (hot-swappable from the cloud)",
+      "childs": [
+        {
+          "name": "name",
+          "displayName": "Model name",
+          "type": "STRING",
+          "description": "from the IOTV header",
+          "unit": "",
+          "attributeColor": ""
+        },
+        {
+          "name": "ver",
+          "displayName": "Model version",
+          "type": "DECIMAL",
+          "description": "from the IOTV header",
+          "unit": "",
+          "attributeColor": ""
+        },
+        {
+          "name": "src",
+          "displayName": "Model source",
+          "type": "STRING",
+          "description": "builtin / flash / cloud",
+          "unit": "",
+          "attributeColor": ""
+        },
+        {
+          "name": "size_b",
+          "displayName": "Model size",
+          "type": "DECIMAL",
+          "description": "",
+          "unit": "B",
+          "attributeColor": ""
+        }
+      ]
     },
     {
-     "name": "state",
-     "displayName": "Detection state",
-     "type": "STRING",
-     "description": "face / clear",
-     "unit": "",
-     "attributeColor": ""
+      "name": "perf",
+      "displayName": "Performance",
+      "type": "OBJECT",
+      "description": "Live pipeline performance metrics",
+      "childs": [
+        {
+          "name": "infer_us",
+          "displayName": "Inference time",
+          "type": "DECIMAL",
+          "description": "Ethos-U55 NPU invoke wall time",
+          "unit": "us",
+          "attributeColor": ""
+        },
+        {
+          "name": "infer_fps",
+          "displayName": "Inference rate capability",
+          "type": "DECIMAL",
+          "description": "1e6 / inference time",
+          "unit": "fps",
+          "attributeColor": ""
+        },
+        {
+          "name": "cam_fps",
+          "displayName": "Camera capture rate",
+          "type": "DECIMAL",
+          "description": "from the VIN vsync period",
+          "unit": "fps",
+          "attributeColor": ""
+        }
+      ]
+    },
+    {
+      "name": "sys",
+      "displayName": "Device Vitals",
+      "type": "OBJECT",
+      "description": "Operational metrics",
+      "childs": [
+        {
+          "name": "uptime_s",
+          "displayName": "Uptime",
+          "type": "DECIMAL",
+          "description": "",
+          "unit": "s",
+          "attributeColor": ""
+        },
+        {
+          "name": "free_heap",
+          "displayName": "FreeRTOS heap free",
+          "type": "DECIMAL",
+          "description": "",
+          "unit": "B",
+          "attributeColor": ""
+        },
+        {
+          "name": "msgs_sent",
+          "displayName": "Telemetry messages sent",
+          "type": "DECIMAL",
+          "description": "since boot",
+          "unit": "",
+          "attributeColor": ""
+        }
+      ],
+      "aggregateTypes": []
+    },
+    {
+      "name": "video",
+      "displayName": "Video Streaming",
+      "type": "OBJECT",
+      "description": "KVS WebRTC live video state",
+      "childs": [
+        {
+          "name": "state",
+          "displayName": "Stream state",
+          "type": "STRING",
+          "description": "off / wait / ready / live",
+          "unit": "",
+          "attributeColor": ""
+        }
+      ]
     }
-   ]
+  ],
+  "commands": [
+    {
+      "name": "Take Snapshot",
+      "command": "snapshot",
+      "requiredParam": false,
+      "requiredAck": true,
+      "isOTACommand": false
+    },
+    {
+      "name": "Set Interval (s)",
+      "command": "set-interval",
+      "requiredParam": true,
+      "requiredAck": true,
+      "isOTACommand": false
+    },
+    {
+      "name": "Model Info",
+      "command": "model-info",
+      "requiredParam": false,
+      "requiredAck": true,
+      "isOTACommand": false
+    },
+    {
+      "name": "Revert To Builtin Model",
+      "command": "model-revert",
+      "requiredParam": false,
+      "requiredAck": true,
+      "isOTACommand": false
+    }
+  ],
+  "messageVersion": "2.1",
+  "capability": "0",
+  "c2dOnDemand": 0,
+  "properties": {
+    "description": "Renesas EK-RA8P1 Vision AI demo: face detection on the Ethos-U55, cloud model hot-swap, snapshot upload",
+    "dataFrequency": "2",
+    "fileSupport": true,
+    "videoStreamResource": "1",
+    "videoStreamType": "2",
+    "certRenewalDay": 0,
+    "enableCSR": false
   },
-  {
-   "name": "model",
-   "displayName": "Vision Model",
-   "type": "OBJECT",
-   "description": "Active IOTV-enveloped Vela .tflite (hot-swappable from the cloud)",
-   "childs": [
-    {
-     "name": "name",
-     "displayName": "Model name",
-     "type": "STRING",
-     "description": "from the IOTV header",
-     "unit": "",
-     "attributeColor": ""
-    },
-    {
-     "name": "ver",
-     "displayName": "Model version",
-     "type": "DECIMAL",
-     "description": "from the IOTV header",
-     "unit": "",
-     "attributeColor": ""
-    },
-    {
-     "name": "src",
-     "displayName": "Model source",
-     "type": "STRING",
-     "description": "builtin / flash / cloud",
-     "unit": "",
-     "attributeColor": ""
-    },
-    {
-     "name": "size_b",
-     "displayName": "Model size",
-     "type": "DECIMAL",
-     "description": "",
-     "unit": "B",
-     "attributeColor": ""
-    }
-   ]
-  },
-  {
-   "name": "perf",
-   "displayName": "Performance",
-   "type": "OBJECT",
-   "description": "Live pipeline performance metrics",
-   "childs": [
-    {
-     "name": "infer_us",
-     "displayName": "Inference time",
-     "type": "DECIMAL",
-     "description": "Ethos-U55 NPU invoke wall time",
-     "unit": "us",
-     "attributeColor": ""
-    },
-    {
-     "name": "infer_fps",
-     "displayName": "Inference rate capability",
-     "type": "DECIMAL",
-     "description": "1e6 / inference time",
-     "unit": "fps",
-     "attributeColor": ""
-    },
-    {
-     "name": "cam_fps",
-     "displayName": "Camera capture rate",
-     "type": "DECIMAL",
-     "description": "from the VIN vsync period",
-     "unit": "fps",
-     "attributeColor": ""
-    }
-   ]
-  },
-  {
-   "name": "sys",
-   "displayName": "Device Vitals",
-   "type": "OBJECT",
-   "description": "Operational metrics",
-   "childs": [
-    {
-     "name": "uptime_s",
-     "displayName": "Uptime",
-     "type": "DECIMAL",
-     "description": "",
-     "unit": "s",
-     "attributeColor": ""
-    },
-    {
-     "name": "free_heap",
-     "displayName": "FreeRTOS heap free",
-     "type": "DECIMAL",
-     "description": "",
-     "unit": "B",
-     "attributeColor": ""
-    },
-    {
-     "name": "msgs_sent",
-     "displayName": "Telemetry messages sent",
-     "type": "DECIMAL",
-     "description": "since boot",
-     "unit": "",
-     "attributeColor": ""
-    }
-   ],
-   "aggregateTypes": []
+  "_meta": {
+    "version": "2.0"
   }
- ],
- "commands": [
-  {
-   "name": "Take Snapshot",
-   "command": "snapshot",
-   "requiredParam": false,
-   "requiredAck": true,
-   "isOTACommand": false
-  },
-  {
-   "name": "Set Interval (s)",
-   "command": "set-interval",
-   "requiredParam": true,
-   "requiredAck": true,
-   "isOTACommand": false
-  },
-  {
-   "name": "Model Info",
-   "command": "model-info",
-   "requiredParam": false,
-   "requiredAck": true,
-   "isOTACommand": false
-  },
-  {
-   "name": "Revert To Builtin Model",
-   "command": "model-revert",
-   "requiredParam": false,
-   "requiredAck": true,
-   "isOTACommand": false
-  }
- ],
- "messageVersion": "2.1",
- "capability": "0",
- "c2dOnDemand": 0,
- "properties": {
-  "description": "Renesas EK-RA8P1 Vision AI demo: face detection on the Ethos-U55, cloud model hot-swap, snapshot upload",
-  "dataFrequency": "2",
-  "fileSupport": true,
-  "certRenewalDay": 0,
-  "enableCSR": false
- },
- "_meta": {
-  "version": "2.0"
- }
 }

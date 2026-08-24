@@ -298,6 +298,11 @@ static void prv_publish_telemetry(void)
                                (double) (xTaskGetTickCount() / configTICK_RATE_HZ));
     iotcl_telemetry_set_number(msg, "sys.free_heap", (double) xPortGetFreeHeapSize());
     iotcl_telemetry_set_number(msg, "sys.msgs_sent", (double) s_msgs_sent);
+    {
+        /* KVS WebRTC video state: off / wait / ready / live. */
+        extern const char *iotc_kvs_state(void);
+        iotcl_telemetry_set_string(msg, "video.state", iotc_kvs_state());
+    }
 
     if (IOTCL_SUCCESS == iotcl_mqtt_send_telemetry(msg, false))
     {
