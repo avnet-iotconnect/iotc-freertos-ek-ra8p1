@@ -86,10 +86,9 @@ void display_thread_entry(void *pvParameters)
             }
             if(wait_for_first_time == false)
             {
-                /* Draw detection boxes into the outgoing camera frame. */
-                extern void detection_overlay_draw(void *frame_buffer);
-                detection_overlay_draw((void *) gp_next_buffer);
-
+                /* Detection boxes are drawn into every frame at VIN
+                 * frame-complete time (camera_control.c) so they persist
+                 * at the full capture rate instead of blinking. */
                 R_GLCDC_BufferChange(&g_plcd_display_ctrl, (uint8_t * const) gp_next_buffer, DISPLAY_FRAME_LAYER_1);
                 do_image_classification_screen(ai_result_updated);
                 console_output_processing_time();

@@ -706,6 +706,14 @@ uint8_t mipi_bits = 8;            // 0x3034 Bit[3:0]: MIPI bit mode (8 or 10)
 /* select the nex VIN output buffer */
 void display_next_buffer_set(uint8_t* next_buffer)
 {
+    /* Draw the detection boxes into every completed frame, right at
+     * publish time. Drawing only from the display thread (~7 fps) made
+     * the boxes blink: the camera rewrites this ring at 55 fps and erased
+     * them between redraws. Outline drawing is a few thousand pixel
+     * writes (~microseconds) - acceptable in the frame-complete path -
+     * and as a bonus the KVS video stream now carries the boxes too. */
+    extern void detection_overlay_draw(void *frame_buffer);
+    detection_overlay_draw(next_buffer);
     gp_next_buffer = next_buffer;
 }
 
