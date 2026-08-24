@@ -152,6 +152,16 @@ static void prv_on_command(IotclC2dEventData data)
  * task; the AI thread applies the swap between inferences and persists the
  * model to the OSPI flash store.
  */
+/* Model pushes are deferred to the net thread (like snapshots): the
+ * download's TLS session needs ~40 KB of heap, which is not available
+ * while a KVS video session is streaming — attempting it live fails the
+ * TLS setup. The worker below waits for the stream to go idle. */
+static char *s_model_host;
+static char *s_model_res;
+static char *s_model_ack_id;
+static volatile bool s_model_pending;
+static TickType_t s_model_wait_since;
+
 static void prv_on_ota(IotclC2dEventData data)
 {
     const char *host = iotcl_c2d_get_ota_url_hostname(data, 0);
@@ -167,11 +177,37 @@ static void prv_on_ota(IotclC2dEventData data)
         }
         return;
     }
+    if (s_model_pending)
+    {
+        if (ack_id)
+        {
+            iotcl_mqtt_send_ota_ack(ack_id, IOTCL_C2D_EVT_OTA_FAILED,
+                                    "another model push is in progress");
+        }
+        return;
+    }
 
     if (ack_id)
     {
         iotcl_mqtt_send_ota_ack(ack_id, IOTCL_C2D_EVT_OTA_DOWNLOADING, NULL);
     }
+
+    iotcl_free(s_model_host);
+    iotcl_free(s_model_res);
+    iotcl_free(s_model_ack_id);
+    s_model_host = iotcl_strdup(host);
+    s_model_res = iotcl_strdup(res);
+    s_model_ack_id = ack_id ? iotcl_strdup(ack_id) : NULL;
+    s_model_wait_since = xTaskGetTickCount();
+    s_model_pending = true; /* net thread picks it up */
+}
+
+/* Runs on the net thread once video streaming is idle. */
+static void prv_model_push_execute(void)
+{
+    const char *host = s_model_host;
+    const char *res = s_model_res;
+    const char *ack_id = s_model_ack_id;
 
     size_t cap = 0;
     uint8_t *buf = face_detection_pending_buf(&cap);
@@ -198,7 +234,7 @@ static void prv_on_ota(IotclC2dEventData data)
         {
             iotcl_mqtt_send_ota_ack(ack_id, IOTCL_C2D_EVT_OTA_DOWNLOAD_FAILED, "download failed");
         }
-        return;
+        goto done;
     }
     IOTC_PRINT("IOTC: model downloaded (%u bytes)\r\n", (unsigned) got);
 
@@ -221,7 +257,7 @@ static void prv_on_ota(IotclC2dEventData data)
                 iotcl_mqtt_send_ota_ack(ack_id, IOTCL_C2D_EVT_OTA_DOWNLOAD_FAILED,
                                         "zip must contain one STORED .iotv entry");
             }
-            return;
+            goto done;
         }
         memmove(buf, buf + data_off, csize);
         got = csize;
@@ -236,13 +272,22 @@ static void prv_on_ota(IotclC2dEventData data)
         {
             iotcl_mqtt_send_ota_ack(ack_id, IOTCL_C2D_EVT_OTA_DOWNLOAD_FAILED, reason);
         }
-        return;
+        goto done;
     }
     if (ack_id)
     {
         iotcl_mqtt_send_ota_ack(ack_id, IOTCL_C2D_EVT_OTA_DOWNLOAD_DONE,
                                 "model queued for hot-swap");
     }
+
+done:
+    iotcl_free(s_model_host);
+    iotcl_free(s_model_res);
+    iotcl_free(s_model_ack_id);
+    s_model_host = NULL;
+    s_model_res = NULL;
+    s_model_ack_id = NULL;
+    s_model_pending = false;
 }
 
 static void prv_publish_telemetry(void)
@@ -467,6 +512,30 @@ void iotc_app_poll(bool network_up)
                 {
                     s_fu_tested = true;
                     (void) iotc_fu_selftest();
+                }
+            }
+            if (s_model_pending)
+            {
+                /* The download's TLS session does not fit in the heap while
+                 * a KVS viewer is streaming; wait for idle (or force after
+                 * 5 minutes rather than dropping the deployment). */
+                extern bool kvs_media_is_streaming(void);
+                bool streaming = kvs_media_is_streaming();
+                bool timed_out = (xTaskGetTickCount() - s_model_wait_since) >=
+                                 pdMS_TO_TICKS(5U * 60U * 1000U);
+                static TickType_t s_hint_at;
+                if (streaming && !timed_out)
+                {
+                    if ((xTaskGetTickCount() - s_hint_at) >= pdMS_TO_TICKS(30000))
+                    {
+                        s_hint_at = xTaskGetTickCount();
+                        IOTC_PRINT("IOTC: model push waiting for video "
+                                   "streaming to stop\r\n");
+                    }
+                }
+                else
+                {
+                    prv_model_push_execute();
                 }
             }
             if (s_snapshot_pending)
