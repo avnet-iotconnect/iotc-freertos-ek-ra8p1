@@ -16,6 +16,7 @@
 #include "bsp_api.h"
 #include "ov5640_cfg.h"
 #include "stdlib.h"
+#include <string.h>
 #include "ai_application_config.h"
 #include "../ra/fsp/inc/instances/r_mipi_phy.h"
 #include "camera_control.h"
@@ -207,7 +208,13 @@ void camera_thread_entry(void *pvParameters)
        xEventGroupSetBits(g_ai_app_event, AI_INFERENCE_INPUT_IMAGE_READY);
        time_counter_end = TimeCounter_CurrentCountGet();
        application_processing_time.ai_inference_pre_processing_time_ms = TimeCounter_CountValueConvertToMs(time_counter_start, time_counter_end);
-       vTaskDelay (30);
+       /* 90 ms: the RGB conversion writes ~150 KB to uncached SDRAM
+        * (~15-19 ms of bus-bound CPU at this thread's priority 3). At the
+        * original 30 ms cadence that was over half the CPU above the
+        * network thread, which starved it visibly during KVS streaming
+        * (telemetry cadence stretched, deferred commands stalled).
+        * ~11 Hz inference input is ample for the demo. */
+       vTaskDelay (90);
     }
 }
 
