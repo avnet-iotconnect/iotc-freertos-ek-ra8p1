@@ -135,19 +135,25 @@ static char s_line[192];
         print_to_console(s_line);                       \
     } while (0)
 
-/* (Re)initialise TFLM from the staging buffer. */
+/* Destroy the current TFLM instance and placement-new a fresh one.
+ * MUST run BEFORE the staging buffer is overwritten with a new model:
+ * the MicroInterpreter destructor (FreeSubgraphs) walks the flatbuffer
+ * it was built on, and parsing a clobbered staging buffer wanders into
+ * wild pointers and hard-faults. Safe on a never-Init'd instance. */
+static void prv_model_teardown(void)
+{
+    s_model.~YoloFastestModel();
+    new (&s_model) arm::app::YoloFastestModel();
+}
+
+/* Initialise TFLM from the staging buffer. Caller must have called
+ * prv_model_teardown() BEFORE writing the new model into staging. */
 static bool prv_model_apply(size_t len)
 {
     s_model_len = len;
     /* Frame buffers use write-through SDRAM; clean D-cache anyway so the NPU
      * (a separate bus master) sees the staged model. */
     SCB_CleanDCache_by_Addr(s_model_staging, (int32_t) len);
-
-    /* Model construction is one-shot per instance; destroy and placement-new
-     * a fresh wrapper over the same static storage for hot-swap (frees the
-     * previous heap-allocated MicroInterpreter; the arena is reused). */
-    s_model.~YoloFastestModel();
-    new (&s_model) arm::app::YoloFastestModel();
     if (!s_model.Init(s_arena, sizeof(s_arena), s_model_staging, (uint32_t) len)) {
         FD_PRINT("FD: TFLM model init FAILED\r\n");
         return false;
@@ -194,6 +200,7 @@ static bool prv_load_builtin_to_staging(void)
     if ((builtin == NULL) || (0 == len)) {
         return false;
     }
+    prv_model_teardown(); /* before overwriting staging - see prv_model_apply */
     memcpy(s_model_staging, builtin, len);
     s_model_len = len;
     strncpy(s_model_name, "builtin", sizeof(s_model_name) - 1);
@@ -210,6 +217,7 @@ bool face_detection_init(void)
     if (0 == rc)
     {
         const struct iotv_hdr *h = (const struct iotv_hdr *) s_model_pending;
+        prv_model_teardown(); /* before overwriting staging */
         memcpy(s_model_staging, s_model_pending + IOTV_HDR_LEN, h->model_len);
         memcpy(s_model_name, h->name, sizeof(s_model_name));
         s_model_name[sizeof(s_model_name) - 1] = 0;
@@ -338,6 +346,9 @@ static void prv_swap_if_pending(void)
     FD_PRINT("FD: hot-swapping to model \"%.15s\" v%u (%u bytes)\r\n",
              h->name, (unsigned) h->model_ver, (unsigned) h->model_len);
 
+    /* Tear down the old interpreter while its flatbuffer in staging is
+     * still intact (its destructor parses it), THEN overwrite staging. */
+    prv_model_teardown();
     memcpy(s_model_staging, s_model_pending + IOTV_HDR_LEN, h->model_len);
     memcpy(s_model_name, h->name, sizeof(s_model_name));
     s_model_name[sizeof(s_model_name) - 1] = 0;
