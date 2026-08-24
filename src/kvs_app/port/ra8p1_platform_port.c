@@ -178,3 +178,19 @@ int platform_set_malloc_free( void * ( *malloc_func )( size_t ),
 void vPetWatchdog( void )
 {
 }
+
+/* ── Assert reporting ───────────────────────────────────────────────────── */
+/* Strong override of the FSP weak __assert_func: the default hits BKPT
+ * silently (a hard fault with no debugger), which cost a debug session to
+ * attribute. Print the location first, then trap. */
+void __assert_func( const char *file, int line, const char *func,
+                    const char *expr )
+{
+    kvs_log_printf( "ASSERT %s:%d %s(): %s\r\n",
+                    file ? file : "?", line,
+                    func ? func : "?", expr ? expr : "?" );
+    __asm volatile ( "bkpt 0" );
+    for( ; ; )
+    {
+    }
+}
