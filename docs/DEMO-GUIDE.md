@@ -64,7 +64,7 @@ Registered models (uploads from `tools/models/`):
 
 ## Part 1 — Live vision inference (2 min)
 
-Start on the face detector (push `face-v3` beforehand, or `model-revert` to the built-in).
+Start on the face detector (push `face-v3` beforehand).
 
 - Step in front of the camera: green boxes track the face on the LCD, and the info panel
   shows the live figures. (Headless: use the serial console detections and the dashboard
@@ -105,8 +105,8 @@ Start on the face detector (push `face-v3` beforehand, or `model-revert` to the 
 
 - Remove power, then repower. The device boots directly into **the last pushed model**
   (from its OSPI flash store), reconnects, and resumes telemetry.
-- **Key point**: pushed models are persisted, and `model-revert` returns to the factory
-  model — model rollout with rollback semantics, on a microcontroller.
+- **Key point**: pushed models are persisted and reload at boot — model rollout that
+  survives power loss, on a microcontroller.
 
 ## Part 5 — Live video streaming (2 min)
 
@@ -129,7 +129,7 @@ Start on the face detector (push `face-v3` beforehand, or `model-revert` to the 
 | `snapshot` | annotated color PNG → Telemetry Files (~10 s) |
 | `set-interval <seconds>` | telemetry period (default 10 s) |
 | `model-info` | ack with active model name/version/source/size |
-| `model-revert` | back to the built-in face detector, clears the stored model |
+| `model-revert` | clears the stored model (inference idles until the next push; this build has no built-in fallback) |
 
 ## Troubleshooting during a demo
 

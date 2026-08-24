@@ -54,7 +54,9 @@ const char *pcKvsIotThingCert        = "";
 const char *pcKvsIotPrivateKey       = "";
 
 /* ── Task configuration ─────────────────────────────────────────────────── */
-#define KVS_TASK_STACK_WORDS   ( 8192U )
+/* 12 KB: the task only runs init + a blocking wait loop; the deep work
+ * happens on the SDK's own tasks. */
+#define KVS_TASK_STACK_WORDS   ( 3072U )
 #define KVS_TASK_PRIORITY      ( 1U )
 #define KVS_RETRY_MIN_DELAY_MS ( 10000U )
 #define KVS_RETRY_MAX_DELAY_MS ( 300000U )

@@ -250,6 +250,8 @@ static void prv_publish_telemetry(void)
     IotclMessageHandle msg = iotcl_telemetry_create();
     if (!msg)
     {
+        IOTC_PRINT("IOTC: telemetry create failed (heap %u)\r\n",
+                   (unsigned) xPortGetFreeHeapSize());
         return;
     }
 
@@ -441,11 +443,12 @@ void iotc_app_poll(bool network_up)
             {
                 extern UBaseType_t uxGetNumberOfFreeNetworkBuffers(void);
                 s_hb = xTaskGetTickCount();
-                IOTC_PRINT("IOTC: hb up=%lu netbuf=%u heap=%u conn=%d\r\n",
+                IOTC_PRINT("IOTC: hb up=%lu netbuf=%u heap=%u conn=%d sent=%lu\r\n",
                            (unsigned long) (s_hb / configTICK_RATE_HZ),
                            (unsigned) uxGetNumberOfFreeNetworkBuffers(),
                            (unsigned) xPortGetFreeHeapSize(),
-                           (int) iotconnect_sdk_is_connected());
+                           (int) iotconnect_sdk_is_connected(),
+                           (unsigned long) s_msgs_sent);
             }
         }
             if (!iotconnect_sdk_is_connected())

@@ -52,8 +52,13 @@
  * packet aged out before the viewer's NACK arrived, retransmission failed
  * ("Fail to retrieve RTP packet sequence number ... result: 5"), and the
  * browser froze on the gap.  768k ~= 80 packets ~= 0.6 s, ~+64 KB heap. */
-#define TRANSCEIVER_H264_VIDEO_BIT_RATE ( 768 * 1024 )
-#define TRANSCEIVER_H265_VIDEO_BIT_RATE ( 768 * 1024 )
+/* RA8P1: the software encoder tops out near 500 kbps (QVGA, 8-10 fps).
+ * 640k of rolling buffer ≈ 1.2 s of retransmit history at the real rate
+ * — at 512k a couple of NACKs per session missed the aged-out packets —
+ * while still leaving ~35 KB of in-session heap for telemetry (768k left
+ * only ~15 KB and starved it). */
+#define TRANSCEIVER_H264_VIDEO_BIT_RATE ( 640 * 1024 )
+#define TRANSCEIVER_H265_VIDEO_BIT_RATE ( 640 * 1024 )
 
 /* Audio bitrate for rolling-buffer sizing.  We don't transmit audio on this
  * board so only the metadata array (12 B × capacity) is allocated — the

@@ -48,17 +48,25 @@ In this step you will confirm the NPU is running inference locally.
 **Checkpoint:** within a few seconds the console shows lines like:
 
 ```
-FD: model "builtin" v1 (builtin, 441088 bytes) loaded: face detector, ethos-u: yes
-FD: 1 face(s): [25,63 49x58 90%]
+FD: no built-in model in this build and no stored model - push one from IOTCONNECT AI Models
 Processing time:
   Camera image capture vsync period :   18 ms,   55 fps
-  AI inference time (Ethos-U55)     : 5800 us,  172 fps
+  AI inference time (Ethos-U55)     :    0 us,    0 fps
 IOTC: no credentials provisioned - use the serial CLI (type 'help') ...
 ```
 
-The camera runs at 55 fps and a full face detection takes about 5.8 ms on the NPU. The last
-line is expected — the cloud connection starts in Step 4. If the LCD is attached, it shows
-live video with green detection boxes.
+The camera runs at 55 fps. Inference idles for now: this image carries no compiled-in
+model (its flash budget went to the live-video stack) — you deploy one from the cloud in
+Step 7, and from then on it loads from flash at boot:
+
+```
+FD: model "face-detect" v3 (flash, 441088 bytes) loaded: face detector, ethos-u: yes
+FD: 1 face(s): [25,63 49x58 90%]
+```
+
+Both lines above are expected on first boot — the cloud connection starts in Step 4. If
+the LCD is attached, it shows live camera video (with green detection boxes once a model
+is active).
 
 ## Step 3 — Create the device in /IOTCONNECT
 
@@ -183,6 +191,25 @@ IOTC: starting (..., credentials: stored)
 IOTC: connected
 ```
 
+## Step 9 — Watch the live video stream
+
+In this step you will open a live WebRTC video session with the board.
+
+1. In /IOTCONNECT, open the device and select the **Video Streaming** tab.
+2. Click **Start Video** and wait a few seconds while the browser negotiates the session.
+   If the first attempt right after a boot stays black, click Stop and Start once more.
+
+**Checkpoint:** the camera's live view appears in the browser (320×240, about 8–10 frames
+per second), and the console shows:
+
+```
+[KVSMedia] streaming ON
+```
+
+The H.264 encoding happens in software on the Cortex-M85 — there is no video hardware on
+this chip — while the NPU keeps running inference on the same frames. Watch the telemetry
+keep updating during the stream, and `video.state` report `live`.
+
 ## Troubleshooting
 
 | Symptom | Cause | Fix |
@@ -195,6 +222,7 @@ IOTC: connected
 | Snapshot ack says upload failed | Transient network error | Send the command again; confirm boot printed `FU: file upload ready` |
 | Model push never arrives | Deployment not dispatched platform-side | Re-push; the device logs `MQTT: C2D message` the moment one arrives |
 | Classifier labels look odd | Scene shots instead of a single object | Hold one object centered, close to the camera |
+| Video tab stays black | First session after boot can time out during TURN setup | Click Stop, then Start again; give it ~15 s |
 
 ## Cleanup and next steps
 
