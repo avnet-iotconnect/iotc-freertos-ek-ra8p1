@@ -66,18 +66,27 @@ JLink.exe -device R7KA8P1KF_CPU0 -if SWD -speed 4000 -AutoConnect 1 -CommandFile
 ## 3. Verify the vision pipeline
 
 Open the serial terminal on the J-Link CDC COM port at **230400 baud**, 8N1. Within a few
-seconds of reset you should see face-detection output and the periodic processing report:
+seconds of reset you should see the periodic processing report:
 
 ```
-FD: model "builtin" v1 (builtin, 441088 bytes) loaded: face detector, ethos-u: yes
-FD: 1 face(s): [25,63 49x58 90%]
+FD: no built-in model in this build and no stored model - push one from IOTCONNECT AI Models
 Processing time:
   Camera image capture vsync period :   18 ms,   55 fps
-  AI inference time (Ethos-U55)     : 5800 us,  172 fps
+  AI inference time (Ethos-U55)     :    0 us,    0 fps
 ```
 
-If the LCD is attached it shows the live camera image with detection boxes and the
-performance panel. Until credentials are provisioned, the console also prints:
+The image carries no compiled-in model (the flash budget went to the live-video stack),
+so inference idles until a model is pushed from /IOTCONNECT AI Models — that happens in
+the [Demo Guide](DEMO-GUIDE.md) after connecting; the pushed model then persists across
+power cycles and loads at boot:
+
+```
+FD: model "face-detect" v3 (stored, 441088 bytes) loaded: face detector, ethos-u: yes
+FD: 1 face(s): [25,63 49x58 90%]
+```
+
+If the LCD is attached it shows the live camera image (with detection boxes once a model
+is active). Until credentials are provisioned, the console also prints:
 
 ```
 IOTC: no credentials provisioned - use the serial CLI (type 'help') ...

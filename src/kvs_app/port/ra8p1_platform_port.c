@@ -14,6 +14,7 @@
 #include <stddef.h>
 #include <stdarg.h>
 #include <stdio.h>
+#include <string.h>
 #include <time.h>
 #include <sys/time.h>
 
@@ -126,6 +127,35 @@ void sntp_get_lasttime( long long *sec, long long *usec, unsigned int *tick )
 void sntp_init( void )
 {
     /* Time is already synced by iotc_time_sync() before KVS starts. */
+}
+
+/* ── Heap helpers for the vendored stack ────────────────────────────────── */
+/* libsrtp's config.h maps malloc/calloc/free here so SRTP session churn
+ * stays on the FreeRTOS heap instead of the 64 KB libc heap. */
+
+void *kvs_port_malloc( unsigned int size )
+{
+    return pvPortMalloc( size );
+}
+
+void *kvs_port_calloc( unsigned int n, unsigned int size )
+{
+    size_t total = ( size_t ) n * ( size_t ) size;
+    void *p = pvPortMalloc( total );
+
+    if( p != NULL )
+    {
+        memset( p, 0, total );
+    }
+    return p;
+}
+
+void kvs_port_free( void *ptr )
+{
+    if( ptr != NULL )
+    {
+        vPortFree( ptr );
+    }
 }
 
 /* ── Ameba platform hooks ───────────────────────────────────────────────── */

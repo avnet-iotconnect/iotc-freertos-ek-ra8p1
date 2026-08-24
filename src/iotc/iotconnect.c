@@ -102,9 +102,33 @@ static int prv_provision_identity(const IotConnectAuthInfo *auth)
     return 0;
 }
 
+static void *prv_iotcl_malloc(size_t size)
+{
+    return pvPortMalloc(size);
+}
+
+static void prv_iotcl_free(void *ptr)
+{
+    vPortFree(ptr);
+}
+
 int iotconnect_sdk_init(IotConnectClientConfig *c)
 {
     int status;
+
+    /* Run iotc-c-lib (and its cJSON) on the FreeRTOS heap. The default is
+     * libc malloc (the 64 KB newlib heap), which the KVS WebRTC stack can
+     * exhaust during a video session - after which telemetry message
+     * creation fails silently, forever. One-shot: allocator must never
+     * change once anything is allocated. */
+    {
+        static bool s_mem_configured;
+        if (!s_mem_configured)
+        {
+            s_mem_configured = true;
+            iotcl_configure_dynamic_memory(prv_iotcl_malloc, prv_iotcl_free);
+        }
+    }
 
     s_ctx.cfg = *c;
     s_ctx.env = iotcl_strdup(c->env);

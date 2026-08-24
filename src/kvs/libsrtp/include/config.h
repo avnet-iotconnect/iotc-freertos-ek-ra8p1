@@ -59,4 +59,13 @@
 /* #undef NSS      */
 /* #undef WOLFSSL  */
 
+/* Map libsrtp allocations to the FreeRTOS heap. calloc must be covered
+ * too (alloc.c uses it); helpers live in ra8p1_platform_port.c. */
+extern void *kvs_port_malloc(unsigned int size);
+extern void *kvs_port_calloc(unsigned int n, unsigned int size);
+extern void kvs_port_free(void *ptr);
+#define malloc  kvs_port_malloc
+#define calloc  kvs_port_calloc
+#define free    kvs_port_free
+
 #endif /* SRTP_CONFIG_H */

@@ -304,9 +304,16 @@ static void prv_publish_telemetry(void)
         iotcl_telemetry_set_string(msg, "video.state", iotc_kvs_state());
     }
 
-    if (IOTCL_SUCCESS == iotcl_mqtt_send_telemetry(msg, false))
     {
-        s_msgs_sent++;
+        int rc = iotcl_mqtt_send_telemetry(msg, false);
+        if (IOTCL_SUCCESS == rc)
+        {
+            s_msgs_sent++;
+        }
+        else
+        {
+            IOTC_PRINT("IOTC: telemetry send failed (%d)\r\n", rc);
+        }
     }
     iotcl_telemetry_destroy(msg);
 }
@@ -424,6 +431,23 @@ void iotc_app_poll(bool network_up)
         }
 
         case IOTC_APP_RUNNING:
+        {
+            /* Net-thread liveness heartbeat: if these stop while other
+             * threads keep printing, the net thread is blocked; the buffer
+             * count exposes FreeRTOS+TCP network-buffer exhaustion under
+             * KVS video load. */
+            static TickType_t s_hb;
+            if ((xTaskGetTickCount() - s_hb) >= pdMS_TO_TICKS(30000))
+            {
+                extern UBaseType_t uxGetNumberOfFreeNetworkBuffers(void);
+                s_hb = xTaskGetTickCount();
+                IOTC_PRINT("IOTC: hb up=%lu netbuf=%u heap=%u conn=%d\r\n",
+                           (unsigned long) (s_hb / configTICK_RATE_HZ),
+                           (unsigned) uxGetNumberOfFreeNetworkBuffers(),
+                           (unsigned) xPortGetFreeHeapSize(),
+                           (int) iotconnect_sdk_is_connected());
+            }
+        }
             if (!iotconnect_sdk_is_connected())
             {
                 IOTC_PRINT("IOTC: disconnected\r\n");
