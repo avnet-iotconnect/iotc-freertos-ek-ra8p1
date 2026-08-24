@@ -289,6 +289,7 @@ static inline srtp_err_status_t srtp_crypto_kernel_do_load_cipher_type(
 
     /* check cipher type by running self-test */
     status = srtp_cipher_type_self_test(new_ct);
+    { extern void kvs_log_printf(const char *fmt, ...); if (status) kvs_log_printf("[SRTP] cipher self-test failed: id=%d status=%d\r\n", (int)id, (int)status); }
     if (status) {
         return status;
     }
@@ -367,6 +368,7 @@ srtp_err_status_t srtp_crypto_kernel_do_load_auth_type(
 
     /* check auth type by running self-test */
     status = srtp_auth_type_self_test(new_at);
+    { extern void kvs_log_printf(const char *fmt, ...); if (status) kvs_log_printf("[SRTP] auth self-test failed: id=%d status=%d\r\n", (int)id, (int)status); }
     if (status) {
         return status;
     }
@@ -454,6 +456,11 @@ srtp_err_status_t srtp_crypto_kernel_alloc_cipher(srtp_cipher_type_id_t id,
      * any ciphers - this is a bit extra-paranoid
      */
     if (crypto_kernel.state != srtp_crypto_kernel_state_secure) {
+        {
+            extern void kvs_log_printf(const char *fmt, ...);
+            kvs_log_printf("[SRTP] alloc_cipher: kernel state=%d (not secure)\r\n",
+                           (int)crypto_kernel.state);
+        }
         return srtp_err_status_init_fail;
     }
 

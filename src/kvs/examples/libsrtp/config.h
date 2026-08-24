@@ -37,7 +37,7 @@
 /* #undef OPENSSL */
 
 /* Define this to use AES-GCM. */
-#define GCM 1
+/* GCM disabled on RA8P1: native software AES-ICM + HMAC-SHA1 only */
 
 /* Define this to use MBEDTLS. */
 #define MBEDTLS 1

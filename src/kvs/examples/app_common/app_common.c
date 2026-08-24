@@ -1722,6 +1722,10 @@ int AppCommon_Init( AppContext_t * pAppContext,
 
         {
             srtp_err_status_t xSrtpStatus = srtp_init();
+            {
+                extern void kvs_log_printf( const char *fmt, ... );
+                kvs_log_printf( "[SRTP] srtp_init -> %d\r\n", ( int ) xSrtpStatus );
+            }
             if( xSrtpStatus != srtp_err_status_ok )
             {
                 /* A failed crypto-kernel init (e.g. a cipher known-answer

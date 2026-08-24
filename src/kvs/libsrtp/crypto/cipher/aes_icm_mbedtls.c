@@ -333,6 +333,11 @@ static srtp_err_status_t srtp_aes_icm_mbedtls_context_init(void *cv,
     errcode = mbedtls_aes_setkey_enc(c->ctx, key, key_size_in_bits);
     if (errcode != 0) {
         debug_print(srtp_mod_aes_icm, "errCode: %d", errcode);
+        {
+            extern void kvs_log_printf(const char *fmt, ...);
+            kvs_log_printf("[SRTP] aes_setkey_enc failed: %d (keybits %u)\r\n",
+                           errcode, (unsigned) key_size_in_bits);
+        }
         /* Swallowing this error leaves the context keyed with garbage: the
          * cipher then encrypts with the wrong key, which fails the crypto
          * kernel's known-answer self-test and (worse) could silently produce

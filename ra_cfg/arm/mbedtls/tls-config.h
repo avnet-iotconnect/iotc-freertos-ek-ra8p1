@@ -481,7 +481,7 @@ extern "C" {
  * Comment this macro to disable storing the peer's certificate
  * after the handshake.
  */
-#if 0
+#if 1
 #define MBEDTLS_SSL_KEEP_PEER_CERTIFICATE
 #endif
 

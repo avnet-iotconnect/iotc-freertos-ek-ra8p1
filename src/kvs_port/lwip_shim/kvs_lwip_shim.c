@@ -41,7 +41,48 @@ typedef struct
 
 static shim_slot_t s_slots[KVS_SHIM_MAX_SOCKETS];
 static SemaphoreHandle_t s_lock;
-static SocketSet_t s_select_set;
+/* Per-task select() socket sets. A single shared set deadlocks when two
+ * tasks (the wslay websocket recv loop and the ICE socket listener) block
+ * in FreeRTOS_select() concurrently: they clobber each other's FD bits and
+ * both wait on the same event group. */
+#define KVS_SHIM_MAX_SELECT_TASKS 6
+typedef struct
+{
+    TaskHandle_t task;
+    SocketSet_t set;
+} shim_select_slot_t;
+static shim_select_slot_t s_select_sets[KVS_SHIM_MAX_SELECT_TASKS];
+
+static SocketSet_t prv_task_select_set(void)
+{
+    TaskHandle_t me = xTaskGetCurrentTaskHandle();
+
+    xSemaphoreTake(s_lock, portMAX_DELAY);
+    for (int i = 0; i < KVS_SHIM_MAX_SELECT_TASKS; i++)
+    {
+        if (s_select_sets[i].task == me)
+        {
+            xSemaphoreGive(s_lock);
+            return s_select_sets[i].set;
+        }
+    }
+    for (int i = 0; i < KVS_SHIM_MAX_SELECT_TASKS; i++)
+    {
+        if (s_select_sets[i].task == NULL)
+        {
+            SocketSet_t set = FreeRTOS_CreateSocketSet();
+            if (set != NULL)
+            {
+                s_select_sets[i].task = me;
+                s_select_sets[i].set = set;
+            }
+            xSemaphoreGive(s_lock);
+            return set;
+        }
+    }
+    xSemaphoreGive(s_lock);
+    return NULL;
+}
 
 static void prv_init(void)
 {
@@ -200,9 +241,12 @@ int close(int s)
 {
     shim_slot_t *sl = prv_slot(s);
     if (!sl) { errno = EBADF; return -1; }
-    if (s_select_set != NULL)
+    for (int i = 0; i < KVS_SHIM_MAX_SELECT_TASKS; i++)
     {
-        FreeRTOS_FD_CLR(sl->sock, s_select_set, eSELECT_ALL);
+        if (s_select_sets[i].set != NULL)
+        {
+            FreeRTOS_FD_CLR(sl->sock, s_select_sets[i].set, eSELECT_ALL);
+        }
     }
     (void) FreeRTOS_closesocket(sl->sock);
     sl->in_use = false;
@@ -314,14 +358,11 @@ int select(int maxfdp1, fd_set *readset, fd_set *writeset, fd_set *exceptset,
 {
     (void) exceptset;
     prv_init();
-    if (s_select_set == NULL)
+    SocketSet_t sel = prv_task_select_set();
+    if (sel == NULL)
     {
-        s_select_set = FreeRTOS_CreateSocketSet();
-        if (s_select_set == NULL)
-        {
-            errno = ENOMEM;
-            return -1;
-        }
+        errno = ENOMEM;
+        return -1;
     }
 
     int upper = maxfdp1 - SHIM_FD_BASE;
@@ -336,16 +377,16 @@ int select(int maxfdp1, fd_set *readset, fd_set *writeset, fd_set *exceptset,
         if (writeset && FD_ISSET(fd, writeset)) { bits |= eSELECT_WRITE; }
         if (bits)
         {
-            FreeRTOS_FD_SET(s_slots[i].sock, s_select_set, bits);
+            FreeRTOS_FD_SET(s_slots[i].sock, sel, bits);
         }
         else
         {
-            FreeRTOS_FD_CLR(s_slots[i].sock, s_select_set, eSELECT_ALL);
+            FreeRTOS_FD_CLR(s_slots[i].sock, sel, eSELECT_ALL);
         }
     }
 
     TickType_t to = timeout ? prv_tv_to_ticks(timeout) : portMAX_DELAY;
-    (void) FreeRTOS_select(s_select_set, to);
+    (void) FreeRTOS_select(sel, to);
 
     int nready = 0;
     fd_set rout, wout;
@@ -355,7 +396,7 @@ int select(int maxfdp1, fd_set *readset, fd_set *writeset, fd_set *exceptset,
     {
         if (!s_slots[i].in_use) { continue; }
         int fd = SHIM_FD_BASE + i;
-        EventBits_t got = FreeRTOS_FD_ISSET(s_slots[i].sock, s_select_set);
+        EventBits_t got = FreeRTOS_FD_ISSET(s_slots[i].sock, sel);
         if (readset && FD_ISSET(fd, readset) && (got & eSELECT_READ))
         {
             FD_SET(fd, &rout);
@@ -366,7 +407,7 @@ int select(int maxfdp1, fd_set *readset, fd_set *writeset, fd_set *exceptset,
             FD_SET(fd, &wout);
             nready++;
         }
-        FreeRTOS_FD_CLR(s_slots[i].sock, s_select_set, eSELECT_ALL);
+        FreeRTOS_FD_CLR(s_slots[i].sock, sel, eSELECT_ALL);
     }
     if (readset) { *readset = rout; }
     if (writeset) { *writeset = wout; }

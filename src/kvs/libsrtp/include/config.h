@@ -17,7 +17,7 @@
 #define MBEDTLS   1
 
 /* Enable AES-GCM (required for SRTP_PROFILE_AES128_CM_HMAC_SHA1_80) */
-#define GCM       1
+/* GCM disabled on RA8P1: native software AES-ICM + HMAC-SHA1 only */
 
 /* Standard C headers available in newlib */
 #define HAVE_STDINT_H    1

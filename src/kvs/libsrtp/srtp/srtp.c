@@ -462,6 +462,7 @@ static srtp_err_status_t srtp_stream_alloc(srtp_stream_ctx_t **str_ptr,
         stat = srtp_crypto_kernel_alloc_cipher(
             p->rtp.cipher_type, &session_keys->rtp_cipher,
             p->rtp.cipher_key_len, p->rtp.auth_tag_len);
+        { extern void kvs_log_printf(const char *fmt, ...); if (stat) kvs_log_printf("[SRTP] L%d stat=%d\r\n", __LINE__, (int)stat); }
         if (stat) {
             srtp_stream_dealloc(str, NULL);
             return stat;
@@ -483,6 +484,7 @@ static srtp_err_status_t srtp_stream_alloc(srtp_stream_ctx_t **str_ptr,
         stat = srtp_crypto_kernel_alloc_cipher(
             p->rtcp.cipher_type, &session_keys->rtcp_cipher,
             p->rtcp.cipher_key_len, p->rtcp.auth_tag_len);
+        { extern void kvs_log_printf(const char *fmt, ...); if (stat) kvs_log_printf("[SRTP] L%d stat=%d\r\n", __LINE__, (int)stat); }
         if (stat) {
             srtp_stream_dealloc(str, NULL);
             return stat;
@@ -548,6 +550,7 @@ static srtp_err_status_t srtp_stream_alloc(srtp_stream_ctx_t **str_ptr,
             stat = srtp_crypto_kernel_alloc_cipher(
                 enc_xtn_hdr_cipher_type, &session_keys->rtp_xtn_hdr_cipher,
                 enc_xtn_hdr_cipher_key_len, 0);
+            { extern void kvs_log_printf(const char *fmt, ...); if (stat) kvs_log_printf("[SRTP] L%d stat=%d\r\n", __LINE__, (int)stat); }
             if (stat) {
                 srtp_stream_dealloc(str, NULL);
                 return stat;
@@ -905,11 +908,15 @@ static srtp_err_status_t srtp_kdf_init(srtp_kdf_t *kdf,
     }
 
     stat = srtp_crypto_kernel_alloc_cipher(cipher_id, &kdf->cipher, key_len, 0);
+
+    { extern void kvs_log_printf(const char *fmt, ...); if (stat) kvs_log_printf("[SRTP] L%d stat=%d\r\n", __LINE__, (int)stat); }
     if (stat) {
         return stat;
     }
 
     stat = srtp_cipher_init(kdf->cipher, key);
+
+    { extern void kvs_log_printf(const char *fmt, ...); if (stat) kvs_log_printf("[SRTP] L%d stat=%d\r\n", __LINE__, (int)stat); }
     if (stat) {
         srtp_cipher_dealloc(kdf->cipher);
         return stat;
@@ -1117,8 +1124,10 @@ srtp_err_status_t srtp_stream_init_keys(srtp_session_keys_t *session_keys,
 /* initialize KDF state     */
 #if defined(OPENSSL) && defined(OPENSSL_KDF)
     stat = srtp_kdf_init(&kdf, tmp_key, rtp_base_key_len, rtp_salt_len);
+    { extern void kvs_log_printf(const char *fmt, ...); if (stat) kvs_log_printf("[SRTP] L%d stat=%d\r\n", __LINE__, (int)stat); }
 #else
     stat = srtp_kdf_init(&kdf, tmp_key, kdf_keylen);
+    { extern void kvs_log_printf(const char *fmt, ...); if (stat) kvs_log_printf("[SRTP] L%d stat=%d\r\n", __LINE__, (int)stat); }
 #endif
     if (stat) {
         /* zeroize temp buffer */
@@ -1129,6 +1138,7 @@ srtp_err_status_t srtp_stream_init_keys(srtp_session_keys_t *session_keys,
     /* generate encryption key  */
     stat = srtp_kdf_generate(&kdf, label_rtp_encryption, tmp_key,
                              rtp_base_key_len);
+    { extern void kvs_log_printf(const char *fmt, ...); if (stat) kvs_log_printf("[SRTP] L%d stat=%d\r\n", __LINE__, (int)stat); }
     if (stat) {
         /* zeroize temp buffer */
         octet_string_set_to_zero(tmp_key, MAX_SRTP_KEY_LEN);
@@ -1147,6 +1157,7 @@ srtp_err_status_t srtp_stream_init_keys(srtp_session_keys_t *session_keys,
         /* generate encryption salt, put after encryption key */
         stat = srtp_kdf_generate(&kdf, label_rtp_salt,
                                  tmp_key + rtp_base_key_len, rtp_salt_len);
+        { extern void kvs_log_printf(const char *fmt, ...); if (stat) kvs_log_printf("[SRTP] L%d stat=%d\r\n", __LINE__, (int)stat); }
         if (stat) {
             /* zeroize temp buffer */
             octet_string_set_to_zero(tmp_key, MAX_SRTP_KEY_LEN);
@@ -1163,6 +1174,7 @@ srtp_err_status_t srtp_stream_init_keys(srtp_session_keys_t *session_keys,
 
     /* initialize cipher */
     stat = srtp_cipher_init(session_keys->rtp_cipher, tmp_key);
+    { extern void kvs_log_printf(const char *fmt, ...); if (stat) kvs_log_printf("[SRTP] L%d stat=%d\r\n", __LINE__, (int)stat); }
     if (stat) {
         /* zeroize temp buffer */
         octet_string_set_to_zero(tmp_key, MAX_SRTP_KEY_LEN);
@@ -1217,8 +1229,10 @@ srtp_err_status_t srtp_stream_init_keys(srtp_session_keys_t *session_keys,
             stat =
                 srtp_kdf_init(xtn_hdr_kdf, tmp_xtn_hdr_key,
                               rtp_xtn_hdr_base_key_len, rtp_xtn_hdr_salt_len);
+            { extern void kvs_log_printf(const char *fmt, ...); if (stat) kvs_log_printf("[SRTP] L%d stat=%d\r\n", __LINE__, (int)stat); }
 #else
             stat = srtp_kdf_init(xtn_hdr_kdf, tmp_xtn_hdr_key, kdf_keylen);
+            { extern void kvs_log_printf(const char *fmt, ...); if (stat) kvs_log_printf("[SRTP] L%d stat=%d\r\n", __LINE__, (int)stat); }
 #endif
             octet_string_set_to_zero(tmp_xtn_hdr_key, MAX_SRTP_KEY_LEN);
             if (stat) {
@@ -1236,6 +1250,8 @@ srtp_err_status_t srtp_stream_init_keys(srtp_session_keys_t *session_keys,
 
         stat = srtp_kdf_generate(xtn_hdr_kdf, label_rtp_header_encryption,
                                  tmp_key, rtp_xtn_hdr_base_key_len);
+
+        { extern void kvs_log_printf(const char *fmt, ...); if (stat) kvs_log_printf("[SRTP] L%d stat=%d\r\n", __LINE__, (int)stat); }
         if (stat) {
             /* zeroize temp buffer */
             octet_string_set_to_zero(tmp_key, MAX_SRTP_KEY_LEN);
@@ -1257,6 +1273,7 @@ srtp_err_status_t srtp_stream_init_keys(srtp_session_keys_t *session_keys,
             stat = srtp_kdf_generate(xtn_hdr_kdf, label_rtp_header_salt,
                                      tmp_key + rtp_xtn_hdr_base_key_len,
                                      rtp_xtn_hdr_salt_len);
+            { extern void kvs_log_printf(const char *fmt, ...); if (stat) kvs_log_printf("[SRTP] L%d stat=%d\r\n", __LINE__, (int)stat); }
             if (stat) {
                 /* zeroize temp buffer */
                 octet_string_set_to_zero(tmp_key, MAX_SRTP_KEY_LEN);
@@ -1272,6 +1289,7 @@ srtp_err_status_t srtp_stream_init_keys(srtp_session_keys_t *session_keys,
 
         /* initialize extensions header cipher */
         stat = srtp_cipher_init(session_keys->rtp_xtn_hdr_cipher, tmp_key);
+        { extern void kvs_log_printf(const char *fmt, ...); if (stat) kvs_log_printf("[SRTP] L%d stat=%d\r\n", __LINE__, (int)stat); }
         if (stat) {
             /* zeroize temp buffer */
             octet_string_set_to_zero(tmp_key, MAX_SRTP_KEY_LEN);
@@ -1292,6 +1310,7 @@ srtp_err_status_t srtp_stream_init_keys(srtp_session_keys_t *session_keys,
     /* generate authentication key */
     stat = srtp_kdf_generate(&kdf, label_rtp_msg_auth, tmp_key,
                              srtp_auth_get_key_length(session_keys->rtp_auth));
+    { extern void kvs_log_printf(const char *fmt, ...); if (stat) kvs_log_printf("[SRTP] L%d stat=%d\r\n", __LINE__, (int)stat); }
     if (stat) {
         /* zeroize temp buffer */
         octet_string_set_to_zero(tmp_key, MAX_SRTP_KEY_LEN);
@@ -1303,6 +1322,7 @@ srtp_err_status_t srtp_stream_init_keys(srtp_session_keys_t *session_keys,
 
     /* initialize auth function */
     stat = srtp_auth_init(session_keys->rtp_auth, tmp_key);
+    { extern void kvs_log_printf(const char *fmt, ...); if (stat) kvs_log_printf("[SRTP] L%d stat=%d\r\n", __LINE__, (int)stat); }
     if (stat) {
         /* zeroize temp buffer */
         octet_string_set_to_zero(tmp_key, MAX_SRTP_KEY_LEN);
@@ -1321,6 +1341,7 @@ srtp_err_status_t srtp_stream_init_keys(srtp_session_keys_t *session_keys,
     /* generate encryption key  */
     stat = srtp_kdf_generate(&kdf, label_rtcp_encryption, tmp_key,
                              rtcp_base_key_len);
+    { extern void kvs_log_printf(const char *fmt, ...); if (stat) kvs_log_printf("[SRTP] L%d stat=%d\r\n", __LINE__, (int)stat); }
     if (stat) {
         /* zeroize temp buffer */
         octet_string_set_to_zero(tmp_key, MAX_SRTP_KEY_LEN);
@@ -1337,6 +1358,7 @@ srtp_err_status_t srtp_stream_init_keys(srtp_session_keys_t *session_keys,
         /* generate encryption salt, put after encryption key */
         stat = srtp_kdf_generate(&kdf, label_rtcp_salt,
                                  tmp_key + rtcp_base_key_len, rtcp_salt_len);
+        { extern void kvs_log_printf(const char *fmt, ...); if (stat) kvs_log_printf("[SRTP] L%d stat=%d\r\n", __LINE__, (int)stat); }
         if (stat) {
             /* zeroize temp buffer */
             octet_string_set_to_zero(tmp_key, MAX_SRTP_KEY_LEN);
@@ -1355,6 +1377,7 @@ srtp_err_status_t srtp_stream_init_keys(srtp_session_keys_t *session_keys,
 
     /* initialize cipher */
     stat = srtp_cipher_init(session_keys->rtcp_cipher, tmp_key);
+    { extern void kvs_log_printf(const char *fmt, ...); if (stat) kvs_log_printf("[SRTP] L%d stat=%d\r\n", __LINE__, (int)stat); }
     if (stat) {
         /* zeroize temp buffer */
         octet_string_set_to_zero(tmp_key, MAX_SRTP_KEY_LEN);
@@ -1364,6 +1387,7 @@ srtp_err_status_t srtp_stream_init_keys(srtp_session_keys_t *session_keys,
     /* generate authentication key */
     stat = srtp_kdf_generate(&kdf, label_rtcp_msg_auth, tmp_key,
                              srtp_auth_get_key_length(session_keys->rtcp_auth));
+    { extern void kvs_log_printf(const char *fmt, ...); if (stat) kvs_log_printf("[SRTP] L%d stat=%d\r\n", __LINE__, (int)stat); }
     if (stat) {
         /* zeroize temp buffer */
         octet_string_set_to_zero(tmp_key, MAX_SRTP_KEY_LEN);
@@ -1377,6 +1401,7 @@ srtp_err_status_t srtp_stream_init_keys(srtp_session_keys_t *session_keys,
 
     /* initialize auth function */
     stat = srtp_auth_init(session_keys->rtcp_auth, tmp_key);
+    { extern void kvs_log_printf(const char *fmt, ...); if (stat) kvs_log_printf("[SRTP] L%d stat=%d\r\n", __LINE__, (int)stat); }
     if (stat) {
         /* zeroize temp buffer */
         octet_string_set_to_zero(tmp_key, MAX_SRTP_KEY_LEN);

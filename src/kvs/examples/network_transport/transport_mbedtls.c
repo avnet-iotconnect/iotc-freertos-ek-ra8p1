@@ -554,9 +554,10 @@ static TlsTransportStatus_t tlsHandshake( TlsNetworkContext_t * pTlsNetworkConte
 
     if( mbedtlsError != 0 )
     {
-        LogError( ( "Failed to set up mbed TLS SSL context: mbedTLSError= %s : %s.",
-                    mbedtlsHighLevelCodeOrDefault( mbedtlsError ),
-                    mbedtlsLowLevelCodeOrDefault( mbedtlsError ) ) );
+        LogError( ( "Failed to set up mbed TLS SSL context: -0x%04x (heap free %u min %u)",
+                    ( unsigned int ) ( -mbedtlsError ),
+                    ( unsigned ) xPortGetFreeHeapSize(),
+                    ( unsigned ) xPortGetMinimumEverFreeHeapSize() ) );
 
         returnStatus = TLS_TRANSPORT_INTERNAL_ERROR;
     }
