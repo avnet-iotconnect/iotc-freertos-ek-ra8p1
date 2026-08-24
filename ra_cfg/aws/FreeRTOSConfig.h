@@ -128,7 +128,7 @@
             #define configSUPPORT_DYNAMIC_ALLOCATION (1)
             #endif
             #ifndef configTOTAL_HEAP_SIZE
-            #define configTOTAL_HEAP_SIZE (0x40000)
+            #define configTOTAL_HEAP_SIZE (0x60000)
             #endif
             #ifndef configAPPLICATION_ALLOCATED_HEAP
             #define configAPPLICATION_ALLOCATED_HEAP (0)

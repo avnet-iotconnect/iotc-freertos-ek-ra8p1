@@ -12,13 +12,48 @@
  *    project runs without an independent watchdog, so it is a no-op.
  */
 #include <stddef.h>
+#include <stdarg.h>
+#include <stdio.h>
 #include <time.h>
 #include <sys/time.h>
 
 #include "FreeRTOS.h"
 #include "task.h"
+#include "semphr.h"
 
 #include "iotc_time.h"
+
+/* ── Console logging (SdkLog target; see port/log_service.h) ────────────── */
+
+extern int print_to_console( char *p_data ); /* fsp_err_t, but int-compatible */
+
+void kvs_log_printf( const char *fmt, ... )
+{
+    /* Per-task buffer would be nicer, but log lines are short and a mutex
+     * keeps concurrent KVS tasks from interleaving mid-line. */
+    static SemaphoreHandle_t s_mtx;
+    static char s_buf[ 256 ];
+    va_list ap;
+
+    if( s_mtx == NULL )
+    {
+        s_mtx = xSemaphoreCreateMutex();
+    }
+    if( ( s_mtx != NULL ) && ( xSemaphoreTake( s_mtx, pdMS_TO_TICKS( 200 ) ) != pdTRUE ) )
+    {
+        return; /* drop the line rather than block a media/network task */
+    }
+
+    va_start( ap, fmt );
+    vsnprintf( s_buf, sizeof( s_buf ), fmt, ap );
+    va_end( ap );
+    ( void ) print_to_console( s_buf );
+
+    if( s_mtx != NULL )
+    {
+        ( void ) xSemaphoreGive( s_mtx );
+    }
+}
 
 /* ── Wall clock ─────────────────────────────────────────────────────────── */
 /* iotc_time_now() gives whole UTC seconds (epoch offset + tick). Derive the

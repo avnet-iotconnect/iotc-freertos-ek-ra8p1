@@ -22,9 +22,16 @@
     #define LIBRARY_LOG_LEVEL    LOG_INFO
 #endif
 
-/* Use plain printf for SdkLog — avoids pulling in FreeRTOS task functions. */
+/* Route SdkLog to the project console UART (printf is not retargeted on
+ * this port). Implemented in ra8p1_platform_port.c. */
+#ifdef __cplusplus
+extern "C" void kvs_log_printf( const char *fmt, ... );
+#else
+extern void kvs_log_printf( const char *fmt, ... );
+#endif
+
 #ifndef SdkLog
-    #define SdkLog( message )  printf message
+    #define SdkLog( message )  kvs_log_printf message
 #endif
 
 /* Override LOG_METADATA_FORMAT/ARGS to avoid pcTaskGetName/xTaskGetCurrentTaskHandle. */

@@ -45,7 +45,11 @@ extern vision_ai_app_err_t face_detection_run(void);
 
 /* Inference engine input buffer */
 
-int8_t model_buffer_int8[AI_INPUT_IMAGE_WIDTH * AI_INPUT_IMAGE_HEIGHT * AI_INPUT_IMAGE_BYTE_PER_PIXEL] BSP_ALIGN_VARIABLE(8);
+/* In SDRAM: frees ~144 KB of SRAM for the FreeRTOS heap (KVS WebRTC). The
+ * buffer is written sequentially by pre-processing and read by the NPU via
+ * AXI, so the uncached-SDRAM penalty is small. */
+int8_t model_buffer_int8[AI_INPUT_IMAGE_WIDTH * AI_INPUT_IMAGE_HEIGHT * AI_INPUT_IMAGE_BYTE_PER_PIXEL]
+    BSP_ALIGN_VARIABLE(8) BSP_PLACE_IN_SECTION(BSP_UNINIT_SECTION_PREFIX ".sdram_noinit");
 
 uint32_t model_buffer_int8_size = sizeof(model_buffer_int8);
 st_ai_classification_point_t g_ai_classification[AI_MAX_DETECTION_NUM] = {};
