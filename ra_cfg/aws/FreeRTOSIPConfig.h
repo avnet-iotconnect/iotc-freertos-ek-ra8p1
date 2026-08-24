@@ -239,7 +239,7 @@ extern "C" {
 
 /* If ipconfigSUPPORT_SELECT_FUNCTION is set to 1 then the FreeRTOS_select()
  * (and associated) API function is available. */
-#define ipconfigSUPPORT_SELECT_FUNCTION                0
+#define ipconfigSUPPORT_SELECT_FUNCTION                1
 
 /* If ipconfigFILTER_OUT_NON_ETHERNET_II_FRAMES is set to 1 then Ethernet frames
  * that are not in Ethernet II format will be dropped.  This option is included for

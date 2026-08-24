@@ -497,7 +497,7 @@ extern "C" {
  *
  * Comment this macro to disable mbedtls_ssl_export_keying_material().
  */
-#if 0
+#if 1
 #define MBEDTLS_SSL_KEYING_MATERIAL_EXPORT
 #endif
 
@@ -748,7 +748,7 @@ extern "C" {
  *
  * Comment this macro to disable support for DTLS
  */
-#if 0
+#if 1
 #define MBEDTLS_SSL_PROTO_DTLS
 #endif
 
@@ -776,7 +776,7 @@ extern "C" {
  *
  * Comment this to disable anti-replay in DTLS.
  */
-#if 0
+#if 1
 #define MBEDTLS_SSL_DTLS_ANTI_REPLAY
 #endif
 
@@ -796,7 +796,7 @@ extern "C" {
  *
  * Comment this to disable support for HelloVerifyRequest.
  */
-#if 0
+#if 1
 #define MBEDTLS_SSL_DTLS_HELLO_VERIFY
 #endif
 
@@ -952,7 +952,7 @@ extern "C" {
  * Module:  library/ssl_cookie.c
  * Caller:
  */
-#if 0
+#if 1
 #define MBEDTLS_SSL_COOKIE_C
 #endif
 
@@ -998,7 +998,7 @@ extern "C" {
  *
  * This module is required for SSL/TLS server support.
  */
-#if 0
+#if 1
 #define MBEDTLS_SSL_SRV_C
 #endif
 
@@ -1100,7 +1100,7 @@ extern "C" {
  *
  * This module is the basis for creating X.509 certificates and CSRs.
  */
-#if 0
+#if 1
 #define MBEDTLS_X509_CREATE_C
 #endif
 
@@ -1115,7 +1115,7 @@ extern "C" {
  *
  * This module is required for X.509 certificate creation.
  */
-#if 0
+#if 1
 #define MBEDTLS_X509_CRT_WRITE_C
 #endif
 
