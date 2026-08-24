@@ -68,6 +68,7 @@
 								</option>
 								<option IS_BUILTIN_EMPTY="false" IS_VALUE_EMPTY="false" id="com.renesas.cdt.managedbuild.llvm.arm.option.compiler.includesFiles.499030502" name="Include file directories (-I)" superClass="com.renesas.cdt.managedbuild.llvm.arm.option.compiler.includesFiles" useByScannerDiscovery="false" valueType="includePath">
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/src/iotc/overrides}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/src/iotc}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/src/kvs_port}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/src/kvs_port/lwip_shim}&quot;"/>
@@ -217,6 +218,7 @@
 								</option>
 								<option IS_BUILTIN_EMPTY="false" IS_VALUE_EMPTY="false" id="com.renesas.cdt.managedbuild.llvm.arm.option.compiler.includesFiles.cpp.734791725" name="Include file directories (-I)" superClass="com.renesas.cdt.managedbuild.llvm.arm.option.compiler.includesFiles.cpp" useByScannerDiscovery="false" valueType="includePath">
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/src/iotc/overrides}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/src/iotc}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/src/kvs_port}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/src/kvs_port/lwip_shim}&quot;"/>
@@ -373,6 +375,7 @@
 								</option>
 								<option IS_BUILTIN_EMPTY="false" IS_VALUE_EMPTY="false" id="com.renesas.cdt.managedbuild.llvm.arm.option.assembler.includes.includeFileDirectories.2106132941" name="Include file directories (-I)" superClass="com.renesas.cdt.managedbuild.llvm.arm.option.assembler.includes.includeFileDirectories" valueType="includePath">
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/src/iotc/overrides}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/src/iotc}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/src/kvs_port}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/src/kvs_port/lwip_shim}&quot;"/>
@@ -522,6 +525,7 @@
 								<option id="com.renesas.cdt.managedbuild.llvm.core.option.linker.entrypoint.202591014" name="Entry point:" superClass="com.renesas.cdt.managedbuild.llvm.core.option.linker.entrypoint" value="" valueType="string"/>
 								<option IS_BUILTIN_EMPTY="false" IS_VALUE_EMPTY="false" id="com.renesas.cdt.managedbuild.llvm.core.option.compiler.includes.includeFileDir.cpp.297900489" name="Include file directories" superClass="com.renesas.cdt.managedbuild.llvm.core.option.compiler.includes.includeFileDir.cpp" valueType="includePath">
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/src/iotc/overrides}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/src/iotc}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/src/kvs_port}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/src/kvs_port/lwip_shim}&quot;"/>
@@ -966,10 +970,10 @@
 						</toolChain>
 					</folderInfo>
 					<sourceEntries>
-						<entry excluding="tests|tools|docs|lib/cJSON/tests|lib/cJSON/fuzzing|lib/cJSON/cJSON_Utils.c|lib/cJSON/test.c|modules/heap-tracker" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="iotc-c-lib"/>
+						<entry excluding="core/src/iotcl_c2d.c|tests|tools|docs|lib/cJSON/tests|lib/cJSON/fuzzing|lib/cJSON/cJSON_Utils.c|lib/cJSON/test.c|modules/heap-tracker" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="iotc-c-lib"/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="ra"/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="ra_gen"/>
-						<entry excluding="kvs_app|iotc/overrides|kvs/configs|kvs/coreHTTP|kvs/examples/master|kvs/examples/metric|kvs/examples/peer_connection/peer_connection_sctp.c|kvs/examples/base64/custom|kvs/libsrtp/crypto/cipher/aes_gcm_ossl.c|kvs/libsrtp/crypto/cipher/aes_gcm_wssl.c|kvs/libsrtp/crypto/cipher/aes_gcm_nss.c|kvs/libsrtp/crypto/cipher/aes_icm_ossl.c|kvs/libsrtp/crypto/cipher/aes_icm_wssl.c|kvs/libsrtp/crypto/cipher/aes_icm_nss.c|kvs/libsrtp/crypto/hash/hmac_ossl.c|kvs/libsrtp/crypto/hash/hmac_wssl.c|kvs/libsrtp/crypto/hash/hmac_nss.c|kvs/libsrtp/crypto/cipher/aes_icm.c|kvs/libsrtp/crypto/hash/hmac.c|kvs/examples/app_media_source/port" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="src"/>
+						<entry excluding="kvs/configs|kvs/coreHTTP|kvs/examples/master|kvs/examples/metric|kvs/examples/peer_connection/peer_connection_sctp.c|kvs/examples/base64/custom|kvs/libsrtp/crypto/cipher/aes_gcm_ossl.c|kvs/libsrtp/crypto/cipher/aes_gcm_wssl.c|kvs/libsrtp/crypto/cipher/aes_gcm_nss.c|kvs/libsrtp/crypto/cipher/aes_icm_ossl.c|kvs/libsrtp/crypto/cipher/aes_icm_wssl.c|kvs/libsrtp/crypto/cipher/aes_icm_nss.c|kvs/libsrtp/crypto/hash/hmac_ossl.c|kvs/libsrtp/crypto/hash/hmac_wssl.c|kvs/libsrtp/crypto/hash/hmac_nss.c|kvs/libsrtp/crypto/cipher/aes_icm.c|kvs/libsrtp/crypto/hash/hmac.c|kvs/examples/app_media_source/port" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="src"/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>
@@ -1041,6 +1045,7 @@
 								</option>
 								<option IS_BUILTIN_EMPTY="false" IS_VALUE_EMPTY="false" id="com.renesas.cdt.managedbuild.llvm.arm.option.compiler.includesFiles.658603742" name="Include file directories (-I)" superClass="com.renesas.cdt.managedbuild.llvm.arm.option.compiler.includesFiles" useByScannerDiscovery="false" valueType="includePath">
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/src/iotc/overrides}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/src/iotc}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/src/kvs_port}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/src/kvs_port/lwip_shim}&quot;"/>
@@ -1178,6 +1183,7 @@
 								</option>
 								<option IS_BUILTIN_EMPTY="false" IS_VALUE_EMPTY="false" id="com.renesas.cdt.managedbuild.llvm.arm.option.compiler.includesFiles.cpp.2034623059" name="Include file directories (-I)" superClass="com.renesas.cdt.managedbuild.llvm.arm.option.compiler.includesFiles.cpp" useByScannerDiscovery="false" valueType="includePath">
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/src/iotc/overrides}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/src/iotc}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/src/kvs_port}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/src/kvs_port/lwip_shim}&quot;"/>
@@ -1321,6 +1327,7 @@
 								</option>
 								<option IS_BUILTIN_EMPTY="false" IS_VALUE_EMPTY="false" id="com.renesas.cdt.managedbuild.llvm.arm.option.assembler.includes.includeFileDirectories.1304884125" name="Include file directories (-I)" superClass="com.renesas.cdt.managedbuild.llvm.arm.option.assembler.includes.includeFileDirectories" valueType="includePath">
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/src/iotc/overrides}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/src/iotc}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/src/kvs_port}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/src/kvs_port/lwip_shim}&quot;"/>
@@ -1468,6 +1475,7 @@
 								<option id="com.renesas.cdt.managedbuild.llvm.core.option.linker.entrypoint.758043800" name="Entry point:" superClass="com.renesas.cdt.managedbuild.llvm.core.option.linker.entrypoint" value="" valueType="string"/>
 								<option IS_BUILTIN_EMPTY="false" IS_VALUE_EMPTY="false" id="com.renesas.cdt.managedbuild.llvm.core.option.compiler.includes.includeFileDir.cpp.1042734609" name="Include file directories" superClass="com.renesas.cdt.managedbuild.llvm.core.option.compiler.includes.includeFileDir.cpp" valueType="includePath">
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/src/iotc/overrides}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/src/iotc}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/src/kvs_port}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/src/kvs_port/lwip_shim}&quot;"/>
@@ -1837,10 +1845,10 @@
 						</toolChain>
 					</folderInfo>
 					<sourceEntries>
-						<entry excluding="tests|tools|docs|lib/cJSON/tests|lib/cJSON/fuzzing|lib/cJSON/cJSON_Utils.c|lib/cJSON/test.c|modules/heap-tracker" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="iotc-c-lib"/>
+						<entry excluding="core/src/iotcl_c2d.c|tests|tools|docs|lib/cJSON/tests|lib/cJSON/fuzzing|lib/cJSON/cJSON_Utils.c|lib/cJSON/test.c|modules/heap-tracker" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="iotc-c-lib"/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="ra"/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="ra_gen"/>
-						<entry excluding="kvs_app|iotc/overrides|kvs/configs|kvs/coreHTTP|kvs/examples/master|kvs/examples/metric|kvs/examples/peer_connection/peer_connection_sctp.c|kvs/examples/base64/custom|kvs/libsrtp/crypto/cipher/aes_gcm_ossl.c|kvs/libsrtp/crypto/cipher/aes_gcm_wssl.c|kvs/libsrtp/crypto/cipher/aes_gcm_nss.c|kvs/libsrtp/crypto/cipher/aes_icm_ossl.c|kvs/libsrtp/crypto/cipher/aes_icm_wssl.c|kvs/libsrtp/crypto/cipher/aes_icm_nss.c|kvs/libsrtp/crypto/hash/hmac_ossl.c|kvs/libsrtp/crypto/hash/hmac_wssl.c|kvs/libsrtp/crypto/hash/hmac_nss.c|kvs/libsrtp/crypto/cipher/aes_icm.c|kvs/libsrtp/crypto/hash/hmac.c|kvs/examples/app_media_source/port" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="src"/>
+						<entry excluding="kvs/configs|kvs/coreHTTP|kvs/examples/master|kvs/examples/metric|kvs/examples/peer_connection/peer_connection_sctp.c|kvs/examples/base64/custom|kvs/libsrtp/crypto/cipher/aes_gcm_ossl.c|kvs/libsrtp/crypto/cipher/aes_gcm_wssl.c|kvs/libsrtp/crypto/cipher/aes_gcm_nss.c|kvs/libsrtp/crypto/cipher/aes_icm_ossl.c|kvs/libsrtp/crypto/cipher/aes_icm_wssl.c|kvs/libsrtp/crypto/cipher/aes_icm_nss.c|kvs/libsrtp/crypto/hash/hmac_ossl.c|kvs/libsrtp/crypto/hash/hmac_wssl.c|kvs/libsrtp/crypto/hash/hmac_nss.c|kvs/libsrtp/crypto/cipher/aes_icm.c|kvs/libsrtp/crypto/hash/hmac.c|kvs/examples/app_media_source/port" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="src"/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>

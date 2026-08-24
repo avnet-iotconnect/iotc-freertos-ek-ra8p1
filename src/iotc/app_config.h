@@ -51,11 +51,14 @@
 #define IOTC_CFG_ENABLED 0
 #endif
 
-/* Build without the 441 KB built-in model array in MRAM (KVS/video builds
- * need the flash). The device then boots from the OSPI model store and idles
- * with a console hint if the store is empty. */
+/* Build without the 441 KB built-in model array in MRAM. Default 1: the
+ * KVS WebRTC video stack and the built-in model do not fit MRAM together.
+ * The device boots from the OSPI model store (any previously pushed model
+ * persists) and idles with a console hint if the store is empty; push a
+ * model from /IOTCONNECT AI Models to start inference. Set to 0 only if
+ * you also exclude src/kvs* from the build. */
 #ifndef IOTC_CFG_NO_BUILTIN_MODEL
-#define IOTC_CFG_NO_BUILTIN_MODEL 0
+#define IOTC_CFG_NO_BUILTIN_MODEL 1
 #endif
 
 /* One-shot on-target H.264 software-encode benchmark (minih264) printed to

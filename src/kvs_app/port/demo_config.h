@@ -22,11 +22,12 @@
     #define ENABLE_TWCC_SUPPORT  1U
 #endif
 
-/* Maximum simultaneous WebRTC viewers */
-#define AWS_MAX_VIEWER_NUM  2
+/* Maximum simultaneous WebRTC viewers. One: each DTLS-SRTP session costs
+ * significant FreeRTOS heap, and the dashboard opens a single viewer. */
+#define AWS_MAX_VIEWER_NUM  1
 
 /* KVS agent string reported to the signaling service */
-#define AWS_KVS_AGENT_NAME  "AWS-SDK-KVS-STM32N6"
+#define AWS_KVS_AGENT_NAME  "AWS-SDK-KVS-RA8P1"
 
 /* Drop TURN-over-TLS/TCP relay candidates (turns:?transport=tcp) from the ICE
  * server list.

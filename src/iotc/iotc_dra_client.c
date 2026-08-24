@@ -260,6 +260,11 @@ int iotc_dra_run(const iotc_dra_config_t *cfg)
                 /* Telemetry Files: capture fu topic + bucket from the raw
                  * identity JSON (iotc-c-lib only keeps fs.url). */
                 iotc_fu_identity_hook((const char *) s_http_buf);
+                /* Video streaming: capture the d.p.vs KVS signaling config. */
+                {
+                    extern void iotc_kvs_identity_hook(const char *identity_json);
+                    iotc_kvs_identity_hook((const char *) s_http_buf);
+                }
             }
         }
     }

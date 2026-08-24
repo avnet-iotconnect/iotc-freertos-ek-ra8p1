@@ -75,6 +75,25 @@ static void prv_on_command(IotclC2dEventData data)
 {
     const char *cmd = iotcl_c2d_get_command(data);
     const char *ack_id = iotcl_c2d_get_ack_id(data);
+
+    /* Dashboard Video Streaming tab Start/Stop (ct:112/113). These carry no
+     * "cmd" field and only need a success ack: the actual stream start/stop
+     * is driven by the viewer's WebRTC signaling connection. */
+    {
+        int et = iotcl_c2d_get_event_type(data);
+        if ((112 == et) || (113 == et))
+        {
+            IOTC_PRINT("IOTC: %s Video (ct=%d)\r\n",
+                       (112 == et) ? "Start" : "Stop", et);
+            if (ack_id)
+            {
+                iotcl_mqtt_send_cmd_ack(ack_id, IOTCL_C2D_EVT_CMD_SUCCESS_WITH_ACK,
+                                        "OK");
+            }
+            return;
+        }
+    }
+
     if (!cmd)
     {
         return;
@@ -369,6 +388,22 @@ void iotc_app_poll(bool network_up)
                     IOTC_PRINT("IOTC: init failed (will retry)\r\n");
                     s_state = IOTC_APP_FAILED;
                     break;
+                }
+
+                /* KVS WebRTC video: the identity hook has parsed d.p.vs by
+                 * now (inside sdk_init). Hand over the device credentials
+                 * (copied) and start the streaming task once. */
+                {
+                    extern void iotc_kvs_set_credentials(const char *cert_pem,
+                                                         const char *key_pem);
+                    extern bool iotc_kvs_config_ready(void);
+                    extern void iotc_kvs_start_task(void);
+                    if (iotc_kvs_config_ready())
+                    {
+                        iotc_kvs_set_credentials(cfg.auth_info.cert_info.device_cert,
+                                                 cfg.auth_info.cert_info.device_key);
+                        iotc_kvs_start_task();
+                    }
                 }
                 if (0 != iotconnect_sdk_connect())
                 {
