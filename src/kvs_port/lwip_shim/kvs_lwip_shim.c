@@ -461,7 +461,6 @@ int recv(int s, void *mem, size_t len, int flags)
 int getaddrinfo(const char *nodename, const char *servname,
                 const struct addrinfo *hints, struct addrinfo **res)
 {
-    (void) hints;
     uint32_t ip = FreeRTOS_inet_addr(nodename);
     if (ip == 0)
     {
@@ -483,7 +482,12 @@ int getaddrinfo(const char *nodename, const char *servname,
     sa->sin_addr.s_addr = ip;
     sa->sin_port = servname ? lwip_htons((uint16_t) atoi(servname)) : 0;
     ai->ai_family = AF_INET;
-    ai->ai_socktype = SOCK_DGRAM;
+    /* Honor the caller's requested socket type: the TCP wrapper passes
+     * SOCK_STREAM and feeds ai_socktype straight into socket(). */
+    ai->ai_socktype = ((hints != NULL) && (hints->ai_socktype != 0))
+                          ? hints->ai_socktype : SOCK_STREAM;
+    ai->ai_protocol = (ai->ai_socktype == SOCK_STREAM) ? IPPROTO_TCP
+                                                       : IPPROTO_UDP;
     ai->ai_addrlen = sizeof(*sa);
     ai->ai_addr = (struct sockaddr *) sa;
     *res = ai;
