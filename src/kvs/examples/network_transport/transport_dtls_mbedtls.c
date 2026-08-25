@@ -289,6 +289,15 @@ static void DtlsSslContextFree( DtlsSSLContext_t * pSslContext )
     mbedtls_ssl_free( &( pSslContext->context ) );
     mbedtls_entropy_free( &( pSslContext->entropyContext ) );
     mbedtls_ctr_drbg_free( &( pSslContext->ctrDrbgContext ) );
+
+    /* Re-init to the all-zero state so a second free is a safe no-op:
+     * the session teardown has multiple close paths (close-notify
+     * received, viewer timeout, error) that may each try to release
+     * the DTLS context. */
+    mbedtls_ssl_init( &( pSslContext->context ) );
+    mbedtls_ssl_config_init( &( pSslContext->config ) );
+    mbedtls_entropy_init( &( pSslContext->entropyContext ) );
+    mbedtls_ctr_drbg_init( &( pSslContext->ctrDrbgContext ) );
 }
 /*-----------------------------------------------------------*/
 

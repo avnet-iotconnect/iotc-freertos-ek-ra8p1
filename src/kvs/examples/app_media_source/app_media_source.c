@@ -133,7 +133,8 @@ static void VideoTx_Task( void * pParameter )
             }
             else
             {
-                LogError( ( " VideoTx_Task: MessageQueue_Recv failed with error %d", retMessageQueue ) );
+                /* Timeout: MessageQueue_Recv waits are bounded now; no frame
+                 * within the window is normal while idle. */
             }
 
             /* Pet watchdog — continuous DTLS/SRTP frame transmission can
@@ -190,7 +191,8 @@ static void AudioTx_Task( void * pParameter )
             }
             else
             {
-                LogError( ( " AudioTx_Task: MessageQueue_Recv failed with error %d", retMessageQueue ) );
+                /* Timeout: MessageQueue_Recv waits are bounded now; no frame
+                 * within the window is normal while idle. */
             }
 
             vPetWatchdog();
@@ -242,7 +244,8 @@ static void AudioTx_Task( void * pParameter )
                 }
                 else
                 {
-                    LogError( ( " AudioRx_Task: MessageQueue_Recv failed with error %d", retMessageQueue ) );
+                    /* Timeout: MessageQueue_Recv waits are bounded now; no frame
+                 * within the window is normal while idle. */
                 }
             }
         }

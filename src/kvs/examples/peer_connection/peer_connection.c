@@ -2197,6 +2197,18 @@ PeerConnectionResult_t PeerConnection_CloseSession( PeerConnectionSession_t * pS
         }
     }
 
+    /* Release the DTLS mbedtls context on EVERY close path (and before the
+     * ICE controller goes away, since the close-notify rides on it). Only
+     * the close-notify-received path (HandleDtlsTermination) used to free
+     * it; viewers that vanish without a clean DTLS close (browser tab
+     * killed, network drop) leaked ~36 KB of heap per session until the
+     * board ran out. DtlsSslContextFree re-inits after freeing, so the
+     * double call on the graceful path is a safe no-op. */
+    if( pSession != NULL )
+    {
+        DTLS_Disconnect( &pSession->dtlsSession.xNetworkContext );
+    }
+
     if( ret == PEER_CONNECTION_RESULT_OK )
     {
         ret = DestroyIceController( pSession );

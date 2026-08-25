@@ -23,9 +23,14 @@
 void MessageQueue_Destroy( MessageQueueHandler_t * pMessageQueueHandler,
                            const char * pQueueName )
 {
-    if( pMessageQueueHandler != NULL )
+    /* NULL-tolerant: when a session setup fails partway under low memory,
+     * the teardown path destroys handlers whose queues never got created.
+     * vQueueDelete(NULL) is a configASSERT (observed as a dead board). */
+    if( ( pMessageQueueHandler != NULL ) &&
+        ( pMessageQueueHandler->messageQueue != NULL ) )
     {
         vQueueDelete( pMessageQueueHandler->messageQueue );
+        pMessageQueueHandler->messageQueue = NULL;
     }
 }
 
@@ -115,11 +120,17 @@ MessageQueueResult_t MessageQueue_Recv( MessageQueueHandler_t * pMessageQueueHan
 
     if( ret == MESSAGE_QUEUE_RESULT_OK )
     {
-        /* Infinite waiting. */
-        retRecv = xQueueReceive( pMessageQueueHandler->messageQueue, pMessage, portMAX_DELAY );
+        /* Bounded wait (was portMAX_DELAY): the peer-connection session
+         * task evaluates its inactivity timeout only between receives, so
+         * an infinite wait made a vanished viewer (no DTLS close, no more
+         * packets) a PERMANENT zombie session - it held ~110 KB of heap
+         * and the single viewer slot forever. A 5 s timeout returns
+         * MQ_RECV_FAILED (callers treat it as no-message) and lets the
+         * 30 s inactivity check actually run. */
+        retRecv = xQueueReceive( pMessageQueueHandler->messageQueue, pMessage,
+                                 pdMS_TO_TICKS( 5000 ) );
         if( retRecv != pdTRUE )
         {
-            LogError( ( "mq_receive returns failed" ) );
             ret = MESSAGE_QUEUE_RESULT_MQ_RECV_FAILED;
         }
     }
