@@ -130,6 +130,7 @@ Start on the face detector (push `face-v3` beforehand).
 | `set-interval <seconds>` | telemetry period (default 10 s) |
 | `model-info` | ack with active model name/version/source/size |
 | `model-revert` | clears the stored model (inference idles until the next push; this build has no built-in fallback) |
+| `set-brightness <0\|1>` | camera exposure target: 0 = normal, 1 = bright (~+1 EV, for dark rooms) |
 
 ## Troubleshooting during a demo
 

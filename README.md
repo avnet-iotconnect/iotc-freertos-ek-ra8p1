@@ -54,7 +54,7 @@ board and a 7-inch parallel LCD.*
 | **Live video (KVS WebRTC)** | Open the device's Video Streaming tab and watch the camera live: software H.264 (QVGA) over DTLS-SRTP via the platform-provisioned Kinesis Video Streams channel |
 | Model persistence | Active model stored in a raw OSPI slot, reloaded at boot. The video-enabled build ships without a compiled-in model (the KVS stack and the 441 KB model array do not fit flash together): push any library model once and it persists |
 | Multi-task | The device re-tasks itself by model shape: face detection (boxes), person/occupancy detection, or 1000-class ImageNet classification |
-| Commands | `snapshot`, `set-interval <s>`, `model-info`, `model-revert` |
+| Commands | `snapshot`, `set-interval <s>`, `set-brightness <0|1>`, `model-info`, `model-revert` |
 
 ## The model library
 

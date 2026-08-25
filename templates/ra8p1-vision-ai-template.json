@@ -185,6 +185,13 @@
       "requiredParam": false,
       "requiredAck": true,
       "isOTACommand": false
+    },
+    {
+      "name": "Camera Brightness",
+      "command": "set-brightness",
+      "requiredParam": true,
+      "requiredAck": true,
+      "isOTACommand": false
     }
   ],
   "messageVersion": "2.1",

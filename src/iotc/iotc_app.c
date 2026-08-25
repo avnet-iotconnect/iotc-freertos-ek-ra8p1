@@ -134,6 +134,20 @@ static void prv_on_command(IotclC2dEventData data)
         iotcl_mqtt_send_cmd_ack(ack_id, IOTCL_C2D_EVT_CMD_SUCCESS_WITH_ACK, info);
         return;
     }
+    if (0 == strncmp(cmd, "set-brightness ", 15))
+    {
+        extern void camera_set_brightness_level(uint8_t level);
+        int v = atoi(&cmd[15]);
+        if ((v == 0) || (v == 1))
+        {
+            camera_set_brightness_level((uint8_t) v);
+            iotcl_mqtt_send_cmd_ack(ack_id, IOTCL_C2D_EVT_CMD_SUCCESS_WITH_ACK,
+                                    (v == 1) ? "brightness: high" : "brightness: normal");
+            return;
+        }
+        iotcl_mqtt_send_cmd_ack(ack_id, IOTCL_C2D_EVT_CMD_FAILED, "use 0 or 1");
+        return;
+    }
     if (0 == strcmp(cmd, "model-revert"))
     {
         face_detection_revert();

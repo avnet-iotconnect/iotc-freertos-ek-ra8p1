@@ -703,6 +703,51 @@ uint8_t mipi_bits = 8;            // 0x3034 Bit[3:0]: MIPI bit mode (8 or 10)
     return 0;
 }
 
+/* Runtime brightness: two AE-target levels for the OV5640, applied from
+ * the camera thread (same context as the init-time register writes; the
+ * command callback only sets the request). Level 0 = the tuned defaults;
+ * level 1 raises the AE luminance target roughly one EV for dark rooms. */
+static volatile uint8_t s_brightness_level = 0;
+static volatile uint8_t s_brightness_dirty = 0;
+
+void camera_set_brightness_level(uint8_t level)
+{
+    s_brightness_level = (level != 0) ? 1 : 0;
+    s_brightness_dirty = 1;
+}
+
+uint8_t camera_get_brightness_level(void)
+{
+    return s_brightness_level;
+}
+
+void camera_apply_brightness_if_pending(void)
+{
+    if (!s_brightness_dirty)
+    {
+        return;
+    }
+    s_brightness_dirty = 0;
+    if (s_brightness_level)
+    {
+        ov5640_write_reg(0x3a0f, 0x50); // stable in high
+        ov5640_write_reg(0x3a10, 0x48); // stable in low
+        ov5640_write_reg(0x3a1b, 0x50); // stable out high
+        ov5640_write_reg(0x3a1e, 0x48); // stable out low
+        ov5640_write_reg(0x3a11, 0x90); // fast zone high
+        ov5640_write_reg(0x3a1f, 0x20); // fast zone low
+    }
+    else
+    {
+        ov5640_write_reg(0x3a0f, 0x30);
+        ov5640_write_reg(0x3a10, 0x28);
+        ov5640_write_reg(0x3a1b, 0x30);
+        ov5640_write_reg(0x3a1e, 0x26);
+        ov5640_write_reg(0x3a11, 0x60);
+        ov5640_write_reg(0x3a1f, 0x14);
+    }
+}
+
 /* select the nex VIN output buffer */
 void display_next_buffer_set(uint8_t* next_buffer)
 {

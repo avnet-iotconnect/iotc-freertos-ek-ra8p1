@@ -63,5 +63,11 @@ void OV5640_stream_on(void);
 void OV5640_stream_off(void);
 uint8_t ov5640_init(void);
 
+/* Runtime AE-target brightness: level 0 = tuned defaults, 1 = ~+1 EV for
+ * dark rooms. Set from any task; applied on the camera thread. */
+void camera_set_brightness_level(uint8_t level);
+uint8_t camera_get_brightness_level(void);
+void camera_apply_brightness_if_pending(void);
+
 extern uint8_t * gp_next_buffer;
 #endif /* CAMERA_LAYER_CAMERA_CONTROL_H_ */

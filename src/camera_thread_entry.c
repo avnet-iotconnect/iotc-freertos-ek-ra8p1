@@ -201,6 +201,10 @@ void camera_thread_entry(void *pvParameters)
        capture_status_t capture_status;
        R_VIN_StatusGet(&g_vin0_ctrl, &capture_status);
 
+       /* Apply a pending brightness change (I2C writes belong on this
+        * thread, same as the init-time sensor configuration). */
+       camera_apply_brightness_if_pending();
+
        time_counter_start = TimeCounter_CurrentCountGet();
        image_rgb565_to_rgb888(vin_image_buffer_1, &model_buffer_int8[0],
                                     (uint16_t)IMAGE_WIDTH, (uint16_t)IMAGE_HEIGHT, (uint16_t)AI_INPUT_IMAGE_WIDTH, (uint16_t)AI_INPUT_IMAGE_HEIGHT);
