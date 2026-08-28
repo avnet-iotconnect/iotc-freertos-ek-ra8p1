@@ -89,7 +89,7 @@ void display_thread_entry(void *pvParameters)
                 /* Detection boxes are drawn into every frame at VIN
                  * frame-complete time (camera_control.c) so they persist
                  * at the full capture rate instead of blinking. */
-                R_GLCDC_BufferChange(&g_plcd_display_ctrl, (uint8_t * const) gp_next_buffer, DISPLAY_FRAME_LAYER_1);
+R_GLCDC_BufferChange(&g_plcd_display_ctrl, (uint8_t * const) gp_next_buffer, DISPLAY_FRAME_LAYER_1);
                 do_image_classification_screen(ai_result_updated);
                 console_output_processing_time();
             }

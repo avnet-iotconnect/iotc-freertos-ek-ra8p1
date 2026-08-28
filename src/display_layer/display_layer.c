@@ -138,10 +138,17 @@ void glcdc_vsync_isr(display_callback_args_t *p_args)
 
     /* Reset Display - active low */
     /* Note: Please update wait periods according to LCD controller specification */
+    /* Panel reset. The stock 10 us pulse is far shorter than this panel
+     * needs and only ever worked because a cold boot had already held the
+     * panel in reset. After a SOFT reset (every J-Link flash / SYSRESETREQ)
+     * the panel keeps its previous state and a 10 us pulse does not
+     * re-initialise it - it latches all-white until the board is
+     * power-cycled. Hold reset 20 ms and allow 150 ms afterwards, which is
+     * the panel's documented power-on timing. */
     R_IOPORT_PinWrite(&g_ioport_ctrl, DISP_RESET, BSP_IO_LEVEL_LOW);
-    R_BSP_SoftwareDelay(10, BSP_DELAY_UNITS_MICROSECONDS);
+    R_BSP_SoftwareDelay(20, BSP_DELAY_UNITS_MILLISECONDS);
     R_IOPORT_PinWrite(&g_ioport_ctrl, DISP_RESET, BSP_IO_LEVEL_HIGH);
-    R_BSP_SoftwareDelay(120, BSP_DELAY_UNITS_MILLISECONDS);
+    R_BSP_SoftwareDelay(150, BSP_DELAY_UNITS_MILLISECONDS);
 
 
     /* Initialize GLCDC driver */
