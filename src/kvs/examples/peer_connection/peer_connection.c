@@ -177,11 +177,19 @@ static void SessionProcessEndlessLoop( PeerConnectionSession_t * pSession )
             /* Empty else marker. */
         }
 
-        /* Check connection inactivity timeout. */
-        if( ( pSession->state == PEER_CONNECTION_SESSION_STATE_CONNECTION_READY ) &&
+        /* Check connection inactivity / setup timeout. Covers the pre-READY
+         * states too: a viewer that abandons the negotiation (tab closed
+         * during ICE/DTLS) otherwise leaves the session allocated forever,
+         * holding the heap that snapshot uploads and model downloads need. */
+        if( ( ( pSession->state == PEER_CONNECTION_SESSION_STATE_CONNECTION_READY ) ||
+              ( pSession->state == PEER_CONNECTION_SESSION_STATE_START ) ||
+              ( pSession->state == PEER_CONNECTION_SESSION_STATE_FIND_CONNECTION ) ||
+              ( pSession->state == PEER_CONNECTION_SESSION_STATE_P2P_CONNECTION_FOUND ) ) &&
             ( ( NetworkingUtils_GetCurrentTimeUs( NULL ) / 1000 ) > pSession->inactiveConnectionTimeoutMs ) )
         {
-            LogInfo( ( "Detect inactive connection, closing peer connection session: %s.",
+            LogInfo( ( "Detect %s connection, closing peer connection session: %s.",
+                       ( pSession->state == PEER_CONNECTION_SESSION_STATE_CONNECTION_READY ) ?
+                       "inactive" : "stalled-setup",
                        pSession->combinedName ) );
             PeerConnection_CloseSession( pSession );
         }
@@ -1767,6 +1775,10 @@ PeerConnectionResult_t PeerConnection_Start( PeerConnectionSession_t * pSession 
         /* Clear all message queue because of new session is coming. */
         EmptyMessageQueue( &pSession->requestQueue );
         pSession->state = PEER_CONNECTION_SESSION_STATE_START;
+        /* Arm the setup deadline; refreshed to the inactivity budget once
+         * the session reaches CONNECTION_READY. */
+        pSession->inactiveConnectionTimeoutMs = ( NetworkingUtils_GetCurrentTimeUs( NULL ) / 1000 ) +
+                                                PEER_CONNECTION_SETUP_TIMEOUT_MS;
     }
 
     return ret;

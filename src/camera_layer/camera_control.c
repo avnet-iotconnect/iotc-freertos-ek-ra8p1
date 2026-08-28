@@ -728,14 +728,23 @@ void camera_apply_brightness_if_pending(void)
         return;
     }
     s_brightness_dirty = 0;
+
+    /* Two knobs, because in a dark room the AE loop is already pinned at
+     * its exposure/gain ceiling: raising the AE *target* alone achieves
+     * nothing (the sensor cannot reach a target it is already straining
+     * for). The SDE luminance offset (0x5587/0x5588, gated by the Y path
+     * enable already set in 0x5580) is a post-processing add that works
+     * regardless of AE saturation, so it carries the visible change. */
     if (s_brightness_level)
     {
-        ov5640_write_reg(0x3a0f, 0x50); // stable in high
-        ov5640_write_reg(0x3a10, 0x48); // stable in low
-        ov5640_write_reg(0x3a1b, 0x50); // stable out high
-        ov5640_write_reg(0x3a1e, 0x48); // stable out low
-        ov5640_write_reg(0x3a11, 0x90); // fast zone high
-        ov5640_write_reg(0x3a1f, 0x20); // fast zone low
+        ov5640_write_reg(0x3a0f, 0x50); // AE stable range in high
+        ov5640_write_reg(0x3a10, 0x48); // AE stable range in low
+        ov5640_write_reg(0x3a1b, 0x50); // AE stable range out high
+        ov5640_write_reg(0x3a1e, 0x48); // AE stable range out low
+        ov5640_write_reg(0x3a11, 0x90); // AE fast zone high
+        ov5640_write_reg(0x3a1f, 0x20); // AE fast zone low
+        ov5640_write_reg(0x5588, 0x01); // SDE Y offset sign: add
+        ov5640_write_reg(0x5587, 0x30); // SDE Y offset magnitude (+48)
     }
     else
     {
@@ -745,6 +754,15 @@ void camera_apply_brightness_if_pending(void)
         ov5640_write_reg(0x3a1e, 0x26);
         ov5640_write_reg(0x3a11, 0x60);
         ov5640_write_reg(0x3a1f, 0x14);
+        ov5640_write_reg(0x5588, 0x01);
+        ov5640_write_reg(0x5587, 0x00); // no offset
+    }
+
+    {
+        static char msg_high[] = "CAM: brightness -> high\r\n";
+        static char msg_norm[] = "CAM: brightness -> normal\r\n";
+        extern fsp_err_t print_to_console(char * p_data);
+        (void) print_to_console(s_brightness_level ? msg_high : msg_norm);
     }
 }
 

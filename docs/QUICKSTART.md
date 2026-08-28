@@ -152,7 +152,9 @@ FU: selftest creds fetch -> 0 (OK)
 and the device appears **connected** on the /IOTCONNECT dashboard with telemetry arriving
 every 10 seconds. The stored credentials persist across power cycles — from now on the
 device connects automatically at boot. Useful maintenance commands: `show` (review, key
-redacted), `erase` (remove stored credentials), `reboot`.
+redacted), `erase` (remove stored credentials), `reboot`, `snapshot` (capture and
+upload without the dashboard), and `brightness 0|1` (camera exposure: `1` brightens
+the picture for dim rooms).
 
 ## 6. Watch the live video stream
 

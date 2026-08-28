@@ -217,7 +217,12 @@ static int fu_https_request(const char *method, const char *host,
                                                    FU_TIMEOUT_MS, FU_TIMEOUT_MS);
     if (TLS_TRANSPORT_SUCCESS != ts)
     {
-        IOTCL_ERROR(ts, "FU: TLS connect to %s failed", host);
+        /* The most common cause on this port is heap: an active KVS video
+         * session holds ~110 KB, and this TLS session needs ~40 KB more.
+         * Report the free heap so the distinction between "out of memory"
+         * and a real network/cert failure is visible on the console. */
+        IOTCL_ERROR(ts, "FU: TLS connect to %s failed (free heap %u)", host,
+                    (unsigned) xPortGetFreeHeapSize());
         return -1;
     }
     /* Debug: confirm what this session actually negotiated and which client

@@ -156,7 +156,9 @@ static void prv_help(void)
               "  set key                 then paste the device private key PEM\r\n"
               "  apply                   connect with the stored configuration\r\n"
               "  erase                   remove the stored configuration\r\n"
-              "  reboot                  restart the device\r\n");
+              "  reboot                  restart the device\r\n"
+              "  snapshot                capture + upload a snapshot now\r\n"
+              "  brightness <0|1>        camera exposure: 0 normal, 1 bright\r\n");
 }
 
 static void prv_handle(char *line)
@@ -168,6 +170,28 @@ static void prv_handle(char *line)
     else if (0 == strcmp(line, "show"))
     {
         prv_show();
+    }
+    else if (0 == strcmp(line, "snapshot"))
+    {
+        /* Same deferred path the cloud command uses: the net thread runs
+         * the capture + upload. Lets uploads be tested without a dashboard
+         * (and while video is streaming, to check the heap headroom). */
+        extern void iotc_app_request_snapshot(void);
+        iotc_app_request_snapshot();
+        prv_print("snapshot queued\r\n");
+    }
+    else if (0 == strncmp(line, "brightness ", 11))
+    {
+        extern void camera_set_brightness_level(uint8_t level);
+        if ((line[11] == '0') || (line[11] == '1'))
+        {
+            camera_set_brightness_level((uint8_t) (line[11] - '0'));
+            prv_print("ok\r\n");
+        }
+        else
+        {
+            prv_print("use: brightness 0 | brightness 1\r\n");
+        }
     }
     else if (0 == strncmp(line, "set env ", 8))
     {

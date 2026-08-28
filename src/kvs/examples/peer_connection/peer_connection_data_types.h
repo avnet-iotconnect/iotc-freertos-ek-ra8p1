@@ -75,6 +75,12 @@ extern "C" {
 
 #define PEER_CONNECTION_WAIT_SDP_MESSAGE_TIMEOUT_MS    ( 24000 )
 #define PEER_CONNECTION_INACTIVE_CONNECTION_TIMEOUT_MS ( 30000 )
+/* Budget for a session to get from START to CONNECTION_READY (ICE gather +
+ * TURN allocate + connectivity checks + DTLS). A viewer that opens the tab
+ * and closes it mid-negotiation used to leave the session in a pre-READY
+ * state forever - the inactivity check below only covers READY - holding
+ * ~110 KB of heap and the single viewer slot. */
+#define PEER_CONNECTION_SETUP_TIMEOUT_MS               ( 90000 )
 #define PEER_CONNECTION_DTLS_HANDSHAKING_TIMEOUT_MS    ( 24000 )
 
 #define PEER_CONNECTION_START_UP_BARRIER_BIT ( 1 << 0 )

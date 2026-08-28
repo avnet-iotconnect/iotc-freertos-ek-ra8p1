@@ -393,6 +393,14 @@ void iotc_app_request_restart(void)
     s_restart_req = true;
 }
 
+/* Serial-CLI entry point: queue a snapshot the same way the cloud command
+ * does (the net thread performs the capture + upload). No ack id, so no
+ * ack is published. */
+void iotc_app_request_snapshot(void)
+{
+    s_snapshot_pending = true;
+}
+
 /* Called from net_thread each loop iteration once the network is up. */
 void iotc_app_poll(bool network_up)
 {
