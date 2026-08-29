@@ -50,6 +50,9 @@ extern display_runtime_cfg_t glcd_layer_change_2;
  static uint8_t * g_p_single_buffer, * g_p_double_buffer;
  static uint32_t last_lcd_glcdc_frame_end = 0;
 
+/* GLCDC graphics-plane underflow counter (see glcdc_vsync_isr). */
+volatile uint32_t g_glcdc_underflow_count = 0;
+
 
  /**********************************************************************************************************************
   * Function Name: drw_init
@@ -94,7 +97,18 @@ void glcdc_vsync_isr(display_callback_args_t *p_args)
     BaseType_t xHigherPriorityTaskWoken, xResult;
     /* xHigherPriorityTaskWoken must be initialised to pdFALSE. */
      xHigherPriorityTaskWoken = pdFALSE;
-     if (DISPLAY_EVENT_LINE_DETECTION & p_args->event )
+
+     /* display_event_t is an enumeration (1,2,3,4), NOT a bitmask, so the
+      * original "DISPLAY_EVENT_LINE_DETECTION & event" test also matched
+      * GR1/GR2 underflow (1 & 3, 2 & 3). Count underflows separately. */
+     if ((DISPLAY_EVENT_GR1_UNDERFLOW == p_args->event) ||
+         (DISPLAY_EVENT_GR2_UNDERFLOW == p_args->event))
+     {
+         g_glcdc_underflow_count++;
+         return;
+     }
+
+     if (DISPLAY_EVENT_LINE_DETECTION == p_args->event )
        {
 
          application_processing_time.lcd_display_update_refresh_ms = TimeCounter_CountValueConvertToMs(last_lcd_glcdc_frame_end, TimeCounter_CurrentCountGet());
@@ -138,17 +152,10 @@ void glcdc_vsync_isr(display_callback_args_t *p_args)
 
     /* Reset Display - active low */
     /* Note: Please update wait periods according to LCD controller specification */
-    /* Panel reset. The stock 10 us pulse is far shorter than this panel
-     * needs and only ever worked because a cold boot had already held the
-     * panel in reset. After a SOFT reset (every J-Link flash / SYSRESETREQ)
-     * the panel keeps its previous state and a 10 us pulse does not
-     * re-initialise it - it latches all-white until the board is
-     * power-cycled. Hold reset 20 ms and allow 150 ms afterwards, which is
-     * the panel's documented power-on timing. */
     R_IOPORT_PinWrite(&g_ioport_ctrl, DISP_RESET, BSP_IO_LEVEL_LOW);
-    R_BSP_SoftwareDelay(20, BSP_DELAY_UNITS_MILLISECONDS);
+    R_BSP_SoftwareDelay(10, BSP_DELAY_UNITS_MICROSECONDS);
     R_IOPORT_PinWrite(&g_ioport_ctrl, DISP_RESET, BSP_IO_LEVEL_HIGH);
-    R_BSP_SoftwareDelay(150, BSP_DELAY_UNITS_MILLISECONDS);
+    R_BSP_SoftwareDelay(120, BSP_DELAY_UNITS_MILLISECONDS);
 
 
     /* Initialize GLCDC driver */
