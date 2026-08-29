@@ -243,6 +243,20 @@ static void prv_model_push_execute(void)
     }
     if (0 != rc)
     {
+        /* A viewer can connect *during* the download: the video session
+         * takes ~110 KB and the transfer's TLS needs ~40 KB, so an
+         * in-flight download dies when a stream starts. Don't give the
+         * deployment up - leave it queued so the net thread retries once
+         * streaming stops (the setup deadline still bounds the wait). */
+        extern bool kvs_media_is_streaming(void);
+        if (kvs_media_is_streaming())
+        {
+            IOTC_PRINT("IOTC: model download interrupted by video streaming "
+                       "(heap %u) - will retry when the stream stops\r\n",
+                       (unsigned) xPortGetFreeHeapSize());
+            s_model_wait_since = xTaskGetTickCount(); /* re-arm the wait */
+            return;                                  /* stays pending */
+        }
         IOTC_PRINT("IOTC: model download failed (%d)\r\n", rc);
         if (ack_id)
         {

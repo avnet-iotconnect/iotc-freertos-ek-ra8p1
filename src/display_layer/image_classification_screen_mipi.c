@@ -168,6 +168,23 @@ void do_image_classification_screen(bool ai_result_new)
             bool classifier = face_detection_class_info(&clabel, &cpct);
 
             char line[40];
+
+            /* The task heading is drawn once in the static overlay above, so
+             * it used to keep saying "Face Detection" after a classifier was
+             * hot-swapped in. Redraw it to match the model actually loaded
+             * (padded so a shorter label erases a longer one). */
+            {
+                static int last_kind = -1;
+                int kind = classifier ? 1 : 0;
+                if (kind != last_kind)
+                {
+                    last_kind = kind;
+                    snprintf(line, sizeof(line), "%-18s",
+                             classifier ? "Classification" : "Face Detection");
+                    print_bg_font_18(d2_handle, 20, 95, DISPLAY_FONT_SCALING, line);
+                }
+            }
+
             snprintf(line, sizeof(line), "Model: %.12s v%u      ", mname, mver);
             print_bg_font_18(d2_handle, hpos, vpos, NORMAL_FONT_SCALING, line);
             snprintf(line, sizeof(line), "Source: %.8s      ", msrc);
