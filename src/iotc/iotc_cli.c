@@ -15,7 +15,9 @@
  *   set key                 paste the device private key PEM (multi-line)
  *   apply                   connect using the stored configuration now
  *   erase                   remove the stored configuration
- *   reboot                  restart the device
+ *   reboot                  restart the device (warm reset; the LCD panel only
+ *                           re-initialises from a cold start, so power-cycle to
+ *                           bring the display back)
  */
 #include <stdio.h>
 #include <string.h>
@@ -156,7 +158,7 @@ static void prv_help(void)
               "  set key                 then paste the device private key PEM\r\n"
               "  apply                   connect with the stored configuration\r\n"
               "  erase                   remove the stored configuration\r\n"
-              "  reboot                  restart the device\r\n"
+              "  reboot                  restart the device (LCD needs a power cycle)\r\n"
               "  snapshot                capture + upload a snapshot now\r\n"
               "  brightness <0|1>        camera exposure: 0 normal, 1 bright\r\n");
 }

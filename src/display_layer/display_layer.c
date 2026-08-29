@@ -152,6 +152,12 @@ void glcdc_vsync_isr(display_callback_args_t *p_args)
 
     /* Reset Display - active low */
     /* Note: Please update wait periods according to LCD controller specification */
+    /* The panel latches white across a warm reset (J-Link reflash, SYSRESETREQ,
+     * NVIC_SystemReset) and only a power cycle clears it. Lengthening this pulse
+     * to 20 ms, and blanking DISP_BLEN plus a 50 ms reset and 200 ms settle, were
+     * both measured and made no difference; the board brings out only DISP_BLEN
+     * and DISP_RESET, so firmware cannot cycle the panel supply. Documented as a
+     * power-cycle-after-flashing step instead. */
     R_IOPORT_PinWrite(&g_ioport_ctrl, DISP_RESET, BSP_IO_LEVEL_LOW);
     R_BSP_SoftwareDelay(10, BSP_DELAY_UNITS_MICROSECONDS);
     R_IOPORT_PinWrite(&g_ioport_ctrl, DISP_RESET, BSP_IO_LEVEL_HIGH);

@@ -33,8 +33,10 @@ In this step you will program the demo image into the board's flash.
 2. Start **J-Flash Lite** (installed with the J-Link software).
 3. Set Device: **R7KA8P1KF_CPU0**, Interface: **SWD**, Speed: **4000 kHz**.
 4. Select Data File: `firmware/iotc-vision-ai-ek-ra8p1-demo.hex`.
-5. Click **Program Device**, wait for completion (about 15 seconds), then press the board's
-   RESET button.
+5. Click **Program Device** and wait for completion (about 15 seconds).
+6. Unplug the USB cable and plug it back in. Use a power cycle rather than the RESET button:
+   the LCD's timing controller only re-initialises from a cold start, so after a warm reset
+   the panel stays white while everything else keeps running.
 
 **Checkpoint:** J-Flash Lite reports the program operation completed without errors.
 
@@ -43,7 +45,8 @@ In this step you will program the demo image into the board's flash.
 In this step you will confirm the NPU is running inference locally.
 
 1. Open your serial terminal on the J-Link CDC COM port, **230400 baud**, 8N1.
-2. Press the board's RESET button. Point the camera at your face.
+2. Point the camera at your face. (If you need to restart the board at any point, power-cycle
+   it rather than pressing RESET, so the LCD comes back up.)
 
 **Checkpoint:** within a few seconds the console shows lines like:
 
@@ -217,6 +220,7 @@ keep updating during the stream, and `video.state` report `live`.
 | J-Link cannot find the device | Old J-Link software, or wrong core selected | Update to V9.38+; use `R7KA8P1KF_CPU0`, not `_CPU1` |
 | No serial output | Wrong COM port or baud rate | Use the J-Link CDC port at **230400**, not 115200 |
 | Typed characters ignored in the CLI | Terminal not sending CR line endings | Set line ending to CR or CR+LF |
+| LCD is all white after flashing | The panel only re-initialises from a cold start | Unplug and reconnect the USB cable. Everything else keeps running through it |
 | Dashboard values show `null` | Template created by hand with wrong attribute types | Import the bundled template (numerics must be DECIMAL) |
 | Dashboard state cards are blank | Artwork not uploaded, or wrong S3 key case | Re-check Step 5.1 filenames exactly |
 | Snapshot ack says upload failed | Transient network error | Send the command again; confirm boot printed `FU: file upload ready` |

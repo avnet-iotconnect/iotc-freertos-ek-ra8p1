@@ -252,7 +252,8 @@ controller before expiry.
 | Dashboard telemetry values `null` | Template attribute type mismatch — numerics must be DECIMAL. Re-import the bundled template |
 | `DUPLICATE_CLIENTID` in platform log after reflash | Benign: the new session kicks the old one |
 | Snapshot/upload fails 403 "Certificate is invalid on this endpoint" | SNI disabled in mbedTLS config — see §8 |
-| Second TLS connection fails intermittently (`HANDSHAKE_FAILED`) | FreeRTOS heap exhaustion — keep ≥100 KB free; heap is 256 KB for this reason |
+| Second TLS connection fails intermittently (`HANDSHAKE_FAILED`) | FreeRTOS heap exhaustion — keep ≥100 KB free; the heap is 484 KB (`0x79000`) for this reason |
+| LCD is all white after flashing or after any warm reset | The panel's timing controller only re-initialises from a cold start. Toggling `DISP_RESET` (10 µs, 20 ms, and a full blank-plus-200 ms sequence were all measured) does not clear it, and no panel power-enable pin is brought out — only `DISP_BLEN` and `DISP_RESET` exist in `bsp_pin_cfg.h`. Power-cycle the board after flashing. The MCU side is unaffected: telemetry, video streaming, snapshots and model push all continue to run |
 | Model download `TLS connect failed` | Signed model URLs are S3 → must be verified against Amazon Root CA 1 (already wired); transient DNS/TLS errors retry 3× |
 | OSPI returns `FSP_ERR_DEVICE_BUSY` after reset | The MX25 flash stays in octal DDR mode across MCU resets — `iotc_fs_init` pulses P106 RESET#; keep that ordering |
 | Pushed model rejected "unsupported shape" | Input outside the contracts in §9 |

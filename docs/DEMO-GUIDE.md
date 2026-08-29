@@ -141,5 +141,6 @@ Start on the face detector (push `face-v3` beforehand).
 | Odd classifier labels | Expected on cluttered scenes — ImageNet knows 1,000 *specific* objects; use a single centered prop |
 | Classifier confidence looks low (30–60%) | Normal for softmax over 1,000 classes; the label being *right* is the demo |
 | Telemetry nulls | Template attribute types (numerics must be DECIMAL) — re-import the bundled template |
+| LCD all white (typically right after a reflash) | Power-cycle the board — the panel needs a cold start. The cloud side is unaffected, so telemetry and video keep working even while the screen is white |
 | Board unresponsive | Power cycle: it reboots into the stored model and reconnects in ~30 s |
 | Video tab shows no stream | Give it ~15 s (TURN allocation); retry once by Stop/Start. The device must have been created from the bundled template (video streaming is fixed at device creation) |

@@ -42,7 +42,11 @@ cycles.
 1. Start **J-Flash Lite** (installed with the J-Link software).
 2. Device: **R7KA8P1KF_CPU0** · Interface: **SWD** · Speed: 4000 kHz.
 3. Data File: `firmware/iotc-vision-ai-ek-ra8p1-demo.hex`
-4. **Program Device**. When it finishes, press the board's RESET button.
+4. **Program Device**. When it finishes, unplug and reconnect the USB cable.
+
+> Power-cycle rather than pressing RESET. The LCD's timing controller only re-initialises
+> from a cold start, so after a warm reset the panel stays white (everything else runs
+> normally). This applies after every reflash.
 
 ### Option B — J-Link Commander (CLI)
 
@@ -62,6 +66,8 @@ then:
 ```
 JLink.exe -device R7KA8P1KF_CPU0 -if SWD -speed 4000 -AutoConnect 1 -CommandFile flash.jlink
 ```
+
+Then power-cycle the board, for the reason given above.
 
 ## 3. Verify the vision pipeline
 
@@ -196,4 +202,5 @@ Notes:
 | PEM paste rejected as too large | Paste only one PEM block per command (certificate and key separately) |
 | `apply` connects but dashboard shows nulls | Template attribute types — import the bundled template rather than creating one manually |
 | No camera image | Re-seat the OV5640 camera board on J35; the flex cable must be fully latched |
+| LCD is all white after flashing or a debugger reset | Expected. Power-cycle the board (unplug and reconnect the USB cable) — the panel needs a cold start, a warm reset is not enough. Everything else keeps running |
 | Blank LCD | The LCD is optional; if attached, check both flat cables |
