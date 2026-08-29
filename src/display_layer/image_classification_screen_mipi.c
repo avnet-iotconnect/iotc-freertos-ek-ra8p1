@@ -34,6 +34,9 @@
 
 #define PERCENTAGE_OFF          50
 
+/* Cell height of the bg_font_18 glyphs, in pixels at scaling 1.0. */
+#define FONT_GLYPH_HEIGHT       22
+
 
 /***************************************************************************************************************************
  * Typedef definitions
@@ -56,10 +59,37 @@ display_runtime_cfg_t glcd_layer_change_2;
  ***************************************************************************************************************************/
 static void process_str(const char* input, char* output, int max_len);
 static void print_inf_time(void);
+static void print_row(d2_point x, d2_point y, float scaling, const char *str);
 static bool overlay_drawn = false;
 static char local_str[5][32] = {0};
 static char local_prob[5][8] = {0};
 
+
+/*********************************************************************************************************************
+ *  print_row
+ *  Draw one line of the text overlay, erasing whatever was there before.
+ *  bg_font_18 is a proportional font, so padding a string with trailing spaces
+ *  does not reliably cover a longer string drawn earlier - spaces are narrower
+ *  than the glyphs they have to hide, which left tails behind ("barbershop"
+ *  showing as "hop" after a shorter label replaced it). Clear the row to the
+ *  overlay background instead, then draw.
+ *  @param      x, y: top-left of the row, in pixels
+ *  @param      scaling: font scaling the row is drawn at
+ *  @param      str: text to draw
+ *  @retval     None
+***********************************************************************************************************************/
+static void print_row(d2_point x, d2_point y, float scaling, const char *str)
+{
+    d2_width h = (d2_width) ((float) FONT_GLYPH_HEIGHT * scaling) + 2;
+
+    d2_setfillmode(d2_handle, d2_fm_color);
+    d2_setcolor(d2_handle, 0, 0x00000000);
+    d2_renderbox(d2_handle,
+                 (d2_point) (x << 4), (d2_point) (y << 4),
+                 (d2_width) ((TEXT_AREA_WIDTH - x) << 4), (d2_width) (h << 4));
+
+    print_bg_font_18(d2_handle, x, y, scaling, (char *) str);
+}
 
 /*********************************************************************************************************************
  *  print_inf_time function
@@ -76,11 +106,11 @@ static void print_inf_time(void)
     uint32_t cam_fps = (cam_ms > 0) ? (1000U / cam_ms) : 0;
 
     char buf[36];
-    snprintf(buf, sizeof(buf), "%lu us / %lu fps    ",
+    snprintf(buf, sizeof(buf), "%lu us / %lu fps",
              (unsigned long) us, (unsigned long) infer_fps);
-    print_bg_font_18(d2_handle, 20, 245, NORMAL_FONT_SCALING, buf);
-    snprintf(buf, sizeof(buf), "Camera: %lu fps    ", (unsigned long) cam_fps);
-    print_bg_font_18(d2_handle, 20, 272, NORMAL_FONT_SCALING, buf);
+    print_row(20, 245, NORMAL_FONT_SCALING, buf);
+    snprintf(buf, sizeof(buf), "Camera: %lu fps", (unsigned long) cam_fps);
+    print_row(20, 272, NORMAL_FONT_SCALING, buf);
 }
 
 /*********************************************************************************************************************
@@ -171,46 +201,44 @@ void do_image_classification_screen(bool ai_result_new)
 
             /* The task heading is drawn once in the static overlay above, so
              * it used to keep saying "Face Detection" after a classifier was
-             * hot-swapped in. Redraw it to match the model actually loaded
-             * (padded so a shorter label erases a longer one). */
+             * hot-swapped in. Redraw it to match the model actually loaded. */
             {
                 static int last_kind = -1;
                 int kind = classifier ? 1 : 0;
                 if (kind != last_kind)
                 {
                     last_kind = kind;
-                    snprintf(line, sizeof(line), "%-18s",
-                             classifier ? "Classification" : "Face Detection");
-                    print_bg_font_18(d2_handle, 20, 95, DISPLAY_FONT_SCALING, line);
+                    print_row(20, 95, DISPLAY_FONT_SCALING,
+                              classifier ? "Classification" : "Face Detection");
                 }
             }
 
-            snprintf(line, sizeof(line), "Model: %.12s v%u      ", mname, mver);
-            print_bg_font_18(d2_handle, hpos, vpos, NORMAL_FONT_SCALING, line);
-            snprintf(line, sizeof(line), "Source: %.8s      ", msrc);
-            print_bg_font_18(d2_handle, hpos, vpos + INFERENCE_ROW_HEIGHT, NORMAL_FONT_SCALING, line);
+            snprintf(line, sizeof(line), "Model: %.12s v%u", mname, mver);
+            print_row(hpos, vpos, NORMAL_FONT_SCALING, line);
+            snprintf(line, sizeof(line), "Source: %.8s", msrc);
+            print_row(hpos, vpos + INFERENCE_ROW_HEIGHT, NORMAL_FONT_SCALING, line);
             if (classifier)
             {
-                snprintf(line, sizeof(line), "Class: %.13s      ", clabel);
-                print_bg_font_18(d2_handle, hpos, vpos + INFERENCE_ROW_HEIGHT*2, NORMAL_FONT_SCALING, line);
-                snprintf(line, sizeof(line), "Score: %02d%%      ", cpct);
+                snprintf(line, sizeof(line), "Class: %.13s", clabel);
+                print_row(hpos, vpos + INFERENCE_ROW_HEIGHT*2, NORMAL_FONT_SCALING, line);
+                snprintf(line, sizeof(line), "Score: %02d%%", cpct);
             }
             else
             {
-                snprintf(line, sizeof(line), "Faces: %u      ", (unsigned) n);
-                print_bg_font_18(d2_handle, hpos, vpos + INFERENCE_ROW_HEIGHT*2, NORMAL_FONT_SCALING, line);
+                snprintf(line, sizeof(line), "Faces: %u", (unsigned) n);
+                print_row(hpos, vpos + INFERENCE_ROW_HEIGHT*2, NORMAL_FONT_SCALING, line);
                 if (n > 0)
                 {
                     int16_t x, y, w, h; float score;
                     face_detection_box_get(0, &x, &y, &w, &h, &score);
-                    snprintf(line, sizeof(line), "Best: %02d%%      ", (int)(score * 100.0f));
+                    snprintf(line, sizeof(line), "Best: %02d%%", (int)(score * 100.0f));
                 }
                 else
                 {
-                    snprintf(line, sizeof(line), "Best: --      ");
+                    snprintf(line, sizeof(line), "Best: --");
                 }
             }
-            print_bg_font_18(d2_handle, hpos, vpos + INFERENCE_ROW_HEIGHT*3, NORMAL_FONT_SCALING, line);
+            print_row(hpos, vpos + INFERENCE_ROW_HEIGHT*3, NORMAL_FONT_SCALING, line);
             (void) labels;
         }
         d2_endframe(d2_handle);
