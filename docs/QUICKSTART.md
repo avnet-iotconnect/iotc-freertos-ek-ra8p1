@@ -316,17 +316,52 @@ FD: 1 face(s): [25,63 49x58 90%]
 Step in front of the camera. The dashboard's Detection State card switches to FACE DETECTED and
 the Faces gauge moves; on the LCD, green boxes track the face.
 
-The model is stored in the board's OSPI flash, so it reloads automatically at the next boot.
-Power-cycle the board and watch it come back with `(flash, 441088 bytes)` in place of
-`(cloud, ...)`.
+**Re-task the device.** Four more models are bundled in
+[`tools/models/`](../tools/models/). Register and deploy them exactly as above to change what
+the device does, without a reflash and without a reboot:
 
-Four more models are bundled in [`tools/models/`](../tools/models/), including a 1000-class
-ImageNet classifier and a person detector. Registering and pushing them the same way re-tasks
-the device in seconds — the full sequence is in the [Demo Guide](DEMO-GUIDE.md).
+| Zip | Suggested name | Code | What the device becomes | Inference time |
+|---|---|---|---|---|
+| `face-v3_v3.zip` | RA8P1 Face Detect | `ra8p1face` | Face detector with boxes | ~5.8 ms |
+| `person-detect_v1.zip` | RA8P1 Person Detect | `ra8p1prsn` | Occupancy sensor — walk in and out of frame | ~1.5 ms |
+| `mobilenet-025_v1.zip` | RA8P1 ImageNet Classifier 0.25 | `ra8p1mn025` | 1000-class classifier, speed tier | ~4.5 ms |
+| `mobilenet-050_v1.zip` | RA8P1 ImageNet Classifier 0.5 | `ra8p1mn050` | 1000-class classifier, mid tier | ~9 ms |
+| `mobilenet-v2_v1.zip` | RA8P1 ImageNet Classifier v2 | `ra8p1mnv2` | 1000-class classifier, accuracy tier — hold up a coffee mug, a banana, a water bottle | ~40 ms |
+
+Deploying `mobilenet-v2` is the most striking of these: it is a roughly 7x larger workload
+than the face detector, and the device absorbs it mid-flight. Watch the Uptime tile on the
+dashboard while the swap happens — it keeps counting, which is the proof that nothing
+rebooted.
+
+> [!NOTE]
+> `model-revert` clears the stored model rather than falling back to a built-in one. This
+> image has no compiled-in model, so after a revert inference idles until you push another
+> model.
+
+**The model survives power loss.** Deployed models are written to the board's OSPI flash.
+Remove power from the board and reconnect it — without any reprovisioning, it boots straight
+back into the model you pushed and reconnects to the cloud:
+
+```
+FD: model "face-v3" v3 (flash, 441088 bytes) loaded: face detector, ethos-u: yes
+IOTC: starting (env=poc duid=ek-ra8p1-01, credentials: stored)
+IOTC: connected
+```
+
+Note `flash` in place of `cloud` — the model came from the board's own storage this time.
+
+For a narrated walkthrough of the full model library, see the [Demo Guide](DEMO-GUIDE.md).
 
 ## 13. Using the Demo
 
 Commands are sent from the device's **Commands** panel or from the dashboard's command widget.
+
+**Capture a snapshot.** Send the `snapshot` command. Within about 10 seconds the dashboard's
+Latest Snapshot widget shows a color photograph of what the camera saw, with the detection
+boxes drawn onto it and tagged with the detection results and performance figures at the
+moment of capture. The board annotated the image, PNG-encoded it, and uploaded it to S3 with
+an AWS SigV4 signature computed on the microcontroller — there is no gateway or intermediary
+in the path. On a headless installation this is the viewfinder.
 
 | Command | Effect |
 |---|---|
@@ -347,6 +382,11 @@ the camera's live view appears — H.264 encoded in software on the Cortex-M85 a
 
 The same commands are also available on the serial console, along with `show`, `erase`, and
 `reboot`. Type `help` to list them.
+
+**Clearing a board.** The cloud identity is stored on the board, so a board that is passed on
+to someone else keeps working as your device. To remove it, type `erase` followed by `reboot`
+in the serial console. The board returns to the unprovisioned state from
+[Step 4](#4-flash-the-firmware), ready to be configured for a different account.
 
 ## 14. Troubleshooting and Known Issues
 
@@ -372,7 +412,6 @@ The same commands are also available on the serial console, along with `show`, `
 * [Developer Guide](DEVELOPER-GUIDE.md) — build from source, the architecture, and adding your
   own Vela-compiled models
 * [Demo Guide](DEMO-GUIDE.md) — a presenter's script for demonstrating the full model hot-swap
-* [Workshop](WORKSHOP.md) — the facilitated, hands-on version of this guide
 * [Purchase the EK-RA8P1 Evaluation Kit](https://www.renesas.com/en/design-resources/boards-kits/ek-ra8p1)
 * [/IOTCONNECT Overview](https://www.iotconnect.io/)
 * [/IOTCONNECT Knowledgebase](https://help.iotconnect.io/)
