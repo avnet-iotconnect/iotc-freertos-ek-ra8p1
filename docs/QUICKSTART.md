@@ -59,8 +59,10 @@ To build the same application from source, see the [Developer Guide](DEVELOPER-G
 * A serial terminal application such as [Tera Term](https://sourceforge.net/projects/tera-term/)
   (Recommended) or a browser-based version such as
   [Google Chrome Labs Serial Terminal](https://googlechromelabs.github.io/serial-terminal/)
-* This repository, cloned or downloaded — you will need
-  `firmware/iotc-vision-ai-ek-ra8p1-demo.hex`
+* The prebuilt demo image:
+  [`iotc-vision-ai-ek-ra8p1-demo.hex`](../firmware/iotc-vision-ai-ek-ra8p1-demo.hex?raw=1)
+  (**must** Right-Click the link, Save As). You will also need the device template and
+  dashboard JSON from this repository, linked in the steps below
 * An /IOTCONNECT account with an **AWS** backend (see [Step 5](#5-create-iotconnect-account))
 
 > [!IMPORTANT]
@@ -102,8 +104,9 @@ installed with the J-Link software. This guide was tested with J-Link software v
    > Select `R7KA8P1KF_CPU0`. `CPU0` is the Cortex-M85 that runs this application — programming
    > `_CPU1` will not produce a working device.
 
-3. **Click** the `...` button next to Data File and select
-   `firmware/iotc-vision-ai-ek-ra8p1-demo.hex` from this repository.
+3. **Click** the `...` button next to Data File and select the demo image you downloaded,
+   [`iotc-vision-ai-ek-ra8p1-demo.hex`](../firmware/iotc-vision-ai-ek-ra8p1-demo.hex?raw=1)
+   (**must** Right-Click the link, Save As).
 4. **Click** the **Program Device** button. Programming takes about 15 seconds.
 5. **Unplug** the USB-C cable and **plug it back in**.
 
