@@ -61,7 +61,7 @@ git clone --recurse-submodules <repo-url>
    - **Runtime provisioning (default, no rebuild)**: the serial CLI stores env, CPID,
      DUID, and the certificate/key PEMs on LittleFS (OSPI flash); they survive power
      cycles and take precedence over anything compiled in. The walkthrough is in the
-     [Quickstart §5](QUICKSTART.md#5-provision-credentials-over-the-serial-terminal); the
+     [Quickstart §9](QUICKSTART.md#9-configure-the-board); the
      implementation is `src/iotc/iotc_cli.c` + `src/iotc/iotc_config.c`.
    - **Compile-time (development convenience)**: copy `src/iotc/app_secrets.h.example` →
      `src/iotc/app_secrets.h` (gitignored) and fill in `IOTC_CFG_ENV`/`CPID`/`DUID` and
@@ -144,7 +144,7 @@ reloaded at boot. The model **family is auto-detected from the input tensor shap
 | Region | Size | Notes |
 |---|---|---|
 | MRAM (code flash) | 1 MB | image is ~21 KB from full — check `llvm-size` after every feature; the 441 KB built-in model array is the big lever if space is needed |
-| SRAM | 2 MB | 640 KB tensor arena, 256 KB FreeRTOS heap (mbedTLS allocates here — two concurrent TLS sessions need ≥100 KB free), 64 KB libc heap |
+| SRAM | 2 MB | 640 KB tensor arena, 484 KB FreeRTOS heap (mbedTLS allocates here — two concurrent TLS sessions need ≥100 KB free), 64 KB libc heap |
 | SDRAM | 64 MB | frame buffers, 4 MB model staging + 4 MB pending, snapshot buffers |
 | OSPI flash | 64 MB | lower 32 MB factory-protected; LittleFS (PKCS#11 store) at +32 MB/16 MB; model slot at +56 MB/8 MB |
 

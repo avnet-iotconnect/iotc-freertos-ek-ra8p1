@@ -77,7 +77,7 @@ upload → push.
 
 | Document | For |
 |---|---|
-| [docs/QUICKSTART.md](docs/QUICKSTART.md) | Flash a prebuilt image, provision credentials over the serial terminal, and connect — no toolchain |
+| [docs/QUICKSTART.md](docs/QUICKSTART.md) | Unboxing to a connected device with a live dashboard and a cloud-deployed model, using the prebuilt image — no toolchain |
 | [docs/WORKSHOP.md](docs/WORKSHOP.md) | Hands-on workshop: flash → provision → dashboard → snapshots → model hot-swap |
 | [docs/DEVELOPER-GUIDE.md](docs/DEVELOPER-GUIDE.md) | Build from source, connect to /IOTCONNECT, architecture, adding models |
 | [docs/DEMO-GUIDE.md](docs/DEMO-GUIDE.md) | The presenter's script: what to show, in what order, with expected results |
