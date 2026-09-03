@@ -377,7 +377,9 @@ in the path. On a headless installation this is the viewfinder.
 **Live video.** Open the device and select the **Video Streaming** tab, then click
 **Start Video**. Within a few seconds the browser negotiates a WebRTC session with the board and
 the camera's live view appears — H.264 encoded in software on the Cortex-M85 at 320x240, roughly
-8–10 frames per second. Inference and telemetry keep running while the stream is live.
+8–10 frames per second. Inference and telemetry keep running while the stream is live, and you
+can deploy a model from [Step 12](#12-deploy-an-ai-model) without stopping the video — the
+device downloads and hot-swaps it with the stream still playing.
 
 > [!NOTE]
 > One viewer is supported at a time. If the first session after a boot stays black, click Stop

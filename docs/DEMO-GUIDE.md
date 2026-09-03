@@ -120,6 +120,10 @@ Start on the face detector (push `face-v3` beforehand).
     frames — telemetry continues uninterrupted during streaming.
   - Transport is production WebRTC: AWS Kinesis Video Streams signaling, ICE/TURN
     traversal, DTLS-SRTP encryption — negotiated on the microcontroller.
+- **The closer, if you want one**: leave the stream running and push a different model from
+  AI Models. The download, validation, and hot-swap all happen with the video live, and the
+  stream keeps playing while the device changes task on screen. Two TLS sessions, a WebRTC
+  session, the NPU, and the camera, concurrently, on one microcontroller.
 - Close the tab (or Stop Video) and show telemetry `video.state` returning from `live`.
 
 ## Command reference
