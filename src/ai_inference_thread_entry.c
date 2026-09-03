@@ -38,6 +38,66 @@
 
 extern bool face_detection_init(void);
 extern vision_ai_app_err_t face_detection_run(void);
+extern uint32_t face_detection_box_count(void);
+extern bool face_detection_class_info(const char **label, int *pct);
+
+/***************************************************************************************************************************
+ * Detection LED (led-auto command)
+ ***************************************************************************************************************************/
+
+/*
+ * The board's green user LED follows the detection state while enabled: lit
+ * whenever a face or a person is in frame, dark otherwise. Updated here, once
+ * per inference, so it tracks detections at the pipeline's own rate and works
+ * with no display attached.
+ *
+ * Off by default, so a board behaves exactly as before until asked.
+ *
+ * This lives in the inference thread rather than a module of its own because
+ * the generated build files list every source explicitly; a new directory
+ * would be dropped the next time the Smart Configurator regenerates them.
+ */
+static volatile bool s_led_auto;
+
+void led_auto_set(bool on)
+{
+    s_led_auto = on;
+    if (!on)
+    {
+        /* Leave the LED dark when switching the feature off, rather than
+         * frozen in whatever state the last detection left it. */
+        (void) R_IOPORT_PinWrite(&g_ioport_ctrl, USER_LED_GREEN, BSP_IO_LEVEL_LOW);
+    }
+}
+
+bool led_auto_get(void)
+{
+    return s_led_auto;
+}
+
+static void prv_led_auto_update(void)
+{
+    if (!s_led_auto)
+    {
+        return;
+    }
+
+    /* Classifier models report a label (the 2-class person detector emits
+     * "person"/"no person"); detector models report boxes. */
+    const char *label = NULL;
+    bool detected;
+    if (face_detection_class_info(&label, NULL))
+    {
+        detected = (NULL != label) && (0 == strcmp(label, "person"));
+    }
+    else
+    {
+        detected = (face_detection_box_count() > 0U);
+    }
+
+    (void) R_IOPORT_PinWrite(&g_ioport_ctrl, USER_LED_GREEN,
+                             detected ? BSP_IO_LEVEL_HIGH : BSP_IO_LEVEL_LOW);
+}
 
 /***************************************************************************************************************************
  * Exported global variables and functions (to be accessed by other files)
@@ -150,6 +210,8 @@ void ai_inference_thread_entry(void *pvParameters)
         {
             handle_error(VISION_AI_APP_ERR_AI_INFERENCE);
         }
+
+        prv_led_auto_update();
 
         xEventGroupSetBits(g_ai_app_event, AI_INFERENCE_RESULT_UPDATED);
          /*

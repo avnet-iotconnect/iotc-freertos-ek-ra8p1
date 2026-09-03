@@ -135,6 +135,8 @@ Start on the face detector (push `face-v3` beforehand).
 | `model-info` | ack with active model name/version/source/size |
 | `model-revert` | clears the stored model (inference idles until the next push; this build has no built-in fallback) |
 | `set-brightness <0\|1>` | camera exposure target: 0 = normal, 1 = bright (~+1 EV, for dark rooms) |
+| `led-auto` | toggles the detection LED: the green user LED follows face/person detections. Off by default; pass 0 or 1 to set it explicitly |
+| `reboot` | warm restart; reconnects and reloads the stored model in ~30 s. **Leaves the LCD white until a power cycle** |
 
 ## Troubleshooting during a demo
 

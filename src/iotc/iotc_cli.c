@@ -160,7 +160,8 @@ static void prv_help(void)
               "  erase                   remove the stored configuration\r\n"
               "  reboot                  restart the device (LCD needs a power cycle)\r\n"
               "  snapshot                capture + upload a snapshot now\r\n"
-              "  brightness <0|1>        camera exposure: 0 normal, 1 bright\r\n");
+              "  brightness <0|1>        camera exposure: 0 normal, 1 bright\r\n"
+              "  led-auto [0|1]          green LED follows detections (no arg toggles)\r\n");
 }
 
 static void prv_handle(char *line)
@@ -194,6 +195,38 @@ static void prv_handle(char *line)
         {
             prv_print("use: brightness 0 | brightness 1\r\n");
         }
+    }
+    else if (0 == strncmp(line, "led-auto", 8) &&
+             ((line[8] == '\0') || (line[8] == ' ')))
+    {
+        extern void led_auto_set(bool on);
+        extern bool led_auto_get(void);
+        const char *arg = &line[8];
+        bool on;
+
+        while (' ' == *arg)
+        {
+            arg++;
+        }
+        if ('\0' == *arg)
+        {
+            on = !led_auto_get(); /* no argument: toggle */
+        }
+        else if (('1' == *arg) || (0 == strcmp(arg, "on")))
+        {
+            on = true;
+        }
+        else if (('0' == *arg) || (0 == strcmp(arg, "off")))
+        {
+            on = false;
+        }
+        else
+        {
+            prv_print("use: led-auto | led-auto 0 | led-auto 1\r\n");
+            return;
+        }
+        led_auto_set(on);
+        prv_print(on ? "detection LED enabled\r\n" : "detection LED disabled\r\n");
     }
     else if (0 == strncmp(line, "set env ", 8))
     {

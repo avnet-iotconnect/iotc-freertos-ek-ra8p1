@@ -373,6 +373,13 @@ in the path. On a headless installation this is the viewfinder.
 | `model-info` | Acknowledges with the active model's name, version, source, and size |
 | `model-revert` | Clears the stored model; inference idles until the next model is pushed |
 | `set-brightness <0\|1>` | Camera exposure target: `0` is normal, `1` brightens the image by roughly 1 EV for dim rooms |
+| `led-auto` | Toggles the detection LED. While enabled, the board's green user LED (P303) lights whenever a face or a person is in frame, and goes dark when the frame clears. Off by default. Pass `0` or `1` to set it explicitly instead of toggling |
+| `reboot` | Restarts the device. It reconnects and reloads its stored model in about 30 seconds |
+
+> [!IMPORTANT]
+> `reboot` is a warm reset, so the LCD stays white afterwards until the board is power-cycled.
+> Everything else — telemetry, video, model storage — comes back normally. Prefer a power
+> cycle when the display is part of what you are showing.
 
 **Live video.** Open the device and select the **Video Streaming** tab, then click
 **Start Video**. Within a few seconds the browser negotiates a WebRTC session with the board and

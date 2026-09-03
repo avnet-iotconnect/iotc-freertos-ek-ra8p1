@@ -192,6 +192,20 @@
       "requiredParam": true,
       "requiredAck": true,
       "isOTACommand": false
+    },
+    {
+      "name": "Detection LED Auto",
+      "command": "led-auto",
+      "requiredParam": false,
+      "requiredAck": true,
+      "isOTACommand": false
+    },
+    {
+      "name": "Reboot Device",
+      "command": "reboot",
+      "requiredParam": false,
+      "requiredAck": true,
+      "isOTACommand": false
     }
   ],
   "messageVersion": "2.1",

@@ -71,6 +71,11 @@ static uint32_t s_msgs_sent;
 static volatile bool s_snapshot_pending;
 static char *s_snapshot_ack_id;
 
+/* Cloud reboot: the ack is published first, then the net thread resets the
+ * core once the delay below has elapsed. */
+static volatile bool s_reboot_pending;
+static TickType_t s_reboot_at;
+
 static void prv_on_command(IotclC2dEventData data)
 {
     const char *cmd = iotcl_c2d_get_command(data);
@@ -153,6 +158,57 @@ static void prv_on_command(IotclC2dEventData data)
         face_detection_revert();
         iotcl_mqtt_send_cmd_ack(ack_id, IOTCL_C2D_EVT_CMD_SUCCESS_WITH_ACK,
                                 "reverting to builtin model");
+        return;
+    }
+    if (0 == strncmp(cmd, "led-auto", 8) &&
+        ((cmd[8] == '\0') || (cmd[8] == ' ')))
+    {
+        extern void led_auto_set(bool on);
+        extern bool led_auto_get(void);
+        const char *arg = (cmd[8] == ' ') ? &cmd[9] : NULL;
+        bool on;
+
+        while ((NULL != arg) && (' ' == *arg))
+        {
+            arg++;
+        }
+        if ((NULL == arg) || ('\0' == *arg))
+        {
+            on = !led_auto_get(); /* no argument: toggle */
+        }
+        else if (0 == strcmp(arg, "1") || 0 == strcmp(arg, "on") ||
+                 0 == strcmp(arg, "enable") || 0 == strcmp(arg, "enabled") ||
+                 0 == strcmp(arg, "true"))
+        {
+            on = true;
+        }
+        else if (0 == strcmp(arg, "0") || 0 == strcmp(arg, "off") ||
+                 0 == strcmp(arg, "disable") || 0 == strcmp(arg, "disabled") ||
+                 0 == strcmp(arg, "false"))
+        {
+            on = false;
+        }
+        else
+        {
+            iotcl_mqtt_send_cmd_ack(ack_id, IOTCL_C2D_EVT_CMD_FAILED,
+                                    "use no argument to toggle, or 0/1");
+            return;
+        }
+        led_auto_set(on);
+        IOTC_PRINT("IOTC: detection LED %s\r\n", on ? "enabled" : "disabled");
+        iotcl_mqtt_send_cmd_ack(ack_id, IOTCL_C2D_EVT_CMD_SUCCESS_WITH_ACK,
+                                on ? "detection LED: enabled"
+                                   : "detection LED: disabled");
+        return;
+    }
+    if (0 == strcmp(cmd, "reboot"))
+    {
+        /* Ack first and reboot from the net thread, so the acknowledgment is
+         * actually published before the core resets. */
+        iotcl_mqtt_send_cmd_ack(ack_id, IOTCL_C2D_EVT_CMD_SUCCESS_WITH_ACK,
+                                "rebooting (the LCD needs a power cycle)");
+        s_reboot_at = xTaskGetTickCount() + pdMS_TO_TICKS(2000);
+        s_reboot_pending = true;
         return;
     }
     iotcl_mqtt_send_cmd_ack(ack_id, IOTCL_C2D_EVT_CMD_FAILED, "unknown command");
@@ -605,6 +661,14 @@ void iotc_app_poll(bool network_up)
                     s_snapshot_ack_id = NULL;
                 }
                 s_snapshot_pending = false;
+            }
+            if (s_reboot_pending &&
+                ((int32_t) (xTaskGetTickCount() - s_reboot_at) >= 0))
+            {
+                s_reboot_pending = false;
+                IOTC_PRINT("IOTC: rebooting on cloud command\r\n");
+                vTaskDelay(pdMS_TO_TICKS(100)); /* let the console drain */
+                NVIC_SystemReset();
             }
             if ((xTaskGetTickCount() - s_last_pub) >= pdMS_TO_TICKS(s_period_s * 1000))
             {
