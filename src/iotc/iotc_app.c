@@ -166,10 +166,19 @@ static void prv_on_command(IotclC2dEventData data)
  * task; the AI thread applies the swap between inferences and persists the
  * model to the OSPI flash store.
  */
-/* Model pushes are deferred to the net thread (like snapshots): the
- * download's TLS session needs ~40 KB of heap, which is not available
- * while a KVS video session is streaming — attempting it live fails the
- * TLS setup. The worker below waits for the stream to go idle. */
+/* Model pushes are deferred to the net thread (like snapshots) because the
+ * download's TLS session needs ~40 KB of heap. Whether that fits alongside a
+ * KVS video session is a question of free heap, not of streaming as such, so
+ * the worker below gates on the measured figure rather than refusing outright.
+ *
+ * Measured on hardware with the 484 KB (0x79000) heap: 185 KB free idle,
+ * 79 KB free with a viewer streaming (the session costs ~108 KB), and a floor
+ * of 20 KB with a second TLS session also live — which a mid-stream snapshot
+ * upload runs at successfully. A download therefore fits while streaming, and
+ * the threshold below keeps a margin over the ~40 KB it needs so the transfer
+ * is only postponed when something else has the heap. */
+#define MODEL_DOWNLOAD_HEAP_FLOOR (64U * 1024U)
+
 static char *s_model_host;
 static char *s_model_res;
 static char *s_model_ack_id;
@@ -243,17 +252,18 @@ static void prv_model_push_execute(void)
     }
     if (0 != rc)
     {
-        /* A viewer can connect *during* the download: the video session
-         * takes ~110 KB and the transfer's TLS needs ~40 KB, so an
-         * in-flight download dies when a stream starts. Don't give the
-         * deployment up - leave it queued so the net thread retries once
-         * streaming stops (the setup deadline still bounds the wait). */
-        extern bool kvs_media_is_streaming(void);
-        if (kvs_media_is_streaming())
+        /* A viewer can still connect *during* the download: the video session
+         * claims ~108 KB in one go, which can pull the heap out from under an
+         * in-flight transfer. If the heap is short now, treat the failure as
+         * contention rather than a bad deployment - leave it queued so the net
+         * thread retries once memory frees up (the 5-minute deadline still
+         * bounds the wait). */
+        size_t heap_free = xPortGetFreeHeapSize();
+        if (heap_free < MODEL_DOWNLOAD_HEAP_FLOOR)
         {
-            IOTC_PRINT("IOTC: model download interrupted by video streaming "
-                       "(heap %u) - will retry when the stream stops\r\n",
-                       (unsigned) xPortGetFreeHeapSize());
+            IOTC_PRINT("IOTC: model download lost the heap (%u free) - "
+                       "will retry when memory frees up\r\n",
+                       (unsigned) heap_free);
             s_model_wait_since = xTaskGetTickCount(); /* re-arm the wait */
             return;                                  /* stays pending */
         }
@@ -552,21 +562,26 @@ void iotc_app_poll(bool network_up)
             }
             if (s_model_pending)
             {
-                /* The download's TLS session does not fit in the heap while
-                 * a KVS viewer is streaming; wait for idle (or force after
-                 * 5 minutes rather than dropping the deployment). */
-                extern bool kvs_media_is_streaming(void);
-                bool streaming = kvs_media_is_streaming();
+                /* Run the download as soon as there is heap for its TLS
+                 * session - a live video stream on its own leaves enough, so
+                 * a push no longer has to wait for the viewer to disconnect.
+                 * If the heap is genuinely short, wait for it to recover, and
+                 * force the attempt after 5 minutes rather than dropping the
+                 * deployment. */
+                size_t heap_free = xPortGetFreeHeapSize();
+                bool tight = (heap_free < MODEL_DOWNLOAD_HEAP_FLOOR);
                 bool timed_out = (xTaskGetTickCount() - s_model_wait_since) >=
                                  pdMS_TO_TICKS(5U * 60U * 1000U);
                 static TickType_t s_hint_at;
-                if (streaming && !timed_out)
+                if (tight && !timed_out)
                 {
                     if ((xTaskGetTickCount() - s_hint_at) >= pdMS_TO_TICKS(30000))
                     {
                         s_hint_at = xTaskGetTickCount();
-                        IOTC_PRINT("IOTC: model push waiting for video "
-                                   "streaming to stop\r\n");
+                        IOTC_PRINT("IOTC: model push waiting for heap "
+                                   "(%u free, need %u)\r\n",
+                                   (unsigned) heap_free,
+                                   (unsigned) MODEL_DOWNLOAD_HEAP_FLOOR);
                     }
                 }
                 else
