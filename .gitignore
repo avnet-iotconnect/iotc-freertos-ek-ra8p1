@@ -32,3 +32,6 @@ __pycache__/
 # Model artifacts (large binaries; keep scripts, not outputs)
 tools/vela/output/
 *.tflite.vela
+
+# Generated per-seat workshop images (tools/make_workshop_images.py)
+workshop-images/

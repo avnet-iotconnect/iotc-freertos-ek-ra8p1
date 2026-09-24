@@ -80,6 +80,7 @@ upload → push.
 | [docs/QUICKSTART.md](docs/QUICKSTART.md) | Unboxing to a connected device with a live dashboard and a cloud-deployed model, using the prebuilt image — no toolchain |
 | [docs/DEVELOPER-GUIDE.md](docs/DEVELOPER-GUIDE.md) | Build from source, connect to /IOTCONNECT, architecture, adding models |
 | [docs/DEMO-GUIDE.md](docs/DEMO-GUIDE.md) | The presenter's script: what to show, in what order, with expected results |
+| [docs/workshop/](docs/workshop/) | A 2 h 30 min hands-on workshop for 30 attendees: attendee lab flow, facilitator runbook, and the slide deck's content. Includes `tools/make_workshop_images.py` for giving each board its own MAC address |
 | [docs/BUILD-NOTES.md](docs/BUILD-NOTES.md) | Raw engineering log: toolchain quirks, hardware gotchas, debugging recipes |
 
 ## Architecture
@@ -126,6 +127,7 @@ src/ai_application/                        TFLM glue, model lifecycle + hot-swap
 src/model_store/                           IOTV envelope validation + raw OSPI model slot
 src/camera_layer/, src/display_layer/      OV5640/VIN capture, GLCDC output, detection overlay
 tools/pack_model.py                        Wrap a Vela .tflite as a pushable .iotv (+ STORED zip)
+tools/make_workshop_images.py              One prebuilt image per workshop seat, each with a unique MAC
 tools/models/                              The five ready-to-push model zips
 templates/ra8p1-vision-ai-template.json    /IOTCONNECT device template (import this)
 dashboard/                                 /IOTCONNECT dashboard import JSON + widget artwork
