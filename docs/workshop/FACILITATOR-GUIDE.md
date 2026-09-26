@@ -33,7 +33,7 @@ Read the whole guide once, then use the checklists.
 | Per seat | EK-RA8P1 kit (board, OV5640 camera fitted on J35, 7-inch LCD attached, USB-C cable), a wired Ethernet drop, the attendee's own laptop, a printed seat card |
 | Cloud | One /IOTCONNECT company on the **AWS** backend, staged by you. Each attendee creates one device in it |
 | Firmware | The prebuilt image, flashed by you before the event, one uniquely-addressed image per seat (see §2) |
-| Presentation | The workshop deck; its content and speaker notes are in [PRESENTATION.md](PRESENTATION.md) |
+| Presentation | [EK-RA8P1-workshop-deck.pptx](EK-RA8P1-workshop-deck.pptx), 25 slides on the Avnet template; its content and speaker notes are in [PRESENTATION.md](PRESENTATION.md) |
 
 Design decisions worth knowing, so you can defend or change them:
 
@@ -367,6 +367,11 @@ Either way, on the day after:
 - [ ] Note what slipped and by how much, and adjust §9 before the next run.
 
 ## 13. Shorter and longer variants
+
+**One hour.** A different format rather than a cut: boards arrive provisioned, dashboards are
+pre-imported, and the hour is three labs of pushing models. See the
+[one-hour facilitator guide](ONE-HOUR-FACILITATOR-GUIDE.md) and
+[one-hour attendee guide](ONE-HOUR-ATTENDEE-GUIDE.md).
 
 **Two hours.** Drop Lab 6 (demonstrate video from the presenter board in 3 minutes during Talk
 3), shorten Lab 5 to 5a, 5b, and 5d, and cut Talk 1 to ten minutes. Keep the break at ten

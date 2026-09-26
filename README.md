@@ -80,7 +80,7 @@ upload → push.
 | [docs/QUICKSTART.md](docs/QUICKSTART.md) | Unboxing to a connected device with a live dashboard and a cloud-deployed model, using the prebuilt image — no toolchain |
 | [docs/DEVELOPER-GUIDE.md](docs/DEVELOPER-GUIDE.md) | Build from source, connect to /IOTCONNECT, architecture, adding models |
 | [docs/DEMO-GUIDE.md](docs/DEMO-GUIDE.md) | The presenter's script: what to show, in what order, with expected results |
-| [docs/workshop/](docs/workshop/) | A 2 h 30 min hands-on workshop for 30 attendees: attendee lab flow, facilitator runbook, and the slide deck's content. Includes `tools/make_workshop_images.py` for giving each board its own MAC address |
+| [docs/workshop/](docs/workshop/) | A hands-on workshop for 30 attendees in two formats (2 h 30 min and one hour): attendee lab flows, facilitator runbooks, and slide decks on the Avnet template. Includes `tools/make_workshop_images.py` for giving each board its own MAC address |
 | [docs/BUILD-NOTES.md](docs/BUILD-NOTES.md) | Raw engineering log: toolchain quirks, hardware gotchas, debugging recipes |
 
 ## Architecture

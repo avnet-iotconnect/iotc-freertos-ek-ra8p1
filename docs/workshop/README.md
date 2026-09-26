@@ -1,18 +1,27 @@
 # Workshop: Push AI Models to a Microcontroller from the Cloud
 
-A hands-on, 2 h 30 min workshop for 30 attendees, each with a Renesas EK-RA8P1 kit and a wired
-Ethernet connection. Attendees connect their board to /IOTCONNECT, then push three different
-AI models to it from AI Model Management and watch the board change task in seconds, with no
-reflash and no reboot.
+A hands-on workshop for 30 attendees, each with a Renesas EK-RA8P1 kit and a wired Ethernet
+connection. Attendees push three different AI models to their board from /IOTCONNECT AI Model
+Management and watch it change task in seconds, with no reflash and no reboot.
+
+Two formats. The **full workshop** (2 h 30 min) has attendees provision their own board over
+the serial console and adds live WebRTC video. The **one-hour format** moves provisioning into
+facilitator prep so the whole hour is spent pushing models.
 
 | Document | For |
 |---|---|
-| [ATTENDEE-GUIDE.md](ATTENDEE-GUIDE.md) | The attendee flow: six labs with checkpoints, from an unboxed board to a cloud-deployed model that survives a power cycle |
-| [FACILITATOR-GUIDE.md](FACILITATOR-GUIDE.md) | The runbook: prep timeline, room and network requirements, account staging, flashing 30 boards, seat cards, run of show, contingencies, closing down |
-| [PRESENTATION.md](PRESENTATION.md) | The slide deck's content and speaker notes, slide by slide |
-| [`tools/make_workshop_images.py`](../../tools/make_workshop_images.py) | Makes one firmware image per seat with a unique MAC address. Required: the prebuilt image ships with a single fixed MAC, and 30 boards on one switch would collide |
+| [ATTENDEE-GUIDE.md](ATTENDEE-GUIDE.md) | Full workshop, attendee flow: six labs with checkpoints, from an unboxed board to a cloud-deployed model that survives a power cycle |
+| [FACILITATOR-GUIDE.md](FACILITATOR-GUIDE.md) | Full workshop, runbook: prep timeline, room and network requirements, account staging, flashing 30 boards, seat cards, run of show, contingencies, closing down |
+| [ONE-HOUR-ATTENDEE-GUIDE.md](ONE-HOUR-ATTENDEE-GUIDE.md) | One-hour format, attendee flow: three labs on a pre-provisioned board |
+| [ONE-HOUR-FACILITATOR-GUIDE.md](ONE-HOUR-FACILITATOR-GUIDE.md) | One-hour format, runbook: what moves into prep, the 60-minute run of show, contingencies |
+| [EK-RA8P1-workshop-deck.pptx](EK-RA8P1-workshop-deck.pptx) | Full workshop slide deck, 25 slides with speaker notes, on the Avnet PowerPoint template |
+| [EK-RA8P1-workshop-deck-1-hour.pptx](EK-RA8P1-workshop-deck-1-hour.pptx) | One-hour slide deck, 15 slides with speaker notes, on the Avnet PowerPoint template |
+| [PRESENTATION.md](PRESENTATION.md) | Both decks' content and speaker notes, slide by slide, in text |
+| [`tools/make_workshop_images.py`](../../tools/make_workshop_images.py) | Makes one firmware image per seat with a unique MAC address. Required for either format: the prebuilt image ships with a single fixed MAC, and 30 boards on one switch would collide |
 
 ## Agenda at a glance
+
+### Full workshop, 2 h 30 min
 
 | Clock | Block | Minutes |
 |---|---|---|
@@ -29,15 +38,29 @@ reflash and no reboot.
 | 2:15 | Talk 3: bring your own model, where to go next | 10 |
 | 2:25 | Close | 5 |
 
+### One-hour format
+
+| Clock | Block | Minutes |
+|---|---|---|
+| 0:00 | Welcome; attendees plug in and the boards connect | 3 |
+| 0:03 | Talk 1: what you will do, the board, what happens when you click Deploy | 10 |
+| 0:13 | Lab A: Find your board in the cloud | 5 |
+| 0:18 | Lab B: Your first push, and a snapshot | 15 |
+| 0:33 | Lab C: Re-task the device, then power-cycle it | 15 |
+| 0:48 | Talk 2: three numbers that prove it, bring your own model | 7 |
+| 0:55 | Close | 5 |
+
 ## Assumptions
 
-- One /IOTCONNECT company on the AWS backend, staged by the facilitator; each attendee creates
-  one device in it. The subscription must allow at least 34 devices.
-- Boards are pre-flashed by the facilitator with per-seat images. Attendees never need J-Link
-  tooling beyond its USB serial driver.
-- Attendees bring their own laptop with a serial terminal; the room provides wired Ethernet for
-  the boards and Wi-Fi for the laptops.
+- One /IOTCONNECT company on the AWS backend, staged by the facilitator, with one device per
+  seat (created by the attendee in the full format, by the facilitator in the one-hour format).
+  The subscription must allow at least 34 devices.
+- Boards are pre-flashed by the facilitator with per-seat images. In the one-hour format they
+  are also pre-provisioned, and attendees need nothing but a browser.
+- Attendees bring their own laptop (with a serial terminal in the full format, a browser only
+  in the one-hour format); the room provides wired Ethernet for the boards and Wi-Fi for the
+  laptops.
 - The LCD is attached but optional; every lab works headless through the dashboard.
 
-Two-hour and three-hour variants are in the
+Two-hour and three-hour variants of the full format are in the
 [facilitator guide](FACILITATOR-GUIDE.md#13-shorter-and-longer-variants).

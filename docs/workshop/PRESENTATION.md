@@ -1,8 +1,19 @@
 # Presentation: Push AI Models to a Microcontroller from the Cloud
 
-The workshop deck, slide by slide, with speaker notes. This is the version-controlled source of
-the deck's content; the deck itself is a 24-slide, 16:9 presentation built from it. Slide
-numbers here match the run of show in the [Facilitator Guide](FACILITATOR-GUIDE.md#9-run-of-show).
+The workshop decks, slide by slide, with speaker notes. Both decks are built on the Avnet
+PowerPoint template (16:9, Arial, Avnet green) and every slide carries its notes in the
+notes pane.
+
+| Deck | File | Slides |
+|---|---|---|
+| Full workshop, 2 h 30 min | [EK-RA8P1-workshop-deck.pptx](EK-RA8P1-workshop-deck.pptx) | 25 |
+| One-hour format | [EK-RA8P1-workshop-deck-1-hour.pptx](EK-RA8P1-workshop-deck-1-hour.pptx) | 15 |
+
+Fill in the presenter line on the cover before the event. The full deck's slide numbers below
+match the run of show in the [Facilitator Guide](FACILITATOR-GUIDE.md#9-run-of-show); the
+one-hour deck is outlined at the [end of this document](#the-one-hour-deck).
+
+## The full deck
 
 Three talks, interleaved with the labs:
 
@@ -15,17 +26,13 @@ Three talks, interleaved with the labs:
 Lab slides (10 – 13, 19, 21) stay on screen while the room works. Slides 14, 15 and 20 are
 transitions.
 
-Look and feel: dark navy `#111C2E` and warm off-white `#F5F6F3` backgrounds, teal `#2BB3A0`
-and amber `#E9A23B` accents, IBM Plex Sans for text and JetBrains Mono for console output.
-Images: the board photo and the live dashboard screenshot from [`docs/images/`](../images/).
-
 ---
 
 ## 1. Cover
 
-**Push an AI model to a microcontroller. From the cloud. In seconds.**
-Vision AI on the Renesas EK-RA8P1 with /IOTCONNECT AI Model Management. Hands-on workshop,
-2 hours 30 minutes. Board photo.
+**Push an AI model to a microcontroller from the cloud, in seconds.**
+Subhead: hands-on workshop, vision AI on the EK-RA8P1 with /IOTCONNECT. Presenter line to fill
+in. The template's brand cover image.
 
 > Notes. While people settle: everyone should have a board, an LCD, a USB-C cable, an Ethernet
 > cable and a printed seat card. The seat number on the card must match the sticker on the
@@ -106,7 +113,7 @@ the S3 upload itself).
 > registered; you deploy them. The template turns on video streaming, provisioned when the device
 > is created, so use exactly this template.
 
-## 8. The headline capability (statement slide, teal)
+## 8. The headline capability (green divider slide)
 
 **Click Deploy in AI Models. The board downloads the model, validates it, swaps it in between
 two inferences, and saves it to flash.** No reflash. No reboot. Uptime uninterrupted. It comes
@@ -315,7 +322,7 @@ match, and an Uptime tile that never went to zero during the swaps.
 > the stored model rather than restoring a built-in one; after a revert inference idles until the
 > next push.
 
-## 20. Three numbers that prove it (dark)
+## 20. Three numbers that prove it
 
 **7×** larger model, absorbed live (5,800 µs to 40,000 µs, swapped while camera and display kept
 running). **0** reboots across every swap (the Uptime tile counts through the whole lab). **3**
@@ -375,7 +382,7 @@ Marketplace).
 > Notes. Everything here is in the repository README. Point at the URL on the whiteboard rather
 > than reading it out.
 
-## 24. Before you leave (dark)
+## 24. Before you leave
 
 Two cards: **The board stays here** (type `erase`, then `reboot`; leave the board, cables and
 seat card on the desk). **The board goes home with you** (leave it provisioned tonight; the
@@ -385,3 +392,48 @@ today and it never rebooted.
 
 > Notes. Say which card applies before anyone stands up. A provisioned board is a live identity
 > in the workshop account. Collect seat cards either way; they carry a login.
+
+## 25. Thank you
+
+The template's thank-you slide.
+
+> Notes. Questions. The repository URL and the guides are on the whiteboard.
+
+---
+
+## The one-hour deck
+
+Fifteen slides. Where a slide is the same as one in the full deck, only the difference is
+listed; its notes are adapted to the one-hour flow (no provisioning, boards arrive connected).
+
+| # | Slide | Relation to the full deck |
+|---|---|---|
+| 1 | Cover | Same headline; subhead says one-hour hands-on |
+| 2 | What you will do in the next hour | Cards: **Find** (your board, online), **Push**, **Prove**. Strip: Talk 10, Lab A 5, Lab B 15, Lab C 15, Talk 7, Close 8 |
+| 3 | What is on your desk | The board is described as flashed and provisioned; the seat card carries seat, device ID, dashboard name and login; the serial terminal is optional. One rule: power-cycle, never RESET |
+| 4 | Why run vision AI on a microcontroller | Same as full slide 4 |
+| 5 | The board: Renesas EK-RA8P1 | Same as full slide 5; notes fold in the firmware overview |
+| 6 | The headline capability | Same as full slide 8 |
+| 7 | What happens when you click Deploy | Same content as full slide 16, moved before the labs because there is no second talk |
+| 8 | Lab A: Find your board in the cloud (5 min) | New. Steps: plug in, sign in, open the dashboard named with your seat, read the values. A table of what the dashboard shows now: Connected, Camera FPS 55, Uptime counting, Active Model empty, inference 0. Checkpoint: Connected |
+| 9 | Lab B: Your first push (15 min) | New. Three cards: Deploy Face Detect (highlighted), Watch it land, Take Snapshot. The console lines are shown as optional. Checkpoint: face-v3 loaded and a snapshot with a box |
+| 10 | The model library, registered and ready to deploy | Same table as full slide 18 |
+| 11 | Lab C: Re-task the device, then prove it (15 min) | Steps C1 to C5 as full slide 19's 5a to 5e; the watch panel shows dashboard values (Active Model, Model Source cloud then flash, Uptime) instead of console lines |
+| 12 | Three numbers that prove it | Same as full slide 20 |
+| 13 | Bring your own model, and where to go next | Full slide 22's four steps, with three link cards (Quickstart, Developer Guide, the repository) below instead of the command panel |
+| 14 | Before you leave | Same as full slide 24; the "stays here" card notes that the facilitator erases boards attendees did not open a console on |
+| 15 | Thank you | Template thank-you slide |
+
+Speaker notes for the one-hour deck are in the file itself. The three that matter most:
+
+> Slide 8. Gate here: nobody starts Lab B until their dashboard shows Connected and Camera FPS
+> at 55. A board that is not connected after two minutes gets swapped for a spare immediately;
+> helpers carry them. No debugging at the seat in a one-hour format.
+
+> Slide 9. Do it on the big screen first with your own board: AI Models, Face Detect, Deploy,
+> pick the presenter device, dispatch, and let the room watch the dashboard change. Then let
+> them go. Deploy to your own device only. When most of the room has a box on a face, move to
+> Lab C.
+
+> Slide 11. Do C4 together as a room: everybody unplugs, counts to three, plugs in, and watches
+> Model Source change to flash. That is the applause moment.
