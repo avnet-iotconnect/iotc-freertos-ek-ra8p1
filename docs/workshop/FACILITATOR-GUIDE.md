@@ -368,8 +368,9 @@ Either way, on the day after:
 
 ## 13. Shorter and longer variants
 
-**One hour.** A different format rather than a cut: boards arrive provisioned, dashboards are
-pre-imported, and the hour is three labs of pushing models. See the
+**One hour.** A different format rather than a cut: a dedicated /IOTCONNECT instance with one
+entity and one user per seat, boards arrive provisioned, dashboards are pre-imported, and the
+hour is three labs of pushing models. See the
 [one-hour facilitator guide](ONE-HOUR-FACILITATOR-GUIDE.md) and
 [one-hour attendee guide](ONE-HOUR-ATTENDEE-GUIDE.md).
 

@@ -16,9 +16,12 @@ and a helper will come to you.
 | Field | What it is | Used in |
 |---|---|---|
 | **Seat** | Your seat number, `01` to `30`. It matches the sticker on your board | Everywhere |
-| **Device ID** | Your board's identity in the cloud, e.g. `ek-ra8p1-07` | Labs B and C (pick it when you deploy) |
-| **Dashboard** | The name of your dashboard, e.g. `Seat 07 - RA8P1 Vision AI` | Lab A |
-| **Login** | Your /IOTCONNECT sign-in for the workshop account | Lab A |
+| **Login** | Your /IOTCONNECT user for today, e.g. `user-7`. The password is on the back of the card | Lab A |
+| **Your board** | Your device's ID, e.g. `ek-ra8p1-07`. It is the only device your login can see | Labs B and C |
+| **Dashboard** | The name of your dashboard, e.g. `Seat 07 - RA8P1 Vision AI`. It is the only dashboard your login can see | Lab A |
+
+Your login lives in its own space in the workshop's /IOTCONNECT instance, with one board in it:
+yours. You cannot see or affect anyone else's, and nobody can push a model to your board but you.
 
 One rule for the hour: **power-cycle, never RESET.** To restart the board, unplug the USB-C cable
 and plug it back in. After the RESET button the LCD stays white until the next power cycle; the
@@ -30,10 +33,9 @@ rest of the board keeps running either way.
    from your laptop (or the USB power adapter) to the board's **DEBUG1** port. The board boots,
    gets an address, and connects to the cloud by itself in about 30 seconds. If the LCD is
    attached it shows the live camera view.
-2. **Sign in** at [console.iotconnect.io](https://console.iotconnect.io) with the login on your
-   seat card.
-3. **Open Dashboards** and pick the one named with your seat, for example
-   `Seat 07 - RA8P1 Vision AI`.
+2. **Sign in** at [console.iotconnect.io](https://console.iotconnect.io) as the user on your
+   seat card, for example `user-7`, with the password on the back.
+3. **Open Dashboards.** There is exactly one, named with your seat. Open it.
 4. **Read the values.** Camera FPS reads 55 and Uptime counts up. Active Model is empty and
    NPU Inference Time is zero: the board arrives with no model. You push the first one next.
 
@@ -42,13 +44,14 @@ rest of the board keeps running either way.
 the dashboard and the LCD show everything.
 
 **Checkpoint.** Your dashboard shows the device as Connected, Camera FPS 55, and Uptime counting.
+If you see more than one device or more than one dashboard, tell a helper.
 
 ## Lab B: Your first push (15 min)
 
-The models are already registered in the workshop account under **AI Models**.
+The models are already registered in the workshop instance under **AI Models**.
 
 1. Go to **AI Models**, open **RA8P1 Face Detect**, and choose **Deploy**.
-2. Select **your device only** (`ek-ra8p1-NN` from your seat card) and dispatch.
+2. **Select your board.** It is the only device in the list. Dispatch the deployment.
 3. **Watch it land.** Within seconds the dashboard's Active Model reads `face-v3`, the Model
    Source card says the model came from the cloud, and NPU Inference Time is about 5,800 µs.
 4. **Step in front of the camera.** The Detection State card switches to FACE DETECTED, the
@@ -76,7 +79,7 @@ your dashboard.
 The same board becomes a 1000-class image classifier, then an occupancy sensor, purely by
 pushing models. Keep the dashboard visible.
 
-1. **Deploy RA8P1 ImageNet Classifier v2** to your device. It is 3.1 MB, about seven times the
+1. **Deploy RA8P1 ImageNet Classifier v2** to your board. It is 3.1 MB, about seven times the
    face detector. Hold up a single object, centred and close to the camera: a coffee mug, a
    banana, a water bottle, your phone. The Detection / Class tile shows the top label. The NPU
    Inference Time chart steps from about 5,800 µs to about 40,000 µs, and Uptime keeps counting.
@@ -102,19 +105,19 @@ a step for every push, and Uptime never went to zero during a swap.
 Ask your facilitator which applies to you.
 
 - **The board stays with the workshop.** Leave it, the cables, and your seat card on the desk.
-  If you opened a serial console, type `erase` then `reboot` to clear the identity; otherwise
-  the facilitator will.
-- **The board goes home with you.** Leave it as it is tonight. The workshop account will be
-  closed after the event, so follow the [Quickstart](../QUICKSTART.md) to create your own
-  /IOTCONNECT trial account, then `erase`, `reboot`, and provision the board against it.
+  The facilitator clears the boards afterwards.
+- **The board goes home with you.** Leave it as it is tonight. The workshop instance will be
+  retired after the event, so follow the [Quickstart](../QUICKSTART.md) to create your own
+  /IOTCONNECT account, then `erase`, `reboot`, and provision the board against it.
 
 ## Troubleshooting
 
 | Symptom | Fix |
 |---|---|
-| The dashboard shows the device as Disconnected | Re-seat the Ethernet cable, then power-cycle. Still disconnected after a minute: raise your seat card. A helper will swap the board for a spare so you keep going |
-| You cannot find your dashboard | Dashboards, then search for your seat number. Still nothing: a helper has the list |
-| The model push never arrives | Check the deployment was dispatched to *your* device in AI Models. Re-push |
+| Your login is rejected | Check the password on the back of the card, and that you typed `user-7`, not `user-07`. Still rejected: raise your seat card; a helper has the list |
+| You see more than one device or dashboard | Tell a helper. Your own board is the one whose ID is on your card |
+| The dashboard shows the device as Disconnected | Re-seat the Ethernet cable, then power-cycle. Still disconnected after a minute: raise your seat card. A helper will swap the board, and the card, for a spare so you keep going |
+| The model push never arrives | Open the deployment in AI Models and confirm it was dispatched. Re-push |
 | Inference time stays at zero | No model is loaded. Push one from AI Models |
 | The LCD is white | Expected after a warm reset. Power-cycle the board |
 | Classifier labels look wrong | Hold one object, centred, close to the lens. ImageNet knows 1,000 specific objects, not scenes |

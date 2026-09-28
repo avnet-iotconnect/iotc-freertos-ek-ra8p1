@@ -6,14 +6,15 @@ Management and watch it change task in seconds, with no reflash and no reboot.
 
 Two formats. The **full workshop** (2 h 30 min) has attendees provision their own board over
 the serial console and adds live WebRTC video. The **one-hour format** moves provisioning into
-facilitator prep so the whole hour is spent pushing models.
+facilitator prep, in a dedicated /IOTCONNECT instance with one entity and one user per seat, so
+the whole hour is spent pushing models.
 
 | Document | For |
 |---|---|
 | [ATTENDEE-GUIDE.md](ATTENDEE-GUIDE.md) | Full workshop, attendee flow: six labs with checkpoints, from an unboxed board to a cloud-deployed model that survives a power cycle |
 | [FACILITATOR-GUIDE.md](FACILITATOR-GUIDE.md) | Full workshop, runbook: prep timeline, room and network requirements, account staging, flashing 30 boards, seat cards, run of show, contingencies, closing down |
 | [ONE-HOUR-ATTENDEE-GUIDE.md](ONE-HOUR-ATTENDEE-GUIDE.md) | One-hour format, attendee flow: three labs on a pre-provisioned board |
-| [ONE-HOUR-FACILITATOR-GUIDE.md](ONE-HOUR-FACILITATOR-GUIDE.md) | One-hour format, runbook: what moves into prep, the 60-minute run of show, contingencies |
+| [ONE-HOUR-FACILITATOR-GUIDE.md](ONE-HOUR-FACILITATOR-GUIDE.md) | One-hour format, runbook: the dedicated instance with one entity per seat, what moves into prep, the 60-minute run of show, contingencies |
 | [EK-RA8P1-workshop-deck.pptx](EK-RA8P1-workshop-deck.pptx) | Full workshop slide deck, 25 slides with speaker notes, on the Avnet PowerPoint template |
 | [EK-RA8P1-workshop-deck-1-hour.pptx](EK-RA8P1-workshop-deck-1-hour.pptx) | One-hour slide deck, 15 slides with speaker notes, on the Avnet PowerPoint template |
 | [PRESENTATION.md](PRESENTATION.md) | Both decks' content and speaker notes, slide by slide, in text |
@@ -52,9 +53,11 @@ facilitator prep so the whole hour is spent pushing models.
 
 ## Assumptions
 
-- One /IOTCONNECT company on the AWS backend, staged by the facilitator, with one device per
-  seat (created by the attendee in the full format, by the facilitator in the one-hour format).
-  The subscription must allow at least 34 devices.
+- Full format: one /IOTCONNECT company on the AWS backend, staged by the facilitator, where
+  each attendee creates their own device. One-hour format: a dedicated /IOTCONNECT instance
+  created for the event, with one entity per seat (`user-1` to `user-33`) holding one
+  pre-created device and one user login, so each attendee sees only their own board. Either
+  way the subscription must allow at least 34 devices.
 - Boards are pre-flashed by the facilitator with per-seat images. In the one-hour format they
   are also pre-provisioned, and attendees need nothing but a browser.
 - Attendees bring their own laptop (with a serial terminal in the full format, a browser only

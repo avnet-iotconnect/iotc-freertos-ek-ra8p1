@@ -404,19 +404,20 @@ The template's thank-you slide.
 ## The one-hour deck
 
 Fifteen slides. Where a slide is the same as one in the full deck, only the difference is
-listed; its notes are adapted to the one-hour flow (no provisioning, boards arrive connected).
+listed; its notes are adapted to the one-hour flow (a dedicated instance with one entity and
+one user per seat, no provisioning, boards arrive connected).
 
 | # | Slide | Relation to the full deck |
 |---|---|---|
 | 1 | Cover | Same headline; subhead says one-hour hands-on |
 | 2 | What you will do in the next hour | Cards: **Find** (your board, online), **Push**, **Prove**. Strip: Talk 10, Lab A 5, Lab B 15, Lab C 15, Talk 7, Close 8 |
-| 3 | What is on your desk | The board is described as flashed and provisioned; the seat card carries seat, device ID, dashboard name and login; the serial terminal is optional. One rule: power-cycle, never RESET |
+| 3 | What is on your desk | The board is described as flashed and provisioned; the seat card carries seat, login (`user-N`) and password, and the dashboard name, and the login sees exactly one device and one dashboard; the serial terminal is optional. One rule: power-cycle, never RESET |
 | 4 | Why run vision AI on a microcontroller | Same as full slide 4 |
 | 5 | The board: Renesas EK-RA8P1 | Same as full slide 5; notes fold in the firmware overview |
 | 6 | The headline capability | Same as full slide 8 |
 | 7 | What happens when you click Deploy | Same content as full slide 16, moved before the labs because there is no second talk |
-| 8 | Lab A: Find your board in the cloud (5 min) | New. Steps: plug in, sign in, open the dashboard named with your seat, read the values. A table of what the dashboard shows now: Connected, Camera FPS 55, Uptime counting, Active Model empty, inference 0. Checkpoint: Connected |
-| 9 | Lab B: Your first push (15 min) | New. Three cards: Deploy Face Detect (highlighted), Watch it land, Take Snapshot. The console lines are shown as optional. Checkpoint: face-v3 loaded and a snapshot with a box |
+| 8 | Lab A: Find your board in the cloud (5 min) | New. Steps: plug in, sign in as `user-N`, open the one dashboard, read the values. A table of what the dashboard shows now: Connected, Camera FPS 55, Uptime counting, Active Model empty, inference 0. Checkpoint: Connected |
+| 9 | Lab B: Your first push (15 min) | New. Three cards: Deploy Face Detect (highlighted; the board is the only device in the deploy list), Watch it land, Take Snapshot. The console lines are shown as optional. Checkpoint: face-v3 loaded and a snapshot with a box |
 | 10 | The model library, registered and ready to deploy | Same table as full slide 18 |
 | 11 | Lab C: Re-task the device, then prove it (15 min) | Steps C1 to C5 as full slide 19's 5a to 5e; the watch panel shows dashboard values (Active Model, Model Source cloud then flash, Uptime) instead of console lines |
 | 12 | Three numbers that prove it | Same as full slide 20 |
@@ -427,13 +428,15 @@ listed; its notes are adapted to the one-hour flow (no provisioning, boards arri
 Speaker notes for the one-hour deck are in the file itself. The three that matter most:
 
 > Slide 8. Gate here: nobody starts Lab B until their dashboard shows Connected and Camera FPS
-> at 55. A board that is not connected after two minutes gets swapped for a spare immediately;
-> helpers carry them. No debugging at the seat in a one-hour format.
+> at 55. Each login lives in its own entity, so the attendee sees one device and one dashboard
+> and cannot open the wrong one. A board that is not connected after two minutes gets swapped
+> for a spare immediately, and the helper hands over the spare seat card with it. No debugging
+> at the seat in a one-hour format.
 
 > Slide 9. Do it on the big screen first with your own board: AI Models, Face Detect, Deploy,
 > pick the presenter device, dispatch, and let the room watch the dashboard change. Then let
-> them go. Deploy to your own device only. When most of the room has a box on a face, move to
-> Lab C.
+> them go. The deploy dialog shows each attendee exactly one device, their own. When most of
+> the room has a box on a face, move to Lab C.
 
 > Slide 11. Do C4 together as a room: everybody unplugs, counts to three, plugs in, and watches
 > Model Source change to flash. That is the applause moment.
