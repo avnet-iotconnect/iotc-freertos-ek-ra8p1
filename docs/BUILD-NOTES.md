@@ -122,9 +122,18 @@ Five independent faults, any one of which kills networking. All fixed in-repo:
    the scheduler stays alive.
 
 Console: `print_to_console` is now mutex-serialized with a bounded TX
-wait; concurrent prints previously hit APP_ERROR_TRAP. MAC is the
-locally-administered 02:8a:9b:71:04:d2 (set in configuration.xml AND
-net_thread_entry.c). Note many home routers isolate Wi-Fi from wired —
+wait; concurrent prints previously hit APP_ERROR_TRAP. MAC was originally
+the fixed locally-administered 02:8a:9b:71:04:d2, duplicated in
+configuration.xml and net_thread_entry.c — which meant every board running
+this image presented the same address, so two on one LAN fought over the
+switch's MAC table, the DHCP lease and ARP. It is now 02:8a:9b plus three
+octets folded (FNV-1a) from the MCU's 128-bit unique ID via
+`R_BSP_UniqueIdGet()`, applied in `prv_mac_from_unique_id()` before
+`FreeRTOS_IPInit` — that call is what opens the driver and latches the
+address, so anything later is too late. The generated arrays
+(`g_ether0_mac_address`, `g_layer3_switch0_mac_address_port0/1`) are
+non-const and overwritten there, so ra_gen/ needs no patch. Note many home
+routers isolate Wi-Fi from wired —
 test connectivity from the board side (gateway ping), not from a Wi-Fi PC.
 
 ## Serial console
