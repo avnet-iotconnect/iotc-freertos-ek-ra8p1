@@ -392,8 +392,14 @@ device downloads and hot-swaps it with the stream still playing.
 > One viewer is supported at a time. If the first session after a boot stays black, click Stop
 > and Start once more and allow about 15 seconds for the connection to be established.
 
-The same commands are also available on the serial console, along with `show`, `erase`, and
-`reboot`. Type `help` to list them.
+The same commands are also available on the serial console, along with `show`, `erase`,
+`reboot`, and `quiet`. Type `help` to list them.
+
+> [!NOTE]
+> The console prints a periodic status report. It pauses on its own as soon as you start
+> typing and resumes about 20 seconds after your last keystroke, so you do not have to fight
+> it while entering commands or pasting a certificate. `quiet` silences it altogether, and
+> `quiet 0` brings it back.
 
 **Clearing a board.** The cloud identity is stored on the board, so a board that is passed on
 to someone else keeps working as your device. To remove it, type `erase` followed by `reboot`
@@ -407,6 +413,7 @@ in the serial console. The board returns to the unprovisioned state from
 | J-Link cannot find the device | Update the J-Link software to V9.38 or later, and select `R7KA8P1KF_CPU0`, not `_CPU1` |
 | No serial output | Select the J-Link CDC UART COM port, and check the speed is `230400`, not `115200` |
 | Typed characters are not accepted | Set the terminal to send CR or CR+LF line endings |
+| Console output scrolls too fast to read what you type | The status report pauses by itself while you type and resumes about 20 seconds after you stop. To silence it for good, type `quiet` |
 | A PEM paste is rejected as too large | Paste one PEM block per command — the certificate and the key separately |
 | The LCD is all white after flashing or a debugger reset | Expected. Power-cycle the board; the panel needs a cold start and a warm reset is not enough. Everything else keeps running |
 | No camera image | Re-seat the OV5640 camera board on J35; the flex cable must be fully latched at both ends |

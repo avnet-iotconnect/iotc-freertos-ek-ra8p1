@@ -245,3 +245,43 @@ void console_output_uart_callback(uart_callback_args_t *p_args)
     }
 }
 
+
+/***********************************************************************************************************************
+ * Periodic-chatter gate
+ **********************************************************************************************************************/
+
+/* Set by the 'quiet' CLI command. */
+static volatile bool s_quiet;
+
+void console_quiet_set(bool quiet)
+{
+    s_quiet = quiet;
+}
+
+bool console_quiet_get(void)
+{
+    return s_quiet;
+}
+
+bool console_report_due(uint32_t *p_last, uint32_t period_ms)
+{
+    /* Defined in src/iotc/iotc_cli.c: true while someone is typing at the
+     * prompt, or for a short grace period after. */
+    extern bool iotc_cli_is_interactive(void);
+
+    uint32_t now = (uint32_t) xTaskGetTickCount();
+
+    if (s_quiet || iotc_cli_is_interactive())
+    {
+        /* Hold the timer at "now" so the chatter does not burst out the
+         * instant the user stops typing. */
+        *p_last = now;
+        return false;
+    }
+    if ((now - *p_last) < pdMS_TO_TICKS(period_ms))
+    {
+        return false;
+    }
+    *p_last = now;
+    return true;
+}

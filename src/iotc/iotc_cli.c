@@ -42,6 +42,32 @@ static void prv_print(const char *s)
     print_to_console((char *) s);
 }
 
+/*
+ * Tick of the last character typed at the prompt. The periodic status chatter
+ * checks this (console_report_due) and holds off while someone is interacting,
+ * so typed input - and a pasted certificate above all - stays readable. Zero
+ * means nothing has ever been typed, so a board nobody touches still reports.
+ */
+static volatile uint32_t s_last_input_tick;
+#define CLI_INTERACTIVE_GRACE_MS (20000U)
+
+static void prv_mark_input(void)
+{
+    uint32_t t = (uint32_t) xTaskGetTickCount();
+    s_last_input_tick = (0U == t) ? 1U : t; /* 0 is reserved for "never" */
+}
+
+bool iotc_cli_is_interactive(void)
+{
+    uint32_t t = s_last_input_tick;
+
+    if (0U == t)
+    {
+        return false;
+    }
+    return (((uint32_t) xTaskGetTickCount() - t) < pdMS_TO_TICKS(CLI_INTERACTIVE_GRACE_MS));
+}
+
 /* Read one line (echo on). Returns length, or -1 if the line overflowed. */
 static int prv_read_line(char *buf, size_t size, bool echo)
 {
@@ -49,6 +75,7 @@ static int prv_read_line(char *buf, size_t size, bool echo)
     for (;;)
     {
         int c = console_read_char(0xFFFFFFFFu);
+        prv_mark_input();
         if ((c == '\r') || (c == '\n'))
         {
             if (echo)
@@ -161,7 +188,8 @@ static void prv_help(void)
               "  reboot                  restart the device (LCD needs a power cycle)\r\n"
               "  snapshot                capture + upload a snapshot now\r\n"
               "  brightness <0|1>        camera exposure: 0 normal, 1 bright\r\n"
-              "  led-auto [0|1]          green LED follows detections (no arg toggles)\r\n");
+              "  led-auto [0|1]          green LED follows detections (no arg toggles)\r\n"
+              "  quiet [0|1]             silence the periodic status reports\r\n");
 }
 
 static void prv_handle(char *line)
@@ -227,6 +255,37 @@ static void prv_handle(char *line)
         }
         led_auto_set(on);
         prv_print(on ? "detection LED enabled\r\n" : "detection LED disabled\r\n");
+    }
+    else if (0 == strncmp(line, "quiet", 5) &&
+             ((line[5] == '\0') || (line[5] == ' ')))
+    {
+        const char *arg = &line[5];
+        bool quiet;
+
+        while (' ' == *arg)
+        {
+            arg++;
+        }
+        if ('\0' == *arg)
+        {
+            quiet = !console_quiet_get(); /* no argument: toggle */
+        }
+        else if (('1' == *arg) || (0 == strcmp(arg, "on")))
+        {
+            quiet = true;
+        }
+        else if (('0' == *arg) || (0 == strcmp(arg, "off")))
+        {
+            quiet = false;
+        }
+        else
+        {
+            prv_print("use: quiet | quiet 0 | quiet 1\r\n");
+            return;
+        }
+        console_quiet_set(quiet);
+        prv_print(quiet ? "status reports silenced\r\n"
+                        : "status reports enabled\r\n");
     }
     else if (0 == strncmp(line, "set env ", 8))
     {
