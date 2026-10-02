@@ -124,6 +124,7 @@ HttpResult_t Http_Send( NetworkingCorehttpContext_t * pHttpCtx,
     char * pSig;
     size_t sigLength;
     TlsTransportStatus_t xNetworkStatus;
+    uint8_t isTlsConnectionEstablished = 0U;
     SigV4Credentials_t sigv4Credential;
 
     if( ( pRequest == NULL ) || ( pResponse == NULL ) )
@@ -189,6 +190,10 @@ HttpResult_t Http_Send( NetworkingCorehttpContext_t * pHttpCtx,
         {
             LogError( ( "Fail to connect the host: %s:%u", pHttpCtx->hostName, 443U ) );
             ret = NETWORKING_COREHTTP_RESULT_FAIL_CONNECT;
+        }
+        else
+        {
+            isTlsConnectionEstablished = 1U;
         }
     }
 
@@ -439,7 +444,14 @@ HttpResult_t Http_Send( NetworkingCorehttpContext_t * pHttpCtx,
         }
     }
 
-    KVSTLS_Disconnect( &pHttpCtx->xTlsNetworkContext );
+    /* Patched: only tear down a session that was established. KVSTLS_Connect
+     * already frees the TLS context when it fails, and a second free asserts in
+     * the FSP mbedtls_ctr_drbg_free (NULL mutex handle), hard-faulting the
+     * device whenever the signaling endpoint is unreachable. */
+    if( isTlsConnectionEstablished != 0U )
+    {
+        KVSTLS_Disconnect( &pHttpCtx->xTlsNetworkContext );
+    }
 
     return ret;
 }

@@ -43,9 +43,10 @@ char sprintf_buffer[BUFFER_LINE_LENGTH] = {};
  ***************************************************************************************************************************/
 static uint8_t s_rx_buf;
 
-/* Interrupt-fed receive ring for the provisioning CLI. Sized so a pasted
- * PEM block at 230400 baud cannot overrun between reader wakeups. */
-#define CONSOLE_RX_RING_SIZE 1024
+/* Interrupt-fed receive ring for the provisioning CLI. Sized to hold a whole
+ * PEM paste (up to IOTC_CONFIG_PEM_MAX) even while the low-priority CLI task
+ * is starved, e.g. during a TLS handshake. */
+#define CONSOLE_RX_RING_SIZE 8192
 static volatile uint8_t  s_rx_ring[CONSOLE_RX_RING_SIZE];
 static volatile uint32_t s_rx_head;
 static volatile uint32_t s_rx_tail;
@@ -245,3 +246,43 @@ void console_output_uart_callback(uart_callback_args_t *p_args)
     }
 }
 
+
+/***********************************************************************************************************************
+ * Periodic-chatter gate
+ **********************************************************************************************************************/
+
+/* Set by the 'quiet' CLI command. */
+static volatile bool s_quiet;
+
+void console_quiet_set(bool quiet)
+{
+    s_quiet = quiet;
+}
+
+bool console_quiet_get(void)
+{
+    return s_quiet;
+}
+
+bool console_report_due(uint32_t *p_last, uint32_t period_ms)
+{
+    /* Defined in src/iotc/iotc_cli.c: true while someone is typing at the
+     * prompt, or for a short grace period after. */
+    extern bool iotc_cli_is_interactive(void);
+
+    uint32_t now = (uint32_t) xTaskGetTickCount();
+
+    if (s_quiet || iotc_cli_is_interactive())
+    {
+        /* Hold the timer at "now" so the chatter does not burst out the
+         * instant the user stops typing. */
+        *p_last = now;
+        return false;
+    }
+    if ((now - *p_last) < pdMS_TO_TICKS(period_ms))
+    {
+        return false;
+    }
+    *p_last = now;
+    return true;
+}

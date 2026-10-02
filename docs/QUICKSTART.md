@@ -25,8 +25,8 @@ Purchase the kit: [EK-RA8P1 Evaluation Kit for RA8P1 MCU Group](https://www.rene
 ## 1. Introduction
 
 This guide takes the [Renesas EK-RA8P1](https://www.renesas.com/en/design-resources/boards-kits/ek-ra8p1)
-from unboxing to a connected device with a live /IOTCONNECT dashboard, using a **prebuilt
-binary** — no toolchain and no source build required.
+from unboxing to a connected device with a live /IOTCONNECT dashboard, using a prebuilt
+binary — no toolchain and no source build required.
 
 The board runs camera vision inference on its Ethos-U55 NPU and connects to /IOTCONNECT over
 Gigabit Ethernet. Once connected you will deploy an AI model from the cloud, capture an
@@ -44,40 +44,43 @@ To build the same application from source, see the [Developer Guide](DEVELOPER-G
 
 * [EK-RA8P1 Evaluation Kit](https://www.renesas.com/en/design-resources/boards-kits/ek-ra8p1),
   which includes the board, the OV5640 camera expansion board, the 7-inch LCD, and the cables
-* A USB-C cable to the board's **DEBUG1** port (included in the kit)
+* A USB-C cable to the board's DEBUG1 port (included in the kit)
 * An Ethernet cable to a network with DHCP and internet access (included in the kit)
-* PC with Windows 10/11
+* PC with Windows 10/11 or Linux (tested on Ubuntu 24.04)
 
 > [!NOTE]
-> The 7-inch LCD is **optional**. With it attached you get live video and detection overlays on
+> The 7-inch LCD is optional. With it attached you get live video and detection overlays on
 > the board. Without it the device runs headless and the /IOTCONNECT dashboard becomes the
 > interface — telemetry as the data feed and cloud-triggered snapshots as the viewfinder.
 
 ### Software
 
-* [SEGGER J-Link Software](https://www.segger.com/downloads/jlink/) — **V9.38 or later**
-* A serial terminal application such as [Tera Term](https://sourceforge.net/projects/tera-term/)
-  (Recommended) or a browser-based version such as
+* [SEGGER J-Link Software](https://www.segger.com/downloads/jlink/) — V9.38 required
+
+> [!NOTE]
+> Both newer and older versions have been tested and failed to flash the EK-RA8P1. 9.38 is the recommended version for use as it has been tested and succeeded.
+
+* A serial terminal application such as [PuTTY](https://www.chiark.greenend.org.uk/~sgtatham/putty/latest.html)
+  (Recommended; on Ubuntu, `sudo apt install putty`) or a browser-based version such as
   [Google Chrome Labs Serial Terminal](https://googlechromelabs.github.io/serial-terminal/)
 * The prebuilt demo image:
   [`iotc-vision-ai-ek-ra8p1-demo.hex`](../firmware/iotc-vision-ai-ek-ra8p1-demo.hex?raw=1)
-  (**must** Right-Click the link, Save As). You will also need the device template and
+  (must Right-Click the link, Save As). You will also need the device template and
   dashboard JSON from this repository, linked in the steps below
-* An /IOTCONNECT account with an **AWS** backend (see [Step 5](#5-create-iotconnect-account))
-
-> [!IMPORTANT]
-> J-Link software earlier than V9.38 does not recognize the RA8P1 and will fail to connect.
 
 ## 3. Hardware Setup
 
-1. **Seat** the OV5640 camera expansion board on connector **J35** and latch the flex cable at
-   both ends.
-2. **Connect** the Ethernet cable from the board to your network.
-3. **Connect** the USB-C cable from your PC to the board's **DEBUG1** port. This single port is
-   both the on-board J-Link debug probe and the serial console.
+1. Seat the OV5640 camera expansion board on connector J35 and close the latch of the connector to secure the flex cable. 
+2. If you are using the LCD, plug the Parallel Graphics Expansion Board onto connector J1 with
+   pin 1 aligned to pin 1 on the EK-RA8P1. Then check the wide ribbon cable from the glass panel
+   into the expansion board: open the connector latch, push the cable fully and squarely in, and
+   close the latch. The cable can work loose in shipping, which leaves the screen white.
+3. Connect the Ethernet cable from the board to your network.
+4. Connect the USB-C cable from your PC to the board's DEBUG1 port. This single port provides power and communications.
 
 The board powers up from the USB-C connection. Once enumerated, a J-Link CDC UART COM port
-appears on your PC — note which COM port it is.
+appears on your PC — note which COM port it is. On Linux the port is usually `/dev/ttyACM0`; if the terminal reports
+permission denied, run `sudo usermod -aG dialout $USER` and log out and back in.
 
 Serial terminal settings:
 
@@ -88,27 +91,69 @@ Serial terminal settings:
 * Stop Bits: `1`
 * Flow Control: `none`
 
+In PuTTY, select Connection type `Serial`, enter the COM port under Serial line and `230400`
+under Speed. The data bits, parity, stop bits and flow control are under Connection → Serial.
+
 > [!IMPORTANT]
-> The console runs at `230400` baud, not the more common `115200`. Set your terminal to send
-> **CR** or **CR+LF** line endings, or the board will not accept typed commands.
+> The console runs at `230400` baud, not the more common `115200`. Set your terminal to send CR or CR+LF line endings, or the board will not accept typed commands.
 
 ## 4. Flash the Firmware
 
-We will program the prebuilt demo image into the board's MRAM using J-Flash Lite, which is
-installed with the J-Link software. This guide was tested with J-Link software v9.38.
+We will program the prebuilt demo image into the board's MRAM with the J-Link software. Two
+options are given below, one using the J-Flash Lite window and one using the J-Link Commander
+command line. Both produce the same result, so use whichever you prefer.
 
-1. **Start** J-Flash Lite.
-2. **Set** Device to `R7KA8P1KF_CPU0`, Interface to `SWD`, and Speed to `4000 kHz`.
+Download the demo image
+[`iotc-vision-ai-ek-ra8p1-demo.hex`](../firmware/iotc-vision-ai-ek-ra8p1-demo.hex?raw=1)
+(must Right-Click the link, Save As).
 
-   > [!CAUTION]
-   > Select `R7KA8P1KF_CPU0`. `CPU0` is the Cortex-M85 that runs this application — programming
-   > `_CPU1` will not produce a working device.
+> [!CAUTION]
+> Whichever option you use, select the device `R7KA8P1KF_CPU0`. `CPU0` is the Cortex-M85 that
+> runs this application — programming `_CPU1` will not produce a working device.
 
-3. **Click** the `...` button next to Data File and select the demo image you downloaded,
-   [`iotc-vision-ai-ek-ra8p1-demo.hex`](../firmware/iotc-vision-ai-ek-ra8p1-demo.hex?raw=1)
-   (**must** Right-Click the link, Save As).
-4. **Click** the **Program Device** button. Programming takes about 15 seconds.
-5. **Unplug** the USB-C cable and **plug it back in**.
+### Option A: J-Flash Lite (GUI)
+
+1. Start J-Flash Lite.
+2. Set Device to `R7KA8P1KF_CPU0`, Interface to `SWD`, and Speed to `4000 kHz`.
+3. Click the `...` button next to Data File and select the demo image you downloaded.
+4. Click the Program Device button. Programming takes about 15 seconds.
+5. Unplug the USB-C cable, wait a second, and then plug it back in.
+
+> [!NOTE]
+> On Linux, J-Flash Lite may end with `ERROR: Could not download file.` even though the
+> image was programmed correctly. Continue to the next step and if the board boots and prints
+> to the serial console then you know the flash succeeded.
+
+### Option B: J-Link Commander (command line)
+
+1. Create a file named `flash.jlink` in the folder where you saved the demo image, containing:
+
+   ```
+   r                                         // reset the MCU
+   h                                         // halt the core
+   loadfile iotc-vision-ai-ek-ra8p1-demo.hex // program MRAM (~10 s)
+   r                                         // reset so the new image boots cleanly
+   g                                         // go (release the core)
+   q                                         // quit, leaving the target running
+   ```
+
+2. Open a terminal in that folder and run the command for your platform:
+
+   Windows:
+
+   ```
+   JLink.exe -device R7KA8P1KF_CPU0 -if SWD -speed 4000 -AutoConnect 1 -CommandFile flash.jlink
+   ```
+
+   Linux:
+
+   ```
+   JLinkExe -device R7KA8P1KF_CPU0 -if SWD -speed 4000 -AutoConnect 1 -CommandFile flash.jlink
+   ```
+
+3. Unplug the USB-C cable, wait a second, and then plug it back in.
+
+### After flashing
 
 > [!IMPORTANT]
 > Power-cycle the board rather than pressing the RESET button, here and any time you restart the
@@ -116,40 +161,21 @@ installed with the J-Link software. This guide was tested with J-Link software v
 > the panel stays white — everything else keeps running, but the display will be blank until the
 > next power cycle.
 
-<details>
-<summary>Alternative: flashing from the command line with J-Link Commander</summary>
-
-Create a file named `flash.jlink` containing:
-
-```
-r                                                  // reset the MCU
-h                                                  // halt the core
-loadfile firmware/iotc-vision-ai-ek-ra8p1-demo.hex // program MRAM (~10 s)
-r                                                  // reset so the new image boots cleanly
-g                                                  // go (release the core)
-q                                                  // quit, leaving the target running
-```
-
-Then run:
-
-```
-JLink.exe -device R7KA8P1KF_CPU0 -if SWD -speed 4000 -AutoConnect 1 -CommandFile flash.jlink
-```
-
-Power-cycle the board afterwards, for the reason given above.
-
-</details>
-
-**Verify the board is running.** Open your serial terminal with the settings from
-[Step 3](#3-hardware-setup). Within a few seconds you should see a repeating processing report:
+Verify the board is running. Open your serial terminal with the settings from
+[Step 3](#3-hardware-setup). Within a few seconds you should see a processing report, repeated every 5 seconds:
 
 ```
 FD: no built-in model in this build and no stored model - push one from IOTCONNECT AI Models
 Processing time:
   Camera image capture vsync period :   18 ms,   55 fps
+  AI inference pre processing time  :   15 ms,   66 fps
   AI inference time (Ethos-U55)     :    0 us,    0 fps
+  LCD display vsync period          :   34 ms,   29 fps
 IOTC: no credentials provisioned - use the serial CLI (type 'help') ...
 ```
+
+The report pauses while you type and resumes about 20 seconds after your last keystroke, so
+commands you enter in the following steps are not interrupted by it.
 
 Both messages are expected on a freshly flashed board. The camera is running at 55 fps.
 Inference reads zero because this image carries no compiled-in model — its flash budget went to
@@ -164,7 +190,7 @@ If the LCD is attached, it now shows the live camera image.
 An /IOTCONNECT account with an AWS backend is required.  If you need to create an account, a free trial subscription is available.
 The free subscription may be obtained directly from [iotconnect.io](https://iotconnect.io) or through the AWS Marketplace.
 
-* Option #1 **(Recommended)**
+* Option #1 (Recommended)
 /IOTCONNECT via [AWS Marketplace](https://github.com/avnet-iotconnect/avnet-iotconnect.github.io/blob/main/documentation/iotconnect/subscription/iotconnect_aws_marketplace.md) - 60 day trial; AWS account creation required
 
 * Option #2
@@ -177,7 +203,7 @@ Login to the platform by navigating to [console.iotconnect.io](https://console.i
 
 ## 6. Acquire Account Information
 
-The Company ID (**CPID**) and Environment (**ENV**) variables identifying your /IOTCONNECT
+The Company ID (CPID) and Environment (ENV) variables identifying your /IOTCONNECT
 account must be configured for the device. Take note of these values for later reference
 located in the "Settings" -> "Key Vault" section of the platform.
 
@@ -187,14 +213,14 @@ located in the "Settings" -> "Key Vault" section of the platform.
 
 A device template defines the telemetry attributes and commands this demo uses.
 
-* **Download** the premade device template
+* Download the premade device template
   [`ra8p1-vision-ai-template.json`](../templates/ra8p1-vision-ai-template.json?raw=1)
-  (**must** Right-Click the link, Save As)
-* **Import** the template into your /IOTCONNECT instance following the
+  (must Right-Click the link, Save As, and save as a `.json` file type)
+* Import the template into your /IOTCONNECT instance following the
   [Importing a Device Template](https://github.com/avnet-iotconnect/avnet-iotconnect.github.io/blob/main/documentation/iotconnect/import_device_template.md)
   guide
 
-The imported template is named **RA8P1 Vision AI** with the template code `ra8p1vis`.
+The imported template is named RA8P1 Vision AI with the template code `ra8p1vis`.
 
 > [!IMPORTANT]
 > Import the supplied template rather than creating one by hand. The numeric attributes must be
@@ -203,21 +229,21 @@ The imported template is named **RA8P1 Vision AI** with the template code `ra8p1
 
 ## 8. Create a Device
 
-* **Create** a new device following the
+* Create a new device following the
   [Create a New Device](https://github.com/avnet-iotconnect/avnet-iotconnect.github.io/blob/main/documentation/iotconnect/create_new_device.md)
   guide, with these values:
-  * **Unique ID**: a name of your choosing, such as `ek-ra8p1-01` — you will type this into the
+  * Unique ID: a name of your choosing, such as `ek-ra8p1-01` — you will type this into the
     board in the next step
-  * **Entity**: your company's entity (for new accounts, there is only one option)
-  * **Template**: `RA8P1 Vision AI (ra8p1vis)`
-  * **Device Certificate**: `Auto-generated`
-* **Click** `Save & View`
-* **Download** the device's certificate package from the device page and unzip it. It contains
+  * Entity: your company's entity (for new accounts, there is only one option)
+  * Template: `RA8P1 Vision AI (ra8p1vis)`
+  * Device Certificate: `Auto-generated`
+* Click `Save & View`
+* Download the device's certificate package from the device page and unzip it. It contains
   the device certificate and private key PEM files.
 
 > [!CAUTION]
 > The template enables video streaming (WebRTC), so the platform provisions a Kinesis Video
-> Streams signaling channel **at the moment the device is created**. This cannot be added to an
+> Streams signaling channel at the moment the device is created. This cannot be added to an
 > existing device later — a device created from a different template will never stream video.
 
 ## 9. Configure the Board
@@ -225,27 +251,36 @@ The imported template is named **RA8P1 Vision AI** with the template code `ra8p1
 We will store the cloud identity on the board over the serial console. The values are written to
 the board's OSPI flash and survive power cycles, so this is a one-time step per board.
 
-1. In the serial terminal, **press** Enter, then type `help` to list the provisioning commands.
-2. **Enter** your account values, pressing Enter after each line and substituting your own:
+1. In the serial terminal, press Enter, then type `help` to list the provisioning commands.
+2. Enter your account values, pressing Enter after each line and substituting your own:
 
    ```
-   set env poc
+   set env <your environment>
+   ```
+   ```
+   set duid <your device ID>
+   ```
+   ```
    set cpid <your CPID>
-   set duid ek-ra8p1-01
    ```
 
    `env` and `cpid` come from the Key Vault in [Step 6](#6-acquire-account-information); `duid`
    is the Unique ID from [Step 8](#8-create-a-device).
 
-3. **Type** `set cert`, then **paste** the entire device certificate PEM, including the
+3. Unzip the downloaded certificate zip folder and then open the included `.crt` file in 
+a text editor.
+4. Type `set cert`, then paste the entire device certificate PEM, including the
    `-----BEGIN CERTIFICATE-----` and `-----END CERTIFICATE-----` lines. Capture ends
-   automatically at the END line and the board replies `certificate stored`.
-4. **Type** `set key`, then **paste** the private key PEM the same way.
-5. **Type** `show` to review what is stored (the key is redacted), then **type** `apply` to
+   automatically at the END line and the board replies `certificate stored`. Nothing is echoed
+   while you paste. To abort, press Enter on an empty line or type `cancel`.
+5. Similarly, open the included `.pem` file in a text editor.
+6. Type `set key`, then paste the private key PEM the same way.
+7. Type `show` to review what is stored (the key is redacted), then type `apply` to
    connect.
 
-> [!NOTE]
-> Paste one PEM block per command. Pasting both at once will be rejected as too large.
+> [!TIP]
+> In PuTTY, Ctrl+V does not paste. Highlight the whole PEM block in your text editor, then
+> paste with a right-click (Windows) or a middle-click or Shift+Insert (Linux).
 
 ## 10. Verify Data
 
@@ -258,28 +293,21 @@ FU: selftest creds fetch -> 0 (OK)
 ```
 
 Switch back to the /IOTCONNECT browser window and verify the device status is displaying as
-`Connected`. Open the device and select the **Live Data** tab to watch telemetry arriving every
+`Connected`. Open the device and select the Live Data tab to watch telemetry arriving every
 10 seconds.
 
-From now on the board connects automatically at every boot — there is no need to repeat
+From now on the board connects automatically at every boot. There is no need to repeat
 [Step 9](#9-configure-the-board).
 
 ## 11. Import a Dashboard
 
-* **Upload** the artwork from [`dashboard/images/`](../dashboard/images/) to your public image
-  bucket under `images/renesas/ek-ra8p1/`
-
-  > [!IMPORTANT]
-  > The image keys are case-sensitive and must match exactly, or the dashboard's state cards
-  > render blank.
-
-* **Download** the premade dashboard
+* Download the premade dashboard
   [`ra8p1-vision-ai-dashboard.json`](../dashboard/ra8p1-vision-ai-dashboard.json?raw=1)
-  (**must** Right-Click the link, Save As)
-* **Select** `Create Dashboard` from the top of the page
-* **Select** the `Import Dashboard` option and select `RA8P1 Vision AI` for **template** and
-  `ek-ra8p1-01` for **device**
-* **Enter** a name (such as `RA8P1 Vision AI Demo Dashboard`) and complete the import
+  (must Right-Click the link, Save As, and save as a `.json` file type)
+* Select `Create Dashboard` from the top of the page
+* Select the `Import Dashboard` option and select `RA8P1 Vision AI` for template and
+  `ek-ra8p1-01` for device
+* Enter a name (such as `RA8P1 Vision AI Demo Dashboard`) and complete the import
 
 You will now be in the dashboard edit mode. You can add/remove widgets or just click `Save` in the upper-right corner to exit the edit mode.
 
@@ -291,20 +319,27 @@ The firmware ships with no compiled-in model, so this step is required before th
 detect anything. Deploying a model from the cloud is also the headline capability of this demo:
 the device swaps models between two inferences, with no reflash and no reboot.
 
-**Register the model** (one-time per model):
+1. In the vertical toolbar on the left side of the UI in /IOTCONNECT navigate to AI Models 
+(the icon with 3 blocks) and then select `Create Model`
+2. Enter a name such as `RA8P1 Face Detect` and the code `ra8p1face`
 
-* **Navigate** to **AI Models** and **select** `Create Model`
-* **Set** Model Type to `AI Model` and Variant to `Renesas`
-* **Enter** a name such as `RA8P1 Face Detect` and the code `ra8p1face`
+> [!NOTE]
+> Model codes must be 3–10 characters.
 
-  > [!NOTE]
-  > Model codes must be 3–10 characters.
+3. Set the version number of your choice
+4. Set Model Type to `AI Model` and Variant to `Renesas`
+5. Upload [`tools/models/face-v3_v3.zip`](tools/models/face-v3_v3.zip) from this repository
+6. Leave "Convert through sagemaker?" unchecked
 
-* **Upload** [`tools/models/face-v3_v3.zip`](../tools/models/) from this repository
+To deploy the model to your device, go back to the AI Models icon on the vertical toolbar and 
+click on "Push Model." 
 
-**Deploy it:**
-
-* From **AI Models**, **deploy** `RA8P1 Face Detect` to your device
+1. For "Model" choose `RA8P1 Face Detect`
+2. The "Version" number should auto-fill
+3. For "Device Template" choose `RA8P1 Vision AI`
+4. Change the radio button to "Selected devices"
+5. Click "Select Device" and then choose your device's Unique ID and click "Save"
+6. Click "Push Model"
 
 Watch the serial console. The download, validation, and hot-swap take a few seconds:
 
@@ -319,7 +354,7 @@ FD: 1 face(s): [25,63 49x58 90%]
 Step in front of the camera. The dashboard's Detection State card switches to FACE DETECTED and
 the Faces gauge moves; on the LCD, green boxes track the face.
 
-**Re-task the device.** Four more models are bundled in
+Four more models are bundled in
 [`tools/models/`](../tools/models/). Register and deploy them exactly as above to change what
 the device does, without a reflash and without a reboot:
 
@@ -341,25 +376,15 @@ rebooted.
 > image has no compiled-in model, so after a revert inference idles until you push another
 > model.
 
-**The model survives power loss.** Deployed models are written to the board's OSPI flash.
-Remove power from the board and reconnect it — without any reprovisioning, it boots straight
-back into the model you pushed and reconnects to the cloud:
+> [!NOTE]
+> The model survives power loss. Deployed models are written to the board's OSPI non-volatile flash.
 
-```
-FD: model "face-v3" v3 (flash, 441088 bytes) loaded: face detector, ethos-u: yes
-IOTC: starting (env=poc duid=ek-ra8p1-01, credentials: stored)
-IOTC: connected
-```
 
-Note `flash` in place of `cloud` — the model came from the board's own storage this time.
+## 13. Using the Demo+
 
-For a narrated walkthrough of the full model library, see the [Demo Guide](DEMO-GUIDE.md).
+Commands are sent from the device's Commands panel or from the dashboard's command widget.
 
-## 13. Using the Demo
-
-Commands are sent from the device's **Commands** panel or from the dashboard's command widget.
-
-**Capture a snapshot.** Send the `snapshot` command. Within about 10 seconds the dashboard's
+Capture a snapshot. Send the `snapshot` command. Within about a minute the dashboard's
 Latest Snapshot widget shows a color photograph of what the camera saw, with the detection
 boxes drawn onto it and tagged with the detection results and performance figures at the
 moment of capture. The board annotated the image, PNG-encoded it, and uploaded it to S3 with
@@ -368,7 +393,7 @@ in the path. On a headless installation this is the viewfinder.
 
 | Command | Effect |
 |---|---|
-| `snapshot` | Captures what the camera sees, draws the detection boxes on it, and uploads an annotated color PNG to Telemetry Files (about 10 seconds) |
+| `snapshot` | Captures what the camera sees, draws the detection boxes on it, and uploads an annotated color PNG to Telemetry Files (about a minute) |
 | `set-interval <seconds>` | Telemetry period; the default is 10 seconds |
 | `model-info` | Acknowledges with the active model's name, version, source, and size |
 | `model-revert` | Clears the stored model; inference idles until the next model is pushed |
@@ -381,8 +406,8 @@ in the path. On a headless installation this is the viewfinder.
 > Everything else — telemetry, video, model storage — comes back normally. Prefer a power
 > cycle when the display is part of what you are showing.
 
-**Live video.** Open the device and select the **Video Streaming** tab, then click
-**Start Video**. Within a few seconds the browser negotiates a WebRTC session with the board and
+Live video. Open the device and select the Video Streaming tab, then click
+Start Video. Within a few seconds the browser negotiates a WebRTC session with the board and
 the camera's live view appears — H.264 encoded in software on the Cortex-M85 at 320x240, roughly
 8–10 frames per second. Inference and telemetry keep running while the stream is live, and you
 can deploy a model from [Step 12](#12-deploy-an-ai-model) without stopping the video — the
@@ -392,10 +417,16 @@ device downloads and hot-swaps it with the stream still playing.
 > One viewer is supported at a time. If the first session after a boot stays black, click Stop
 > and Start once more and allow about 15 seconds for the connection to be established.
 
-The same commands are also available on the serial console, along with `show`, `erase`, and
-`reboot`. Type `help` to list them.
+The same commands are also available on the serial console, along with `show`, `erase`,
+`reboot`, and `quiet`. Type `help` to list them.
 
-**Clearing a board.** The cloud identity is stored on the board, so a board that is passed on
+> [!NOTE]
+> The console prints a periodic status report. It pauses on its own as soon as you start
+> typing and resumes about 20 seconds after your last keystroke, so you do not have to fight
+> it while entering commands or pasting a certificate. `quiet` silences it altogether, and
+> `quiet 0` brings it back.
+
+Clearing a board. The cloud identity is stored on the board, so a board that is passed on
 to someone else keeps working as your device. To remove it, type `erase` followed by `reboot`
 in the serial console. The board returns to the unprovisioned state from
 [Step 4](#4-flash-the-firmware), ready to be configured for a different account.
@@ -404,11 +435,15 @@ in the serial console. The board returns to the unprovisioned state from
 
 | Symptom | Fix |
 |---|---|
-| J-Link cannot find the device | Update the J-Link software to V9.38 or later, and select `R7KA8P1KF_CPU0`, not `_CPU1` |
+| J-Link cannot find the device, or programming fails | Use J-Link software V9.38 (newer and older versions fail on this board), and select `R7KA8P1KF_CPU0`, not `_CPU1` |
 | No serial output | Select the J-Link CDC UART COM port, and check the speed is `230400`, not `115200` |
 | Typed characters are not accepted | Set the terminal to send CR or CR+LF line endings |
+| Console output scrolls too fast to read what you type | The status report pauses by itself while you type and resumes about 20 seconds after you stop. To silence it for good, type `quiet` |
 | A PEM paste is rejected as too large | Paste one PEM block per command — the certificate and the key separately |
+| `error: that is not a certificate PEM` (or `private key PEM`) | The key was pasted at `set cert`, or the certificate at `set key`. Nothing was stored; repeat with the right file |
+| Nothing happens when pasting a PEM in PuTTY | Ctrl+V does not paste in PuTTY. See the tip in [Step 9](#9-configure-the-board) |
 | The LCD is all white after flashing or a debugger reset | Expected. Power-cycle the board; the panel needs a cold start and a warm reset is not enough. Everything else keeps running |
+| The LCD stays white even after a power cycle | Re-seat the ribbon cable from the glass panel into the expansion board (open the latch, push the cable fully in, close the latch), and check that the expansion board's pin 1 lines up with pin 1 of J1 |
 | No camera image | Re-seat the OV5640 camera board on J35; the flex cable must be fully latched at both ends |
 | The LCD stays blank | The LCD is optional and the demo runs headless; if it is attached, check both flat cables |
 | The device connects but the dashboard shows `null` | Import the supplied template rather than creating one by hand — numeric attributes must be DECIMAL |

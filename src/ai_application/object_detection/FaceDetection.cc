@@ -537,7 +537,10 @@ vision_ai_app_err_t face_detection_run(void)
         s_box_count++;
     }
 
-    if (s_box_count > 0) {
+    /* One line per inference buried anything typed at the CLI the moment a
+     * face was in frame. Rate limited, and silent while someone is typing. */
+    static uint32_t s_last_detect_report;
+    if ((s_box_count > 0) && console_report_due(&s_last_detect_report, 2000U)) {
         FD_PRINT("FD: %u face(s):", (unsigned) s_box_count);
         for (uint32_t i = 0; i < s_box_count; i++) {
             FD_PRINT(" [%d,%d %dx%d %d%%]", s_boxes[i].x, s_boxes[i].y,

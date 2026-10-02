@@ -17,8 +17,18 @@
 #include "common_util.h"
 #include "console_output/console_output.h"
 
-/* MAC must match the module.driver.ether MAC in configuration.xml. */
-static uint8_t s_mac[6] = {0x02, 0x8A, 0x9B, 0x71, 0x04, 0xD2};
+/*
+ * Station MAC address. The first three octets are fixed; bit 1 of octet 0 is
+ * set, marking this a locally administered address, so it does not claim any
+ * manufacturer's OUI. The last three are derived at boot from the MCU's unique
+ * ID (prv_mac_from_unique_id below), which is what keeps two boards running
+ * the same image off each other's toes - a fixed address made every board look
+ * identical to the switch, the DHCP server and ARP.
+ *
+ * The low octets are filled in before FreeRTOS_IPInit, which is what opens the
+ * Ethernet driver; the initial value here is never put on the wire.
+ */
+static uint8_t s_mac[6] = {0x02, 0x8A, 0x9B, 0x00, 0x00, 0x00};
 /* DHCP overwrites these; they are the static fallback. */
 static uint8_t s_ip[4]      = {192, 168, 71, 222};
 static uint8_t s_netmask[4] = {255, 255, 252, 0};
@@ -34,6 +44,45 @@ extern void iotc_cli_start(void);
 
 /* Debug breadcrumb, read via J-Link when the console is quiet. */
 volatile uint32_t g_net_step;
+
+/*
+ * MAC address arrays the FSP configuration generates. The RMAC driver programs
+ * the controller from g_ether0_mac_address when the interface is opened, and
+ * the Ethernet switch takes its per-port addresses from its own pair, so all
+ * three have to carry the derived address. They are writable (not const), so
+ * this needs no patch to the generated sources - which matters because the
+ * Smart Configurator rewrites ra_gen/ on every build.
+ */
+extern uint8_t g_ether0_mac_address[6];
+extern uint8_t g_layer3_switch0_mac_address_port0[6];
+extern uint8_t g_layer3_switch0_mac_address_port1[6];
+
+/*
+ * Derive the host portion of the MAC from the MCU's 128-bit unique ID, so each
+ * board gets its own address without per-unit configuration, and keeps the same
+ * one across reboots and reflashes. The ID is folded with FNV-1a rather than
+ * taking four bytes of it directly: neighbouring parts can share long runs, and
+ * a hash spreads those differences across all three octets.
+ */
+static void prv_mac_from_unique_id(void)
+{
+    bsp_unique_id_t const *p_uid = R_BSP_UniqueIdGet();
+    uint32_t hash = 2166136261U; /* FNV-1a offset basis */
+
+    for (uint32_t i = 0; i < sizeof(p_uid->unique_id_bytes); i++)
+    {
+        hash ^= (uint32_t) p_uid->unique_id_bytes[i];
+        hash *= 16777619U; /* FNV-1a prime */
+    }
+
+    s_mac[3] = (uint8_t) (hash >> 16);
+    s_mac[4] = (uint8_t) (hash >> 8);
+    s_mac[5] = (uint8_t) (hash);
+
+    memcpy(g_ether0_mac_address, s_mac, sizeof(s_mac));
+    memcpy(g_layer3_switch0_mac_address_port0, s_mac, sizeof(s_mac));
+    memcpy(g_layer3_switch0_mac_address_port1, s_mac, sizeof(s_mac));
+}
 
 static char s_print_buf[256];
 
@@ -135,6 +184,12 @@ void net_thread_entry(void *pvParameters)
     NET_PRINT("\r\nEthernet: initializing FreeRTOS+TCP\r\n");
 
     iotc_cli_start();
+
+    /* Must precede FreeRTOS_IPInit: that is where the Ethernet driver opens
+     * and latches the address into the controller. */
+    prv_mac_from_unique_id();
+    NET_PRINT("Ethernet: MAC %02x:%02x:%02x:%02x:%02x:%02x (from MCU unique ID)\r\n",
+              s_mac[0], s_mac[1], s_mac[2], s_mac[3], s_mac[4], s_mac[5]);
 
     if (pdFALSE == FreeRTOS_IPInit(s_ip, s_netmask, s_gateway, s_dns, s_mac))
     {

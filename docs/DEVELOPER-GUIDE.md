@@ -26,10 +26,10 @@ with the reasoning), see [BUILD-NOTES.md](BUILD-NOTES.md). This guide is the dis
 
 | Tool | Version used | Notes |
 |---|---|---|
-| e² studio | 2025-10 (25.10.0) | includes the FSP Smart Configurator (DDSC) |
+| e² studio | 2025-10 (Windows), 2025-12 (Linux) | includes the FSP Smart Configurator (DDSC) |
 | FSP packs | 6.3.1 | install into the e² studio tree |
 | LLVM Embedded Toolchain for Arm (ATfE) | 21.1.1 | GNU ARM toolchains are not used |
-| SEGGER J-Link | V9.38+ | earlier versions lack RA8P1 flash support |
+| SEGGER J-Link | V9.38 | earlier versions lack RA8P1 flash support; V9.82 cannot reset the RA8P1 and fails to program it |
 | Python | 3.10+ | for `tools/pack_model.py` and Vela |
 | ethos-u-vela | 5.1.0 | `pip install ethos-u-vela` (only for adding models) |
 
@@ -78,15 +78,30 @@ git clone --recurse-submodules <repo-url>
 
 Import the project (**File → Import → Existing Projects**), let the Smart Configurator
 generate (`ra_gen/`, `ra_cfg/`), and build the **Debug** configuration. First build takes a
-few minutes; the image links at ~1,022 KB of the 1,024 KB MRAM (see §7 before adding code).
+few minutes; the image links at ~916 KB of the 1,024 KB MRAM (see §7 before adding code).
 
 ### Headless (CI / command line)
+
+Windows:
 
 ```
 e2studioc.exe -nosplash --launcher.suppressErrors ^
   -application org.eclipse.cdt.managedbuilder.core.headlessbuild ^
   -data <workspace-dir> -import <project-dir> -build "iotc_freertos_ek_ra8p1/Debug"
 ```
+
+Linux (the Linux `e2studio-cli` rejects `--launcher.suppressErrors`):
+
+```
+E2=~/renesas/ra/e2studio_v2025-12_fsp_v6.3.0
+export PATH=$E2/toolchains/llvm_arm/ATfE-21.1.1-Linux-x86_64/bin:$PATH
+$E2/eclipse/e2studio-cli -nosplash \
+  -application org.eclipse.cdt.managedbuilder.core.headlessbuild \
+  -data <workspace-dir> -import <project-dir> -build "iotc_freertos_ek_ra8p1/Debug"
+```
+
+The build produces `Debug/iotc_freertos_ek_ra8p1.elf` and `.srec`. To make a `.hex` like the
+prebuilt image: `llvm-objcopy -O ihex Debug/iotc_freertos_ek_ra8p1.elf <name>.hex`.
 
 Quirks that matter (details in BUILD-NOTES):
 - The ATfE `bin` directory must be on `PATH` or clang is not found.
@@ -102,9 +117,13 @@ Quirks that matter (details in BUILD-NOTES):
 JLink.exe -device R7KA8P1KF_CPU0 -if SWD -speed 4000 -AutoConnect 1 -CommandFile commands.jlink
 ```
 
+On Linux the executable is `JLinkExe`, with the same arguments.
+
 - MRAM programs at ~130 KB/s (full image ≈ 10 s). **Verify the "Flash download:" line
   appeared** — a J-Link session conflict occasionally exits early and leaves stale firmware.
-- Serial console = the J-Link OB CDC UART at **230400 8N1**.
+- Serial console = the J-Link OB CDC UART at **230400 8N1**. The processing report prints
+  every 5 s and holds off for 20 s after any keystroke, so typed commands stay readable;
+  `quiet` silences it.
 
 A healthy cloud boot prints, in order: DHCP lease →
 `IOTC: starting (…, credentials: stored|compiled)` → `IOTC: time synced` → identity
@@ -143,7 +162,7 @@ reloaded at boot. The model **family is auto-detected from the input tensor shap
 
 | Region | Size | Notes |
 |---|---|---|
-| MRAM (code flash) | 1 MB | image is ~21 KB from full — check `llvm-size` after every feature; the 441 KB built-in model array is the big lever if space is needed |
+| MRAM (code flash) | 1 MB | image is ~916 KB, ~108 KB from full — check `llvm-size` after every feature; the 441 KB built-in model array is the big lever if space is needed |
 | SRAM | 2 MB | 640 KB tensor arena, 484 KB FreeRTOS heap (mbedTLS allocates here — two concurrent TLS sessions need ≥100 KB free), 64 KB libc heap |
 | SDRAM | 64 MB | frame buffers, 4 MB model staging + 4 MB pending, snapshot buffers |
 | OSPI flash | 64 MB | lower 32 MB factory-protected; LittleFS (PKCS#11 store) at +32 MB/16 MB; model slot at +56 MB/8 MB |
@@ -160,6 +179,7 @@ Smart Configurator regeneration can overwrite them — re-check after FSP versio
 | `ra/.../NetworkInterface.c` | NO_DATA no longer treated as a received frame (spin fix) |
 | `ra/.../FreeRTOS_DHCP.c` | MSG_PEEK loop breaker (spin fix) |
 | `ra/.../transport_mbedtls_pkcs11.c` | TLS capped at 1.2 (AWS credentials provider mishandles client certs over 1.3) |
+| `src/kvs/.../core_http_helper.c` | `Http_Send` only disconnects a TLS session it established (a failed connect was freed twice, asserting in the FSP `mbedtls_ctr_drbg_free` and hard-faulting the device) |
 
 Config that must stay set in `configuration.xml` (regen-safe): mbedTLS **SNI enabled**
 (`mbedtls_ssl_server_name_indication` — without it every Telemetry Files request is rejected
@@ -208,7 +228,7 @@ The device streams live camera video to the /IOTCONNECT Video Streaming tab as a
 master over an AWS Kinesis Video Streams signaling channel.
 
 **Provisioning.** The platform creates the KVS channel when a device is created from a
-template with `videoStreamResource: "1"` / `videoStreamType: "2"` (the bundled template
+template with `videoStreamResource: "2"` / `videoStreamType: "3"` (the bundled template
 has these). At runtime, the identity response carries a `d.p.vs` block:
 `carn` (the signaling channel ARN — region and channel name are parsed out of it) and
 `url` (the IoT credentials-provider role-alias URL used to fetch temporary AWS

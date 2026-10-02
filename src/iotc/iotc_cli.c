@@ -42,13 +42,51 @@ static void prv_print(const char *s)
     print_to_console((char *) s);
 }
 
-/* Read one line (echo on). Returns length, or -1 if the line overflowed. */
+/*
+ * Tick of the last character typed at the prompt. The periodic status chatter
+ * checks this (console_report_due) and holds off while someone is interacting,
+ * so typed input - and a pasted certificate above all - stays readable. Zero
+ * means nothing has ever been typed, so a board nobody touches still reports.
+ */
+static volatile uint32_t s_last_input_tick;
+#define CLI_INTERACTIVE_GRACE_MS (20000U)
+
+static void prv_mark_input(void)
+{
+    uint32_t t = (uint32_t) xTaskGetTickCount();
+    s_last_input_tick = (0U == t) ? 1U : t; /* 0 is reserved for "never" */
+}
+
+bool iotc_cli_is_interactive(void)
+{
+    uint32_t t = s_last_input_tick;
+
+    if (0U == t)
+    {
+        return false;
+    }
+    return (((uint32_t) xTaskGetTickCount() - t) < pdMS_TO_TICKS(CLI_INTERACTIVE_GRACE_MS));
+}
+
+/* Read one line. With echo off (PEM capture), a complete "-----END ...-----"
+ * line also ends the read, so a paste copied without a trailing newline still
+ * finishes instead of leaving the END line pending. Returns the length. */
 static int prv_read_line(char *buf, size_t size, bool echo)
 {
+    static bool s_last_was_cr = false;
     size_t n = 0;
     for (;;)
     {
         int c = console_read_char(0xFFFFFFFFu);
+        prv_mark_input();
+        /* A CR+LF terminal sends both for one Enter: drop the LF so it does not
+         * read as an empty line (which would cancel a PEM capture). */
+        bool after_cr = s_last_was_cr;
+        s_last_was_cr = (c == '\r');
+        if ((c == '\n') && after_cr)
+        {
+            continue;
+        }
         if ((c == '\r') || (c == '\n'))
         {
             if (echo)
@@ -78,15 +116,23 @@ static int prv_read_line(char *buf, size_t size, bool echo)
                 char e[2] = {(char) c, 0};
                 prv_print(e);
             }
+            else if ((n >= 16) && (0 == strncmp(buf, "-----END", 8)) &&
+                     (0 == strncmp(&buf[n - 5], "-----", 5)))
+            {
+                buf[n] = '\0';
+                return (int) n;
+            }
         }
     }
 }
 
 /*
- * Capture a pasted PEM block: lines are accumulated until the -----END line.
- * A blank line before any content cancels. Echo is off (pastes are long).
+ * Capture a pasted PEM block: lines are accumulated from the -----BEGIN line
+ * until the -----END line. Anything before BEGIN is ignored (a paste of the
+ * wrong selection), and a second BEGIN restarts the capture. A blank line
+ * before any content cancels. Echo is off (pastes are long).
  */
-static int prv_read_pem(const char *what)
+static int prv_read_pem(const char *what, const char *label)
 {
     char line[96];
     size_t used = 0;
@@ -95,25 +141,63 @@ static int prv_read_pem(const char *what)
     sprintf_buffer[0] = 0;
     snprintf(sprintf_buffer, BUFFER_LINE_LENGTH,
              "Paste the %s PEM now (ends automatically at the -----END line; "
-             "empty line cancels):\r\n", what);
+             "an empty line or 'cancel' aborts):\r\n", what);
     prv_print(sprintf_buffer);
 
+    bool seen_input = false;
+    bool too_large = false;
+    bool wrong_type = false;
     for (;;)
     {
         int n = prv_read_line(line, sizeof(line), false);
         if (n <= 0)
         {
-            if (used == 0)
+            if (!seen_input)
             {
                 prv_print("cancelled\r\n");
                 return -1;
             }
             continue; /* tolerate blank lines inside a paste */
         }
-        if (used + (size_t) n + 2 >= sizeof(s_pem))
+        seen_input = true;
+        if ((used == 0) && (0 == strcmp(line, "cancel")))
         {
-            prv_print("error: PEM too large\r\n");
+            prv_print("cancelled\r\n");
             return -1;
+        }
+        if (0 == strncmp(line, "-----BEGIN", 10))
+        {
+            used = 0;
+            too_large = false;
+            /* A key pasted at "set cert" (or the reverse) is rejected rather
+             * than stored in the wrong slot. */
+            wrong_type = (NULL == strstr(line, label));
+        }
+        else if ((used == 0) && !wrong_type)
+        {
+            continue; /* not inside a PEM block yet */
+        }
+        if (wrong_type)
+        {
+            if (0 == strncmp(line, "-----END", 8))
+            {
+                snprintf(sprintf_buffer, BUFFER_LINE_LENGTH,
+                         "error: that is not a %s PEM\r\n", what);
+                prv_print(sprintf_buffer);
+                return -1;
+            }
+            continue;
+        }
+        if (too_large || (used + (size_t) n + 2 >= sizeof(s_pem)))
+        {
+            /* Swallow the rest of the paste so its lines are not run as commands. */
+            too_large = true;
+            if (0 == strncmp(line, "-----END", 8))
+            {
+                prv_print("error: PEM too large\r\n");
+                return -1;
+            }
+            continue;
         }
         memcpy(&s_pem[used], line, (size_t) n);
         used += (size_t) n;
@@ -161,7 +245,8 @@ static void prv_help(void)
               "  reboot                  restart the device (LCD needs a power cycle)\r\n"
               "  snapshot                capture + upload a snapshot now\r\n"
               "  brightness <0|1>        camera exposure: 0 normal, 1 bright\r\n"
-              "  led-auto [0|1]          green LED follows detections (no arg toggles)\r\n");
+              "  led-auto [0|1]          green LED follows detections (no arg toggles)\r\n"
+              "  quiet [0|1]             silence the periodic status reports\r\n");
 }
 
 static void prv_handle(char *line)
@@ -228,6 +313,37 @@ static void prv_handle(char *line)
         led_auto_set(on);
         prv_print(on ? "detection LED enabled\r\n" : "detection LED disabled\r\n");
     }
+    else if (0 == strncmp(line, "quiet", 5) &&
+             ((line[5] == '\0') || (line[5] == ' ')))
+    {
+        const char *arg = &line[5];
+        bool quiet;
+
+        while (' ' == *arg)
+        {
+            arg++;
+        }
+        if ('\0' == *arg)
+        {
+            quiet = !console_quiet_get(); /* no argument: toggle */
+        }
+        else if (('1' == *arg) || (0 == strcmp(arg, "on")))
+        {
+            quiet = true;
+        }
+        else if (('0' == *arg) || (0 == strcmp(arg, "off")))
+        {
+            quiet = false;
+        }
+        else
+        {
+            prv_print("use: quiet | quiet 0 | quiet 1\r\n");
+            return;
+        }
+        console_quiet_set(quiet);
+        prv_print(quiet ? "status reports silenced\r\n"
+                        : "status reports enabled\r\n");
+    }
     else if (0 == strncmp(line, "set env ", 8))
     {
         prv_print((0 == iotc_config_write("env", &line[8], strlen(&line[8])))
@@ -245,7 +361,7 @@ static void prv_handle(char *line)
     }
     else if (0 == strcmp(line, "set cert"))
     {
-        int n = prv_read_pem("certificate");
+        int n = prv_read_pem("certificate", "CERTIFICATE");
         if (n > 0)
         {
             prv_print((0 == iotc_config_write("cert", s_pem, (size_t) n))
@@ -254,7 +370,7 @@ static void prv_handle(char *line)
     }
     else if (0 == strcmp(line, "set key"))
     {
-        int n = prv_read_pem("private key");
+        int n = prv_read_pem("private key", "PRIVATE KEY");
         if (n > 0)
         {
             prv_print((0 == iotc_config_write("key", s_pem, (size_t) n))
@@ -295,7 +411,7 @@ static void prv_cli_task(void *arg)
     for (;;)
     {
         int n = prv_read_line(line, sizeof(line), true);
-        if (n >= 0)
+        if (n > 0)
         {
             prv_handle(line);
         }

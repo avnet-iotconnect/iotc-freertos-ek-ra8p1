@@ -26,8 +26,20 @@ void glcdc_vsync_isr(display_callback_args_t *p_args);
 extern void  do_image_classification_screen(bool ai_result_new);
 
 
+/* Printed every pass of the display loop originally - about seven times a
+ * second, five lines each - which made the provisioning CLI unusable. Rate
+ * limited, and held off entirely while someone is typing. */
+#define PROCESSING_REPORT_PERIOD_MS (5000U)
+
 void console_output_processing_time(void)
 {
+    static uint32_t s_last_report;
+
+    if (!console_report_due(&s_last_report, PROCESSING_REPORT_PERIOD_MS))
+    {
+        return;
+    }
+
     sprintf (sprintf_buffer, "\r\nProcessing time:\r\n");
     print_to_console(sprintf_buffer);
 
