@@ -45,7 +45,7 @@ static inline void ic_raw_putc( char c )
     ( void ) c;
     return;
 #endif
-    /* RA8P1: no STM32 USART registers here - forward to the console. */
+    /* Forward to the console. */
     {
         extern void kvs_log_putc( char ch );
         kvs_log_putc( c );
@@ -428,7 +428,7 @@ static void ProcessLocalCandidates( IceControllerContext_t * pCtx )
                     LogWarn( ( "Unable to send packet to remote address, result: %d", result ) );
                 }
 
-                /* Give W6x module breathing room between SPI transactions. */
+                /* Pace sends to give the network stack breathing room. */
                 vTaskDelay( pdMS_TO_TICKS( 50 ) );
 
                 if( xSemaphoreTake( pCtx->iceMutex, portMAX_DELAY ) != pdTRUE )
@@ -572,8 +572,8 @@ static IceControllerResult_t HandleCandidatePairRequest( IceControllerContext_t 
 }
 
 /* Maximum candidate pairs to check per timer tick.  Spreading the STUN
- * traffic across multiple ticks prevents the W6x WiFi module from being
- * overwhelmed by a burst of SPI transactions.  The round-robin index
+ * traffic across multiple ticks avoids flooding the network stack with a
+ * burst of sends.  The round-robin index
  * ensures every pair is eventually checked. */
 #define ICE_CONTROLLER_MAX_PAIRS_PER_TICK ( 6 )
 
@@ -985,7 +985,7 @@ IceControllerResult_t IceController_ProcessIceCandidatesAndPairs( IceControllerC
         /* Send next candidate pair request for each candidate pair. */
         ProcessCandidatePairs( pCtx );
 
-        /* Pet watchdog after pair processing — W6x SPI can be slow. */
+        /* Pet watchdog after pair processing, which can be slow. */
         vPetWatchdog();
 
         /* Send request for local candidates. */

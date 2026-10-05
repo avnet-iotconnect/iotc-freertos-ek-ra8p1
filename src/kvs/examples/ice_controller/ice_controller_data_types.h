@@ -77,8 +77,8 @@ extern "C" {
 
 /* Bounded deadline for the CLOSING state.  On a relay (TURN) session close we
  * send a refresh with lifetime 0 and keep the socket alive until the TURN
- * server confirms the release.  On the W6X relay that confirmation never
- * arrives, so without a deadline the socket stays alive, ICE_CLOSED is never
+ * server confirms the release.  If that confirmation never arrives,
+ * then without a deadline the socket stays alive, ICE_CLOSED is never
  * emitted, and the peer-connection slot is stuck in CLOSING forever — after
  * both slots wedge, the master silently drops every new viewer.  Once the close
  * has waited this long (wall-clock) we force the lingering sockets closed and
@@ -87,7 +87,7 @@ extern "C" {
 #define ICE_CONTROLLER_CLOSING_TIMEOUT_MS ( 2000 )
 
 /* Expiration timeout in mili-seconds.
- * W6x WiFi module: TURN allocation over TCP TLS takes ~20s, then
+ * TURN allocation over TCP TLS can take many seconds, then
  * relay pairs must complete CREATE_PERMISSION → CHANNEL_BIND → WAITING
  * → SUCCEEDED.  120s gives headroom for the full state machine plus
  * the stream-reassembly and retry cycles. */

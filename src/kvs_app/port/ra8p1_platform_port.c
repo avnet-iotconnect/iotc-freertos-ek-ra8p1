@@ -56,8 +56,8 @@ void kvs_log_printf( const char *fmt, ... )
     }
 }
 
-/* Character sink for the vendored stack's raw diagnostic traces (replaces
- * the STM32 USART register pokes). Line-buffered; flushed on newline or
+/* Character sink for the vendored stack's raw diagnostic traces, routed to
+ * the console. Line-buffered; flushed on newline or
  * when full. Diagnostic-only paths, so the shared buffer race is benign. */
 void kvs_log_putc( char ch )
 {

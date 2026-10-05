@@ -1,5 +1,5 @@
 /*
- * STM32N6570 KVS WebRTC port — demo_config.h
+ * EK-RA8P1 KVS WebRTC port — demo_config.h
  *
  * Compile-time configuration for the KVS WebRTC SDK examples layer.
  * Runtime values (AWS region, channel name, credentials) are read from
@@ -32,19 +32,11 @@
 /* Drop TURN-over-TLS/TCP relay candidates (turns:?transport=tcp) from the ICE
  * server list.
  *
- * DISABLED (0) — 2026-07-25, after testing showed it makes things worse:
- * dropping turns:tcp on Wi-Fi caused the TURN Allocate to yield NO relay
- * candidate at all (fresh boot, first Start Video: only host+srflx gathered,
- * "Unable to find valid connection" -> black).  Root cause: the W6X's plain-UDP
- * TURN Allocate is intermittent (the Allocate response over WAN UDP does not
- * reliably arrive), and turns:tcp (TLS/TCP Allocate) was actually the RELIABLE
- * relay that let sessions connect at all.  Removing it left only the flaky UDP
- * Allocate -> often no relay -> can't connect.  So keep turns:tcp (0).
- *
- * The TCP relay's *media* path still wedges once ICE nominates it (that
- * black-after-connect is a separate symptom); the real fix is making the UDP
- * TURN relay reliable / preferred, NOT removing the TCP one.  See
- * developer.md (W6X module notes section). */
+ * Off (0) by default: when the plain-UDP TURN Allocate gets no response, the
+ * TLS/TCP relay is the only relay candidate left, and without it the session
+ * cannot connect ("Unable to find valid connection", black video).  Instead of
+ * dropping it, ice_controller_net.c advertises the TLS/TCP relay at the lowest
+ * priority, so ICE nominates it only when there is no UDP relay. */
 #ifndef KVS_TURN_DROP_TCP
     #define KVS_TURN_DROP_TCP  0
 #endif

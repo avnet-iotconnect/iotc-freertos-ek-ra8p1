@@ -1,5 +1,5 @@
 /*
- * STM32N6570 KVS WebRTC port — log_service.h
+ * EK-RA8P1 KVS WebRTC port — log_service.h
  *
  * The AWS KVS WebRTC SDK examples/logging/logging.h includes this file to
  * allow projects to customise SdkLog.  It is included from WITHIN logging.h

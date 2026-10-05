@@ -284,7 +284,7 @@ static int32_t setRootCaPath( SSLContext_t * pSslContext,
     caFilePath[ rootCaPathLength ] = '\0';
 
     /* mbedtls_x509_crt_parse_file requires MBEDTLS_FS_IO which is not available
-     * on bare-metal STM32.  File-based certificate loading is unsupported on
+     * on this bare-metal target.  File-based certificate loading is unsupported on
      * this platform; callers must supply DER/PEM buffers instead. */
     ( void ) caFilePath;
     mbedtlsError = MBEDTLS_ERR_PLATFORM_FEATURE_UNSUPPORTED;

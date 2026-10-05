@@ -1,8 +1,8 @@
 /*
- * STM32N6570 KVS WebRTC port — FreeRTOS_POSIX/time.h stub
+ * EK-RA8P1 KVS WebRTC port — FreeRTOS_POSIX/time.h stub
  *
  * The KVS WebRTC SDK (core_http_helper.c) includes "FreeRTOS_POSIX/time.h"
- * which on the Ameba platform provides FreeRTOS-POSIX time types.  On STM32
+ * which on the Ameba platform provides FreeRTOS-POSIX time types.  On the RA8P1
  * with newlib the standard <time.h> already supplies struct timespec, time_t,
  * and clock_gettime, so this header simply re-exports it.
  *

@@ -165,7 +165,7 @@ static inline void ac_raw_putc( char c )
     ( void ) c;
     return;
 #endif
-    /* RA8P1: no STM32 USART registers here - forward to the console. */
+    /* Forward to the console. */
     {
         extern void kvs_log_putc( char ch );
         kvs_log_putc( c );
@@ -735,15 +735,9 @@ static int32_t GetIceServerList( AppContext_t * pAppContext,
                     continue;
                 }
 
-                /* 2026-07-24: WAN UDP RX is CONFIRMED WORKING on the N6 with
-                 * V1.3.0 (public DNS/53 responses arrive — proven with the
-                 * lwip_netif.c WAN_UDP_RX_DIAG trace, contradicting the old
-                 * "WAN UDP dropped" premise below).  And empirically the
-                 * W6X wedge is TCP-TX-specific — UDP media streams fine while
-                 * turns:?transport=tcp starves.  So RE-ENABLE plain UDP TURN
-                 * (turn:?transport=udp) so relay sessions can use the UDP
-                 * path.  turns:?transport=tcp is kept only on Ethernet (see the
-                 * KVS_TURN_DROP_TCP skip below).
+                /* Plain UDP TURN (turn:?transport=udp) is accepted so relay
+                 * sessions can use the UDP path.  turns:?transport=tcp is
+                 * dropped only when KVS_TURN_DROP_TCP is set (see below).
                  *
                  * Still skip turns:?transport=udp (DTLS-TURN over UDP): the
                  * net layer (ice_controller_net.c) rejects it downstream, so
@@ -758,31 +752,27 @@ static int32_t GetIceServerList( AppContext_t * pAppContext,
                 }
 
 #if KVS_TURN_DROP_TCP
-                /* Wi-Fi (W6X) only: drop turns:?transport=tcp entirely.  The
-                 * module's TCP-TX path wedges under load, so a relay session
-                 * nominated onto the TCP relay starves ([TLS] snd stall ->
-                 * GATE CLOSE) and the viewer stays black; ICE picks UDP vs TCP
-                 * relay non-deterministically.  Removing it forces the reliable
-                 * UDP relay every time.  Kept on Ethernet (KVS_TURN_DROP_TCP=0).
-                 * See demo_config.h / developer.md (W6X module notes section). */
+                /* Drop turns:?transport=tcp entirely, so a relay session can
+                 * only be nominated onto the UDP relay.  See KVS_TURN_DROP_TCP
+                 * in demo_config.h. */
                 if( ( pOutputIceServers[ currentIceServerIndex ].serverType == ICE_CONTROLLER_ICE_SERVER_TYPE_TURNS ) &&
                     ( pOutputIceServers[ currentIceServerIndex ].protocol == ICE_SOCKET_PROTOCOL_TCP ) )
                 {
-                    LogInfo( ( "Skipping TCP-TURN URI (W6x TCP-TX wedges): %.*s",
+                    LogInfo( ( "Skipping TCP-TURN URI (KVS_TURN_DROP_TCP): %.*s",
                                ( int ) pIceServerConfigs[ i ].iceServerUris[ j ].uriLength,
                                pIceServerConfigs[ i ].iceServerUris[ j ].uri ) );
                     continue;
                 }
 #endif /* KVS_TURN_DROP_TCP */
 
-                /* W6x WiFi module: keep the TURN entries bounded to limit SPI
-                 * load, but allow up to 2 so one UDP TURN (primary) + one
-                 * TCP/TLS TURN (fallback) can coexist. */
+                /* Keep the TURN entries bounded to limit the ICE pair count,
+                 * but allow up to 2 so one UDP TURN (primary) + one TCP/TLS
+                 * TURN (fallback) can coexist. */
                 if( ( ( pOutputIceServers[ currentIceServerIndex ].serverType == ICE_CONTROLLER_ICE_SERVER_TYPE_TURN ) ||
                       ( pOutputIceServers[ currentIceServerIndex ].serverType == ICE_CONTROLLER_ICE_SERVER_TYPE_TURNS ) ) &&
                     ( turnServerCount >= 2 ) )
                 {
-                    LogInfo( ( "Skipping extra TURN server (W6x limit): %.*s",
+                    LogInfo( ( "Skipping extra TURN server (limit 2): %.*s",
                                ( int ) pIceServerConfigs[ i ].iceServerUris[ j ].uriLength,
                                pIceServerConfigs[ i ].iceServerUris[ j ].uri ) );
                     continue;
@@ -1745,10 +1735,9 @@ int AppCommon_Init( AppContext_t * pAppContext,
          * call srand() after Sctp_Init() to ensure proper randomization. */
         srand( NetworkingUtils_GetCurrentTimeSec( NULL ) );
 
-        /* W6x WiFi module: UDP is broken, so host and srflx candidates are
-         * dead paths.  Send relay only to reduce pair count and focus ICE on
-         * the single viable TURN TCP path.  Still accept host/srflx/relay
-         * remote candidates so relay pairs can be formed with the viewer. */
+        /* Send relay candidates only, to keep the pair count small and focus
+         * ICE on the TURN relay paths.  Still accept host/srflx/relay remote
+         * candidates so relay pairs can be formed with the viewer. */
         pAppContext->natTraversalConfig =
             ( IceControllerNatTraversalConfig_t ) (
                 ICE_CANDIDATE_NAT_TRAVERSAL_CONFIG_SEND_RELAY |

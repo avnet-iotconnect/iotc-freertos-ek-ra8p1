@@ -27,7 +27,7 @@
 /* Rolling buffer duration: drives the size of the RTP retransmit history.
  * PeerConnectionRollingBuffer_Create allocates capacity = duration * bitRate / 8 /
  * maxSizePerPacket packets up-front (on-demand via pvPortMalloc) and never
- * shrinks.  For the STM32N6570-DK with ~180 KB free heap at frame-send time,
+ * shrinks.  With the free heap available at frame-send time,
  * the stock (3 s × 1.4 Mbps × 1400 B/pkt = 393 packets × ~1.5 KB = ~590 KB)
  * cannot fit — heap exhausted within ~25 frames and the h264 publisher hung.
  * 1 s at our actual 500 kbps output = 45 packets × ~1.5 KB = ~66 KB, which

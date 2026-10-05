@@ -41,7 +41,7 @@ static inline void icn_raw_putc( char c )
     ( void ) c;
     return;
 #endif
-    /* RA8P1: no STM32 USART registers here - forward to the console. */
+    /* Forward to the console. */
     {
         extern void kvs_log_putc( char ch );
         kvs_log_putc( c );
@@ -58,7 +58,7 @@ static void icn_raw_putn( const char *s, int n ) { while( n-- > 0 ) icn_raw_putc
  * are used only on failure exits (bounded to a few lines per second). */
 static inline void icn_diag_putc( char c )
 {
-    /* RA8P1: no STM32 USART registers here - forward to the console. */
+    /* Forward to the console. */
     {
         extern void kvs_log_putc( char ch );
         kvs_log_putc( c );
@@ -101,7 +101,7 @@ static void icn_raw_dec( int v )
  * TURN-allocation failures undiagnosable from field logs. */
 static inline void icn_gather_putc( char c )
 {
-    /* RA8P1: no STM32 USART registers here - forward to the console. */
+    /* Forward to the console. */
     {
         extern void kvs_log_putc( char ch );
         kvs_log_putc( c );
@@ -144,8 +144,8 @@ static void icn_gather_dec( int v )
  * retry dominated frame time on the TURN-TLS path. */
 #define ICE_CONTROLLER_RESEND_DELAY_MS ( 5 )
 /* 1000 -> 200 (2026-07-20): the retry loop runs while HOLDING the ICE
- * socketMutex, and each lap re-enters lwIP (which takes the global core
- * lock for up to the W6X enqueue timeout).  A 1 s budget meant one
+ * socketMutex, and each lap re-enters the network stack (which can block
+ * for up to the send enqueue timeout).  A 1 s budget meant one
  * congested send could hold the mutex ~1.2 s, starving STUN responses on
  * the RX task.  200 ms keeps the mutex hold bounded; the 3-strike gate
  * absorbs the resulting per-packet failures. */
@@ -155,13 +155,12 @@ static void icn_gather_dec( int v )
  * session is declared dead.  Each failure already represents up to
  * ICE_CONTROLLER_RESEND_TIMEOUT_MS of EAGAIN/ENOMEM retries, so 3 in a row
  * means ~3 s with zero packets out — a real link failure — while a single
- * W6X TX hiccup (which killed a healthy 231 s session on 2026-07-20) just
- * drops one RTP packet and lets NACK/retransmit recover it. */
+ * transient TX stall just drops one RTP packet and lets NACK/retransmit recover it. */
 #define ICE_CONTROLLER_SEND_FAILURE_CLOSE_THRESHOLD ( 3 )
 
 /* Minimum duration a consecutive-failure burst must span before the
- * nominated session is closed.  The W6X module pauses TX for 100s of ms
- * during RF retransmission bursts; sends now fail fast, so a count alone
+ * nominated session is closed.  The link can pause TX for 100s of ms at a
+ * time; sends now fail fast, so a count alone
  * trips in <0.5 s.  3 s matches the original design intent (3 strikes x
  * ~1.2 s of slow retries) and converts brief module pauses into a video
  * stutter instead of a session death. */
@@ -637,7 +636,7 @@ static IceControllerResult_t SendSocketPacket( IceControllerSocketContext_t * pS
                 }
             }
             else if( ( errno == ENOMEM ) || ( errno == ENOSPC ) || ( errno == ENOBUFS ) ||
-                     ( errno == EINPROGRESS ) )   /* W6X txq-full maps to ERR_INPROGRESS — transient, retry */
+                     ( errno == EINPROGRESS ) )   /* TX queue full — transient, retry */
             {
                 vTaskDelay( pdMS_TO_TICKS( ICE_CONTROLLER_RESEND_DELAY_MS ) );
                 totalDelayMs += ICE_CONTROLLER_RESEND_DELAY_MS;
@@ -1043,13 +1042,11 @@ static void AddRelayCandidates( IceControllerContext_t * pCtx )
                     icn_gather_puts( "[icn] relay addCand>\r\n" );
                     iceResult = Ice_AddRelayCandidate( &pCtx->iceContext, &pCtx->iceServers[i].iceEndpoint, pCtx->iceServers[i].userName, pCtx->iceServers[i].userNameLength, pCtx->iceServers[i].password, pCtx->iceServers[i].passwordLength );
 
-                    /* developer.md (W6X module notes section): bias nomination toward the UDP
-                     * relay.  The W6X TCP-TX path wedges under media load once
-                     * nominated ([TLS] snd stall -> GATE CLOSE), so advertise
-                     * the TLS/TCP relay candidate at the RFC 8445 minimum
-                     * priority: both agents then order every UDP relay pair
-                     * ahead of it and it wins only when the flaky UDP Allocate
-                     * produced no relay.  (This gather loop is where relay
+                    /* Bias nomination toward the UDP relay, which carries media
+                     * better than TLS/TCP: advertise the TLS/TCP relay candidate
+                     * at the RFC 8445 minimum priority, so both agents order
+                     * every UDP relay pair ahead of it and it wins only when the
+                     * UDP Allocate produced no relay.  (This gather loop is where relay
                      * candidates are actually added for both transports.) */
                     if( ( iceResult == ICE_RESULT_OK ) &&
                         ( pCtx->iceServers[ i ].serverType == ICE_CONTROLLER_ICE_SERVER_TYPE_TURNS ) &&
@@ -1143,7 +1140,7 @@ static void AddRelayCandidates( IceControllerContext_t * pCtx )
             {
                 /* CreateSocketContext returned an error not handled above —
                  * for the UDP path this is the most likely place to lose a
-                 * relay silently if e.g. ST67W6X UDP socket creation fails.  */
+                 * relay silently if e.g. UDP socket creation fails.  */
                 icn_gather_puts( "[icn] relay DROPPED ret=" );
                 icn_gather_dec( ( int ) ret );
                 icn_gather_puts( "\r\n" );
@@ -1503,11 +1500,10 @@ IceControllerResult_t IceControllerNet_SendPacket( IceControllerContext_t * pCtx
     {
         if( pSocketContext == pCtx->pNominatedSocketContext )
         {
-            /* One failed send is NOT proof the link is dead: the W6X
-             * module pauses TX for 100s of ms during RF retransmission
-             * bursts, and with fast-failing sends (20 ms enqueue, 200 ms
-             * retry budget) a pure count trips in <0.5 s — a 114 s
-             * healthy 1 Mbps session was killed that way on 2026-07-20.
+            /* One failed send is NOT proof the link is dead: the link can
+             * pause TX for 100s of ms, and with fast-failing sends (20 ms
+             * enqueue, 200 ms retry budget) a pure count trips in <0.5 s
+             * and kills an otherwise healthy session.
              * Close only when failures are BOTH consecutive (>= count
              * threshold) AND have spanned >= the close window: the
              * module gets ICE_CONTROLLER_SEND_FAILURE_CLOSE_WINDOW_MS to
@@ -1696,16 +1692,14 @@ IceControllerResult_t IceControllerNet_ExecuteTlsHandshake( IceControllerContext
                                                    &( pSocketContext->pIceServer->password[ 0 ] ),
                                                    pSocketContext->pIceServer->passwordLength );
 
-                /* developer.md (W6X module notes section) ("Attempted + REVERTED"): keep the
-                 * TLS/TCP relay — its Allocate is the only reliable one — but
-                 * bias nomination toward the UDP relay, because the W6X
-                 * TCP-TX path wedges under media load once nominated
-                 * ([TLS] snd stall -> GATE CLOSE).  This function is the
+                /* Keep the TLS/TCP relay as a fallback for when the UDP
+                 * Allocate fails, but bias nomination toward the UDP relay,
+                 * which carries media better.  This function is the
                  * TLS/TCP TURN connect path (TLS_TRANSPORT_SUCCESS above), so
                  * the candidate just added is the TCP relay: advertise it at
                  * the RFC 8445 minimum priority.  Both agents then order
                  * every UDP relay pair ahead of it, and it wins nomination
-                 * only when the flaky UDP Allocate produced no relay. */
+                 * only when the UDP Allocate produced no relay. */
                 if( ( iceResult == ICE_RESULT_OK ) &&
                     ( pCtx->iceContext.numLocalCandidates > 0 ) )
                 {

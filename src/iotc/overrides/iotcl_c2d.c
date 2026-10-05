@@ -74,7 +74,7 @@ static int iotcl_c2d_process_callback(struct IotclC2dEventDataTag *event_data) {
         case IOTCL_C2D_ET_MODULE_COMMAND:
             // Module commands (the platform's AI Model push) carry the same
             // "ack" + "urls" payload as OTA, so they route to the OTA callback.
-            // (Present in stock iotc-c-lib; lost in the n6 override this file
+            // (Present in stock iotc-c-lib; lost in the earlier override this file
             // came from - its project had no model push.)
             if (config->event_functions.ota_cb) {
                 config->event_functions.ota_cb(event_data);
@@ -175,7 +175,7 @@ static int iotcl_c2d_validate_data_and_type(
 // (ct:2 module commands) have been observed delivering other shapes. Accept a
 // plain URL string, an object with a "url" field, or -- failing that -- scan
 // the object for the first string member that looks like an https URL.
-// (Ported from the stock iotc-c-lib; the n6 override this file came from
+// (Ported from the stock iotc-c-lib; the earlier override this file came from
 // predates the tolerant handling.)
 static const char *iotcl_c2d_url_from_array_item(cJSON *url_array_item) {
     if (cJSON_IsString(url_array_item)) {

@@ -1,5 +1,5 @@
 /*
- * STM32N6570 KVS WebRTC port — kvs_runtime_config.h
+ * EK-RA8P1 KVS WebRTC port — kvs_runtime_config.h
  *
  * Provides the AWS_REGION / AWS_KVS_CHANNEL_NAME / credential macros that
  * app_common.c expects, but redirects them to runtime-mutable global char*

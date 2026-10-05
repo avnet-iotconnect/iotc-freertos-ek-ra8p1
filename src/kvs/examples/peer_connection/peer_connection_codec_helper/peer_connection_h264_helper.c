@@ -23,13 +23,12 @@
 extern void vPetWatchdog( void );
 static inline void h264_raw_putc( char c )
 {
-    /* RA8P1: the STM32N6 USART1 registers poked below do not exist on this
-     * device; touching 0x56000C1C bus-faults. Traces stay compiled out. */
+    /* Raw traces are compiled out unless KVS_RAW_TRACE is set. */
 #if !defined( KVS_RAW_TRACE ) || ( KVS_RAW_TRACE == 0 )
     ( void ) c;
     return;
 #endif
-    /* RA8P1: no STM32 USART registers here - forward to the console. */
+    /* Forward to the console. */
     {
         extern void kvs_log_putc( char ch );
         kvs_log_putc( c );
@@ -37,10 +36,9 @@ static inline void h264_raw_putc( char c )
 }
 static void h264_raw_puts( const char *s ) { while( *s ) h264_raw_putc( *s++ ); }
 
-/* Send-path stage timing, reported by the media heartbeat
- * (stm32_media_port.c) as avg ms/frame: splits the frame's network cost
- * into SRTP construct+encrypt vs ICE (TURN-TLS) send while chasing the
- * frame-size-independent ~300 ms/frame send wait.  Written only on the
+/* Send-path stage timing counters: split a frame's network cost into SRTP
+ * construct+encrypt vs ICE send.  Nothing reports them in this port; read
+ * them from a debugger when profiling the send path.  Written only on the
  * media task's synchronous frame path — no locking needed. */
 volatile uint32_t g_h264SrtpTicks = 0U;
 volatile uint32_t g_h264SendTicks = 0U;
@@ -427,11 +425,9 @@ PeerConnectionResult_t PeerConnectionH264Helper_WriteH264Frame( PeerConnectionSe
             bytesSent += pRollingBufferPacket->rtpPacket.payloadLength;
 
             /* Pace intra-frame packet bursts.  A 40-50KB IDR is ~35 RTP
-             * packets; fired back-to-back they overflow the W6X TX queue
-             * and its sendto() WEDGES for seconds (socketMutex timeout,
-             * session collapse - seen 2026-07-20 at ~45s and ~231s into
-             * otherwise healthy sessions).  A 1-tick breather every 4
-             * packets lets the SPI engine drain: ~8ms extra on an IDR,
+             * packets; fired back-to-back they can overflow the network
+             * stack's TX queue and stall sendto().  A 1-tick breather
+             * every 4 packets lets the queue drain: ~8ms extra on an IDR,
              * ~1ms on a normal 7-packet frame. */
             if( ( packetSent & 0x03U ) == 0U )
             {

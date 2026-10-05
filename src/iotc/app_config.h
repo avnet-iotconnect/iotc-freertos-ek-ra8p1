@@ -61,10 +61,4 @@
 #define IOTC_CFG_NO_BUILTIN_MODEL 1
 #endif
 
-/* One-shot on-target H.264 software-encode benchmark (minih264) printed to
- * the console at boot. Requires IOTC_CFG_NO_BUILTIN_MODEL=1 for MRAM space. */
-#ifndef H264_BENCH
-#define H264_BENCH 0
-#endif
-
 #endif /* IOTC_APP_CONFIG_H */

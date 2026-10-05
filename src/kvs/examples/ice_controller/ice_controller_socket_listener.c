@@ -35,19 +35,17 @@
 /* ── Raw-UART diagnostic helpers ────────────────────────────────────────── */
 /* Used to surface TURN-unwrap failures that LogWarn/LogDebug can't because
  * the project's logging.h in this path is the AWS-KVS printf stub, not the
- * vLoggingPrintf-backed one.  Matches the pattern in ice_controller.c and
- * media_enc.c — spins on TXE bit 7 at USART1 ISR (0x56000C1C), writes TDR
- * at 0x56000C28, pets the watchdog on timeout.                             */
+ * vLoggingPrintf-backed one.  Matches the pattern in ice_controller.c:
+ * output goes to the console through kvs_log_putc().                      */
 extern void vPetWatchdog( void );
 static inline void isl_raw_putc( char c )
 {
-    /* RA8P1: the STM32N6 USART1 registers poked below do not exist on this
-     * device; touching 0x56000C1C bus-faults. Traces stay compiled out. */
+    /* Raw traces are compiled out unless KVS_RAW_TRACE is set. */
 #if !defined( KVS_RAW_TRACE ) || ( KVS_RAW_TRACE == 0 )
     ( void ) c;
     return;
 #endif
-    /* RA8P1: no STM32 USART registers here - forward to the console. */
+    /* Forward to the console. */
     {
         extern void kvs_log_putc( char ch );
         kvs_log_putc( c );
@@ -121,7 +119,7 @@ static int32_t RecvPacketUdp( IceControllerSocketContext_t * pSocketContext,
                     ( struct sockaddr * ) &srcAddress,
                     &srcAddressLength );
 
-    /* UDP RX visibility for the W6x UDP-TURN diagnosis.  The ALLOCATING
+    /* UDP RX visibility for diagnosing UDP TURN failures.  The ALLOCATING
      * timeout is ambiguous: either our Allocate request never left (TX broken)
      * or the server's response never came back (RX broken).  Emit:
      *   [isl] udpRx b=<N>  when any bytes actually arrive (includes port)
