@@ -376,10 +376,9 @@ the device does, without a reflash and without a reboot:
 | `mobilenet-050_v1.zip` | RA8P1 ImageNet Classifier 0.5 | `ra8p1mn050` | 1000-class classifier, mid tier | ~9 ms |
 | `mobilenet-v2_v1.zip` | RA8P1 ImageNet Classifier v2 | `ra8p1mnv2` | 1000-class classifier, accuracy tier — hold up a coffee mug, a banana, a water bottle | ~40 ms |
 
-Deploying `mobilenet-v2` is the most striking of these: it is a roughly 7x larger workload
-than the face detector, and the device absorbs it mid-flight. Watch the Uptime tile on the
-dashboard while the swap happens. It keeps counting, which is the proof that nothing
-rebooted.
+The `mobilenet-v2` model is roughly 7x larger than the face detector, and the device 
+absorbs it mid-flight. Watch the Uptime tile on the dashboard while the swap happens. 
+It keeps counting, which is the proof that nothing rebooted.
 
 > [!NOTE]
 > `model-revert` clears the stored model rather than falling back to a built-in one. This
