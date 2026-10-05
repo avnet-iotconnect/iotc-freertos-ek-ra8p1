@@ -2,7 +2,7 @@
 
 Everything needed to build this project from source, understand how it works, and extend it,
 including adding your own pushable AI models. To run the demo with the prebuilt image instead,
-follow the [Quickstart](README.md).
+follow the [Quickstart](../README.md).
 
 ## Contents
 
@@ -168,7 +168,7 @@ it off while someone is typing and for 20 seconds after the last character
 ## 5. Provisioning the Device Identity
 
 1. In /IOTCONNECT (AWS backend), import the device template
-   [`templates/ra8p1-vision-ai-template.json`](templates/ra8p1-vision-ai-template.json). It
+   [`templates/ra8p1-vision-ai-template.json`](../templates/ra8p1-vision-ai-template.json). It
    defines the telemetry attributes (numeric attributes must be DECIMAL — a type mismatch shows
    as `null` on the dashboard), the commands, File Support (required for snapshot upload), and
    video streaming.
@@ -178,7 +178,7 @@ it off while someone is typing and for 20 seconds after the last character
    - **Runtime provisioning (default, no rebuild):** the serial CLI stores env, CPID, device ID,
      certificate and private key in LittleFS on the OSPI flash. They survive power cycles and
      take precedence over a compiled-in identity. The walkthrough is
-     [Quickstart step 9](README.md#9-configure-the-board); the implementation is
+     [Quickstart step 9](../README.md#9-configure-the-board); the implementation is
      `src/iotc/iotc_cli.c` and `src/iotc/iotc_config.c`.
    - **Compile-time (development convenience):** copy `src/iotc/app_secrets.h.example` to
      `src/iotc/app_secrets.h` (gitignored), fill in `IOTC_CFG_ENV`, `IOTC_CFG_CPID`,
@@ -309,7 +309,7 @@ The same commands are available on the serial console, alongside the provisionin
 
 ### Model library
 
-Five ready-to-push models ship in [`tools/models/`](tools/models/). Upload the `.zip` in
+Five ready-to-push models ship in [`tools/models/`](../tools/models/). Upload the `.zip` in
 /IOTCONNECT AI Models (Model Type "AI Model", Variant "Renesas"). The model's code must be 3–10
 characters; the name and code are platform bookkeeping only — the name the device displays comes
 from inside the file.
@@ -478,11 +478,11 @@ section that conflicts with the memory layout. The e² studio managed build drop
 
 ## 14. Dashboard
 
-[`dashboard/ra8p1-vision-ai-dashboard.json`](dashboard/ra8p1-vision-ai-dashboard.json) is the
+[`dashboard/ra8p1-vision-ai-dashboard.json`](../dashboard/ra8p1-vision-ai-dashboard.json) is the
 importable dashboard. Its artwork (banner, detection-state and model-source cards) is served from
 Avnet's public bucket at
 `https://avnetpublicaccess.s3.us-east-1.amazonaws.com/images/renesas/ek-ra8p1/`, so an imported
-dashboard needs no setup. The source images are in [`dashboard/images/`](dashboard/images/). To
+dashboard needs no setup. The source images are in [`dashboard/images/`](../dashboard/images/). To
 host them elsewhere, upload them keeping the exact (case-sensitive) file names, and replace the
 bucket URL throughout the dashboard JSON.
 
@@ -504,7 +504,7 @@ Model Revert (`model-revert`). It has no general command widget, so the other co
 | Console output scrolls too fast to read what you type | The status report pauses by itself while you type and resumes about 20 seconds after you stop. To silence it for good, type `quiet` |
 | A PEM paste is rejected as too large | Paste one PEM block per command — the certificate and the key separately |
 | `error: that is not a certificate PEM` (or `private key PEM`) | The key was pasted at `set cert`, or the certificate at `set key`. Nothing was stored; repeat with the right file |
-| Nothing happens when pasting a PEM in PuTTY | Ctrl+V does not paste in PuTTY. See the tip in [Quickstart step 9](README.md#9-configure-the-board) |
+| Nothing happens when pasting a PEM in PuTTY | Ctrl+V does not paste in PuTTY. See the tip in [Quickstart step 9](../README.md#9-configure-the-board) |
 | The Chrome Labs Serial Terminal lists no port, or will not connect | Use Chrome or Edge (Firefox and Safari have no Web Serial). Close any other program that has the port open, since only one can hold it. On Linux, add yourself to the `dialout` group. After a power cycle, click Connect again |
 | The LCD is all white after flashing or any warm reset | The panel's timing controller only initialises from a cold start, and the board brings out only `DISP_BLEN` and `DISP_RESET` (no panel power control), so firmware cannot recover it. Power-cycle the board. Telemetry, video, snapshots and model pushes are unaffected |
 | The LCD stays white after a power cycle | The panel ribbon cable has worked loose, or the expansion board is misaligned. Re-seat the ribbon cable from the glass panel into the expansion board (open the latch, push the cable fully in, close the latch), and check that the expansion board's pin 1 lines up with pin 1 of J1 |
@@ -515,7 +515,7 @@ Model Revert (`model-revert`). It has no general command widget, so the other co
 | Boot prints `FU: selftest creds fetch -> -13` | File Support is not enabled on the template, or the device's certificate is not the one registered for it |
 | A snapshot acknowledgment reports upload failed | Send the command again; confirm the boot log printed `FU: file upload ready` |
 | Snapshot upload fails with 403 "Certificate is invalid on this endpoint" | mbedTLS Server Name Indication is disabled — see [section 13](#13-vendor-patches-and-required-configuration) |
-| Inference time stays at `0 us` | No model is loaded — deploy one as described in [Quickstart step 12](README.md#12-deploy-an-ai-model) |
+| Inference time stays at `0 us` | No model is loaded — deploy one as described in [Quickstart step 12](../README.md#12-deploy-an-ai-model) |
 | A model push never arrives | Confirm the deployment was dispatched in AI Models; the device logs `MQTT: C2D message` the moment one arrives |
 | Model download reports `TLS connect failed` | Signed model URLs are on S3 and verify against Amazon Root CA 1 (already configured); transient DNS/TLS errors are retried three times |
 | A pushed model is rejected with "unsupported shape" | Its input is outside the contracts in [section 9](#9-ai-models) |
@@ -527,9 +527,9 @@ Model Revert (`model-revert`). It has no general command widget, so the other co
 
 ## 16. Resources
 
-- [Quickstart](README.md) — run the demo with the prebuilt image, no toolchain needed
-- [Workshop slides (PDF)](docs/EK-RA8P1-vision-ai-workshop.pdf) — the hands-on workshop built on
-  this demo ([PowerPoint](docs/EK-RA8P1-vision-ai-workshop.pptx))
+- [Quickstart](../README.md) — run the demo with the prebuilt image, no toolchain needed
+- [Workshop slides (PDF)](EK-RA8P1-vision-ai-workshop.pdf) — the hands-on workshop built on
+  this demo ([PowerPoint](EK-RA8P1-vision-ai-workshop.pptx))
 - [EK-RA8P1 Evaluation Kit](https://www.renesas.com/en/design-resources/boards-kits/ek-ra8p1) —
   board documentation and the user's manual
 - [Renesas Flexible Software Package](https://github.com/renesas/fsp)

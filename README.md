@@ -37,7 +37,7 @@ validates it, and swaps it in between two inferences with no reflash and no rebo
 it in flash so it survives power cycles. The same board becomes a face detector, an occupancy
 sensor, or a 1000-class image classifier depending on which model you push.
 
-To build the same application from source, see the [Developer Guide](developer.md).
+To build the same application from source, see the [Developer Guide](docs/DEVELOPER.md).
 
 > [!NOTE]
 > This guide has been written and tested with the hardware and software listed below, but may
@@ -481,12 +481,12 @@ in the serial console. The board returns to the unprovisioned state from
 
 Building from source, the firmware architecture, the telemetry and command reference, adding
 your own Vela-compiled models, and the live-video internals are all covered in the
-[Developer Guide](developer.md). If something is not working, see its
-[Troubleshooting](developer.md#15-troubleshooting) section.
+[Developer Guide](docs/DEVELOPER.md). If something is not working, see its
+[Troubleshooting](docs/DEVELOPER.md#15-troubleshooting) section.
 
 ## 15. Resources
 
-* [Developer Guide](developer.md) — build from source, the architecture, and adding your
+* [Developer Guide](docs/DEVELOPER.md) — build from source, the architecture, and adding your
   own Vela-compiled models
 * [Workshop slides (PDF)](docs/EK-RA8P1-vision-ai-workshop.pdf) — the hands-on workshop built on
   this demo: connecting the board, deploying models, and validating the hot-swap
