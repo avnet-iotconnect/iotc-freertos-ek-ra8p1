@@ -148,7 +148,10 @@ connected, add `-USB <serial-number>`.
   the old firmware in place. The option bytes are handled by the flash loader.
 - After flashing, power-cycle the board instead of relying on a debugger reset. The LCD panel
   only initialises from a cold start (see [section 15](#15-troubleshooting)).
-- The serial console is the J-Link OB CDC UART at 230400 baud, 8N1 (not 115200).
+- The serial console is the J-Link OB CDC UART at 230400 baud, 8N1 (not 115200). Any serial
+  terminal works, including the browser-based
+  [Chrome Labs Serial Terminal](https://googlechromelabs.github.io/serial-terminal/) (Web
+  Serial, so Chrome or Edge only).
 
 A healthy boot with a stored identity prints, in order: the DHCP lease →
 `IOTC: starting (…, credentials: stored|compiled)` → `IOTC: time synced` → identity provisioned
@@ -502,6 +505,7 @@ Model Revert (`model-revert`). It has no general command widget, so the other co
 | A PEM paste is rejected as too large | Paste one PEM block per command — the certificate and the key separately |
 | `error: that is not a certificate PEM` (or `private key PEM`) | The key was pasted at `set cert`, or the certificate at `set key`. Nothing was stored; repeat with the right file |
 | Nothing happens when pasting a PEM in PuTTY | Ctrl+V does not paste in PuTTY. See the tip in [Quickstart step 9](README.md#9-configure-the-board) |
+| The Chrome Labs Serial Terminal lists no port, or will not connect | Use Chrome or Edge (Firefox and Safari have no Web Serial). Close any other program that has the port open, since only one can hold it. On Linux, add yourself to the `dialout` group. After a power cycle, click Connect again |
 | The LCD is all white after flashing or any warm reset | The panel's timing controller only initialises from a cold start, and the board brings out only `DISP_BLEN` and `DISP_RESET` (no panel power control), so firmware cannot recover it. Power-cycle the board. Telemetry, video, snapshots and model pushes are unaffected |
 | The LCD stays white after a power cycle | The panel ribbon cable has worked loose, or the expansion board is misaligned. Re-seat the ribbon cable from the glass panel into the expansion board (open the latch, push the cable fully in, close the latch), and check that the expansion board's pin 1 lines up with pin 1 of J1 |
 | The LCD stays blank | The LCD is optional and the demo runs headless; if it is attached, check both flat cables |

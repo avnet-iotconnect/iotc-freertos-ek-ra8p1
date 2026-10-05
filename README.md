@@ -56,7 +56,7 @@ To build the same application from source, see the [Developer Guide](developer.m
 > [!NOTE]
 > The 7-inch LCD is optional. With it attached you get live video and detection overlays on
 > the board. Without it the device runs headless and the /IOTCONNECT dashboard becomes the
-> interface — telemetry as the data feed and cloud-triggered snapshots as the viewfinder.
+> interface.
 
 ### Software
 
@@ -65,9 +65,15 @@ To build the same application from source, see the [Developer Guide](developer.m
 > [!NOTE]
 > Both newer and older versions have been tested and failed to flash the EK-RA8P1. 9.38 is the recommended version for use as it has been tested and succeeded.
 
-* A serial terminal application such as [PuTTY](https://www.chiark.greenend.org.uk/~sgtatham/putty/latest.html)
-  (Recommended; on Ubuntu, `sudo apt install putty`) or a browser-based version such as
-  [Google Chrome Labs Serial Terminal](https://googlechromelabs.github.io/serial-terminal/)
+* A serial terminal application:
+  * Recommended, with nothing to install:
+    [Chrome Labs Serial Terminal](https://googlechromelabs.github.io/serial-terminal/), which
+    runs in Chrome or Edge (Web Serial is not available in Firefox or Safari). Tick Convert EOL
+  * Windows: install either [PuTTY](https://putty.software) (the `.msi` installer) or
+    [Tera Term](https://github.com/TeraTermProject/teraterm/releases) (the `.exe` installer)
+  * macOS and Linux: use `screen` in a terminal, for example
+    `screen /dev/tty.usbmodem* 230400` on macOS or `screen /dev/ttyACM0 230400` on Linux
+    (if it is missing on Linux, `sudo apt install screen`)
 * The prebuilt demo image:
   [`iotc-vision-ai-ek-ra8p1-demo.hex`](firmware/iotc-vision-ai-ek-ra8p1-demo.hex?raw=1)
   (must Right-Click the link, Save As). You will also need the device template and
@@ -83,21 +89,34 @@ To build the same application from source, see the [Developer Guide](developer.m
 3. Connect the Ethernet cable from the board to your network.
 4. Connect the USB-C cable from your PC to the board's DEBUG1 port. This single port provides power and communications.
 
-The board powers up from the USB-C connection. Once enumerated, a J-Link CDC UART COM port
-appears on your PC and note which COM port it is. On Linux the port is usually `/dev/ttyACM0`; if the terminal reports
-permission denied, run `sudo usermod -aG dialout $USER` and log out and back in.
+The board powers up from the USB-C connection and appears on your PC as a serial port:
+`JLink CDC UART Port (COMx)` on Windows (or `USB Serial Device (COMx)` if the J-Link software is
+not installed yet), `/dev/tty.usbmodem…` on macOS, and usually `/dev/ttyACM0` on Linux. On
+Linux, if the terminal reports permission denied or lists no port, run
+`sudo usermod -aG dialout $USER` and log out and back in.
 
 Serial terminal settings:
 
-* Port: (Select the COM port with the device)
+* Port: the board's serial port (above)
 * Speed: `230400`
 * Data: `8 bits`
 * Parity: `none`
 * Stop Bits: `1`
 * Flow Control: `none`
 
-In PuTTY, select Connection type `Serial`, enter the COM port under Serial line and `230400`
-under Speed. The data bits, parity, stop bits and flow control are under Connection → Serial.
+Connect with the terminal you chose in [Prerequisites](#2-prerequisites):
+
+* Chrome Labs Serial Terminal (recommended): open
+  [googlechromelabs.github.io/serial-terminal](https://googlechromelabs.github.io/serial-terminal/)
+  in Chrome or Edge. Set Baud rate to `230400` (data bits, parity and stop bits already default
+  to 8, None and 1), tick Convert EOL, and leave Hardware flow control and Local echo unticked.
+  Click Connect, select the board's port in the pop-up, and click Connect again.
+* PuTTY: select Connection type `Serial`, enter the COM port under Serial line and `230400`
+  under Speed. The data bits, parity, stop bits and flow control are under Connection → Serial.
+* Tera Term: choose File → New connection, select Serial and the board's COM port, then set
+  Speed to `230400` under Setup → Serial port.
+* screen (macOS and Linux): run `screen /dev/tty.usbmodem* 230400` on macOS or
+  `screen /dev/ttyACM0 230400` on Linux. To quit, press Ctrl+A, then K, then Y.
 
 > [!IMPORTANT]
 > The console runs at `230400` baud, not the more common `115200`. Set your terminal to send CR or CR+LF line endings, or the board will not accept typed commands.
@@ -181,6 +200,11 @@ IOTC: no credentials provisioned - use the serial CLI (type 'help') ...
 
 The report pauses while you type and resumes about 20 seconds after your last keystroke, so
 commands you enter in the following steps are not interrupted by it.
+
+> [!NOTE]
+> Power-cycling the board disconnects its serial port, so reconnect your terminal afterwards. In
+> the Chrome Labs Serial Terminal, click Connect again, or tick Automatically connect to have it
+> reconnect by itself.
 
 Both messages are expected on a freshly flashed board. The camera is running at 55 fps.
 Inference reads zero because this image carries no compiled-in model. Its flash budget went to
@@ -284,8 +308,14 @@ a text editor.
    connect.
 
 > [!TIP]
-> In PuTTY, Ctrl+V does not paste. Highlight the whole PEM block in your text editor, then
-> paste with a right-click (Windows) or a middle-click or Shift+Insert (Linux).
+> How to paste the PEM block depends on the terminal:
+>
+> * Chrome Labs Serial Terminal: Ctrl+V (Cmd+V on macOS).
+> * PuTTY: Ctrl+V does not paste. Highlight the whole PEM block in your text editor, then paste
+>   with a right-click (Windows) or a middle-click or Shift+Insert (Linux).
+> * Tera Term: right-click or Alt+V, then click OK if it asks you to confirm a multi-line paste.
+> * screen: use your terminal application's normal paste (Cmd+V on macOS, Ctrl+Shift+V in most
+>   Linux terminals).
 
 ## 10. Verify Data
 
