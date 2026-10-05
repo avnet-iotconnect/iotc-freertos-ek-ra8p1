@@ -44,6 +44,14 @@ typedef struct {
  */
 void iotc_dra_set_default_ca(const char *ca_pem);
 
+/*
+ * Print why a TLS connection to `host` could not be made: link state, a fresh
+ * DNS lookup, network-buffer and heap levels. `who` prefixes the message and
+ * `tls_status` is the TlsTransportStatus_t returned by TLS_FreeRTOS_Connect.
+ * Call it only on failure - the DNS lookup can block for several seconds.
+ */
+void iotc_net_report_connect_failure(const char *who, const char *host, int tls_status);
+
 /**
  * Run discovery + identity and populate the iotc-c-lib MQTT config in place.
  * On success, iotcl_mqtt_get_config() returns the resolved host/client_id/

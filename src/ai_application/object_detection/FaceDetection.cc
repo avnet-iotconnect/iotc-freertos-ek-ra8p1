@@ -2,13 +2,13 @@
  * FaceDetection.cc - TFLM + Ethos-U55 face detection for the IOTCONNECT
  * EK-RA8P1 Vision AI demo.
  *
- * Replaces the MERA/RUHMI code-generated inference path with a TensorFlow
- * Lite Micro interpreter running a Vela-compiled YOLO Fastest 192x192 face
- * model. The interpreter takes the model as a pointer + length at runtime;
- * to prove the model-hot-swap mechanism (IoTConnect AI Model Management,
- * Phase 5) the built-in model is first staged into an SDRAM buffer and the
- * interpreter is initialised from THAT copy - the same path a cloud-pushed
- * model will take after download from OSPI flash.
+ * A TensorFlow Lite Micro interpreter runs Vela-compiled models on the
+ * Ethos-U55. The interpreter takes the model as a pointer + length at
+ * runtime: every model - one pushed from /IOTCONNECT AI Model Management,
+ * one reloaded from the OSPI flash store at boot, or a compiled-in model
+ * when the build has one - is staged into an SDRAM buffer and the
+ * interpreter is initialised from that copy, so all of them share the
+ * same validation and hot-swap path.
  */
 
 #include "YoloFastestModel.hpp"
@@ -109,7 +109,7 @@ static const char *prv_class_label(size_t idx, size_t n_classes)
     return (idx < n_labels) ? getLabelPtr()[idx] : "?";
 }
 
-/* Latest detection results, for telemetry (Phase 3) and display overlay. */
+/* Latest detection results, for telemetry and the display overlay. */
 typedef struct {
     int16_t x, y, w, h; /* in model input coordinates (192x192) */
     float score;
@@ -454,14 +454,14 @@ vision_ai_app_err_t face_detection_run(void)
     }
 
     /* Time the NPU invoke with the app's 100 us tick counter: the U55
-     * finishes this model in ~1 ms, below the 1 ms resolution the donor
-     * used (which is why its readout showed 0). The DWT cycle counter is
+     * finishes small models in ~1 ms, below the resolution of a 1 ms tick
+     * (which would read 0). The DWT cycle counter is
      * debug-gated on this core, so use the peripheral timer instead. */
     uint32_t t0 = TimeCounter_CurrentCountGet();
     bool inference_ok = s_model.RunInference();
     g_ai_inference_time_us = (TimeCounter_CurrentCountGet() - t0) * 100U;
-    /* Keep the donor field alive for anything still reading it (rounded up
-     * so a sub-ms inference no longer reads 0). */
+    /* Millisecond copy for the console report, rounded up so a sub-ms
+     * inference does not read 0. */
     application_processing_time.ai_inference_time_ms = (g_ai_inference_time_us + 999U) / 1000U;
 
     if (!inference_ok) {

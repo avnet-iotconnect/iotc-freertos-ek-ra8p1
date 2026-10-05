@@ -1,10 +1,10 @@
 /*
- * net_thread_entry.c - Ethernet + FreeRTOS+TCP bring-up for the
+ * net_thread_entry.c - Ethernet + FreeRTOS+TCP network thread for the
  * IOTCONNECT EK-RA8P1 Vision AI demo.
  *
- * Phase 1 scope: bring the RGMII link up, run DHCP, and report the IP
- * configuration on the console while the camera/NPU/display threads run.
- * The IoTConnect client (Phase 3) attaches on top of this stack.
+ * Brings the RGMII link up, runs DHCP, reports the IP configuration on the
+ * console, and runs the /IOTCONNECT client on top of the stack while the
+ * camera/NPU/display threads run.
  */
 
 #include <stdio.h>
@@ -94,15 +94,15 @@ static char s_print_buf[256];
 
 uint32_t ulRand(void)
 {
-    /* rand() returns 15 bits; assemble 32. TODO: back with the RA8P1 TRNG
-     * before TLS sequence numbers matter (coreMQTT phase uses mbedTLS TRNG). */
+    /* rand() returns 15 bits; assemble 32. Used by FreeRTOS+TCP for
+     * non-cryptographic values only - TLS draws its entropy from mbedTLS. */
     return ((((uint32_t) rand()) & 0x7fffuL)) |
            ((((uint32_t) rand()) & 0x7fffuL) << 15) |
            ((((uint32_t) rand()) & 0x0003uL) << 30);
 }
 
 /* FreeRTOS+TCP's weak default returns pdFALSE, which silently aborts DHCP
- * (no transaction ID). TODO: back with the RSIP TRNG for TLS-grade entropy. */
+ * (no transaction ID). */
 BaseType_t xApplicationGetRandomNumber(uint32_t *pulNumber)
 {
     static uint32_t s_seeded;

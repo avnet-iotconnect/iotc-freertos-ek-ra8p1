@@ -16,6 +16,9 @@
 #include <stdlib.h>
 
 #include "FreeRTOS.h"
+#include "FreeRTOS_IP.h"
+#include "FreeRTOS_DNS.h"
+#include "NetworkBufferManagement.h"
 #include "core_http_client.h"
 #include "transport_mbedtls_pkcs11.h"
 #include "core_pkcs11_config.h"
@@ -44,6 +47,28 @@ static const char *s_default_ca;
 void iotc_dra_set_default_ca(const char *ca_pem)
 {
     s_default_ca = ca_pem;
+}
+
+void iotc_net_report_connect_failure(const char *who, const char *host, int tls_status)
+{
+    /* TlsTransportStatus_t: 2 = out of memory, 3 = credentials, 4 = handshake,
+     * 6 = TCP connect (DNS, socket or SYN) failed. */
+    HeapStats_t heap;
+    vPortGetHeapStats(&heap);
+    char ip_s[16] = "FAILED";
+    uint32_t ip = FreeRTOS_gethostbyname(host);
+    if (0U != ip)
+    {
+        FreeRTOS_inet_ntoa(ip, ip_s);
+    }
+    IOTCL_ERROR(tls_status, "%s: TLS connect to %s failed: link=%s dns=%s netbufs=%u (min %u) "
+                "heap=%u (min %u, largest block %u)",
+                who, host, (pdTRUE == FreeRTOS_IsNetworkUp()) ? "up" : "down", ip_s,
+                (unsigned) uxGetNumberOfFreeNetworkBuffers(),
+                (unsigned) uxGetMinimumFreeNetworkBuffers(),
+                (unsigned) heap.xAvailableHeapSpaceInBytes,
+                (unsigned) heap.xMinimumEverFreeBytesRemaining,
+                (unsigned) heap.xSizeOfLargestFreeBlockInBytes);
 }
 
 /*
@@ -89,7 +114,7 @@ static int https_get_ex(const char *host,
                                                    (uint32_t) timeout_ms);
     if (TLS_TRANSPORT_SUCCESS != ts)
     {
-        IOTCL_ERROR(ts, "DRA: TLS connect failed");
+        iotc_net_report_connect_failure("DRA", host, (int) ts);
         return -1;
     }
 
@@ -125,9 +150,9 @@ static int https_get_ex(const char *host,
             if (sink)
             {
                 /* Buffered variant of streaming: coreHTTP delivered the whole
-                 * body into s_http_buf; forward it in one chunk. Models beyond
-                 * IOTC_DRA_HTTP_BUF_SIZE need the raw-socket streaming path
-                 * (planned in the model download rework if needed). */
+                 * body into s_http_buf; forward it in one chunk. Large
+                 * downloads (AI models) use iotc_https_download_large(),
+                 * which receives straight into the caller's buffer. */
                 rc = sink(resp.pBody, resp.bodyLen, sink_user);
                 if (sink_total)
                 {

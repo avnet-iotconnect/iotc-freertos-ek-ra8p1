@@ -41,6 +41,7 @@
 #include "iotc_mqtt_client.h"
 #include "iotc_time.h"
 #include "iotc_file_upload.h"
+#include "iotc_dra_client.h"
 
 #define FU_RESP_BUF_SIZE 6144
 #define FU_TIMEOUT_MS 20000
@@ -218,11 +219,9 @@ static int fu_https_request(const char *method, const char *host,
     if (TLS_TRANSPORT_SUCCESS != ts)
     {
         /* The most common cause on this port is heap: an active KVS video
-         * session holds ~110 KB, and this TLS session needs ~40 KB more.
-         * Report the free heap so the distinction between "out of memory"
-         * and a real network/cert failure is visible on the console. */
-        IOTCL_ERROR(ts, "FU: TLS connect to %s failed (free heap %u)", host,
-                    (unsigned) xPortGetFreeHeapSize());
+         * session holds ~110 KB, and this TLS session needs ~40 KB more. The
+         * report separates "out of memory" from a network or DNS failure. */
+        iotc_net_report_connect_failure("FU", host, (int) ts);
         return -1;
     }
     /* Debug: confirm what this session actually negotiated and which client

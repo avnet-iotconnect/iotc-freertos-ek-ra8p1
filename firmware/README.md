@@ -1,7 +1,7 @@
 # Prebuilt firmware
 
 `iotc-vision-ai-ek-ra8p1-demo.hex` — the demo image for the
-[Quickstart](../docs/QUICKSTART.md). Runs the full application: camera capture, Ethos-U55
+[Quickstart](../README.md). Runs the full application: camera capture, Ethos-U55
 inference, LCD overlay (LCD optional), serial provisioning CLI, /IOTCONNECT telemetry,
 snapshot upload, cloud model hot-swap, and live KVS WebRTC video streaming to the
 Video Streaming tab. **No credentials are embedded in this image** — provision them

@@ -25,6 +25,7 @@
 #include "iotcl_log.h"
 #include "iotcl_c2d.h"
 #include "iotc_time.h"
+#include "iotc_dra_client.h"
 
 #define IOTC_MQTT_BUF_SIZE       (8 * 1024)
 #define IOTC_MQTT_KEEPALIVE_S    60
@@ -124,7 +125,7 @@ int iotc_mqtt_client_connect(const iotc_mqtt_config_t *cfg)
     TlsTransportStatus_t ts = TLS_FreeRTOS_Connect(&s_net, cfg->host, port, &creds, 10000, 10000);
     if (TLS_TRANSPORT_SUCCESS != ts)
     {
-        IOTCL_ERROR(ts, "MQTT: TLS connect failed");
+        iotc_net_report_connect_failure("MQTT", cfg->host, (int) ts);
         return -1;
     }
 

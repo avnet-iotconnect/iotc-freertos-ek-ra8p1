@@ -10,6 +10,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "bsp_api.h"
 #include "FreeRTOS.h"
 #include "task.h"
 
@@ -45,11 +46,13 @@ extern bool face_detection_class_info(const char **label, int *pct);
 
 #define IOTC_TELEMETRY_PERIOD_S_DEFAULT 10
 
-static char s_print[160];
+/* The buffer is per call: the net thread, the transfer task and the MQTT
+ * task (command callbacks) all print through this macro. */
 #define IOTC_PRINT(...)                                     \
     do {                                                    \
-        snprintf(s_print, sizeof(s_print), __VA_ARGS__);    \
-        print_to_console(s_print);                          \
+        char line_[160];                                    \
+        snprintf(line_, sizeof(line_), __VA_ARGS__);        \
+        print_to_console(line_);                            \
     } while (0)
 
 typedef enum
@@ -127,7 +130,7 @@ static void prv_on_command(IotclC2dEventData data)
         }
         iotcl_free(s_snapshot_ack_id);
         s_snapshot_ack_id = ack_id ? iotcl_strdup(ack_id) : NULL;
-        s_snapshot_pending = true; /* net thread picks it up */
+        s_snapshot_pending = true; /* the net thread starts it on the transfer task */
         return;
     }
     if (0 == strcmp(cmd, "model-info"))
@@ -278,10 +281,10 @@ static void prv_on_ota(IotclC2dEventData data)
     s_model_res = iotcl_strdup(res);
     s_model_ack_id = ack_id ? iotcl_strdup(ack_id) : NULL;
     s_model_wait_since = xTaskGetTickCount();
-    s_model_pending = true; /* net thread picks it up */
+    s_model_pending = true; /* the net thread starts it on the transfer task */
 }
 
-/* Runs on the net thread once video streaming is idle. */
+/* Runs on the transfer task once there is heap for the download. */
 static void prv_model_push_execute(void)
 {
     const char *host = s_model_host;
@@ -311,9 +314,9 @@ static void prv_model_push_execute(void)
         /* A viewer can still connect *during* the download: the video session
          * claims ~108 KB in one go, which can pull the heap out from under an
          * in-flight transfer. If the heap is short now, treat the failure as
-         * contention rather than a bad deployment - leave it queued so the net
-         * thread retries once memory frees up (the 5-minute deadline still
-         * bounds the wait). */
+         * contention rather than a bad deployment - leave it queued so it is
+         * retried once memory frees up (the 5-minute deadline still bounds
+         * the wait). */
         size_t heap_free = xPortGetFreeHeapSize();
         if (heap_free < MODEL_DOWNLOAD_HEAP_FLOOR)
         {
@@ -382,6 +385,74 @@ done:
     s_model_res = NULL;
     s_model_ack_id = NULL;
     s_model_pending = false;
+}
+
+/*
+ * Long transfers - a model download or a snapshot upload - run on their own
+ * task, one at a time, so the net thread keeps publishing telemetry and
+ * handling commands while they are in flight (either can take a minute or
+ * more). The stack matches the net thread's, which ran them before; it is in
+ * SDRAM because the on-chip SRAM is fully allocated.
+ */
+#define IOTC_XFER_STACK_WORDS (32768U / 4U)
+static StackType_t s_xfer_stack[IOTC_XFER_STACK_WORDS]
+    BSP_ALIGN_VARIABLE(8) BSP_PLACE_IN_SECTION(BSP_UNINIT_SECTION_PREFIX ".sdram_noinit");
+static StaticTask_t s_xfer_tcb;
+static TaskHandle_t s_xfer_task;
+static volatile bool s_model_running;
+static volatile bool s_snapshot_running;
+
+static void prv_snapshot_execute(void)
+{
+    char result[96];
+    IOTC_PRINT("IOTC: snapshot: capturing + uploading...\r\n");
+    int rc = iotc_snapshot_capture_upload(result, sizeof(result));
+    IOTC_PRINT("IOTC: snapshot: %s\r\n", result);
+    if (s_snapshot_ack_id)
+    {
+        iotcl_mqtt_send_cmd_ack(s_snapshot_ack_id,
+                                (0 == rc) ? IOTCL_C2D_EVT_CMD_SUCCESS_WITH_ACK
+                                          : IOTCL_C2D_EVT_CMD_FAILED,
+                                result);
+        iotcl_free(s_snapshot_ack_id);
+        s_snapshot_ack_id = NULL;
+    }
+    s_snapshot_pending = false;
+}
+
+static void prv_xfer_task(void *arg)
+{
+    (void) arg;
+    for (;;)
+    {
+        (void) ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
+        if (s_model_running)
+        {
+            prv_model_push_execute(); /* may leave s_model_pending set to retry */
+            s_model_running = false;
+        }
+        if (s_snapshot_running)
+        {
+            prv_snapshot_execute();
+            s_snapshot_running = false;
+        }
+    }
+}
+
+static bool prv_xfer_busy(void)
+{
+    return s_model_running || s_snapshot_running;
+}
+
+static void prv_xfer_start(volatile bool *p_running)
+{
+    if (NULL == s_xfer_task)
+    {
+        s_xfer_task = xTaskCreateStatic(prv_xfer_task, "iotc_xfer", IOTC_XFER_STACK_WORDS,
+                                        NULL, tskIDLE_PRIORITY + 2, s_xfer_stack, &s_xfer_tcb);
+    }
+    *p_running = true;
+    xTaskNotifyGive(s_xfer_task);
 }
 
 static void prv_publish_telemetry(void)
@@ -484,7 +555,9 @@ void iotc_app_request_snapshot(void)
 /* Called from net_thread each loop iteration once the network is up. */
 void iotc_app_poll(bool network_up)
 {
-    if (s_restart_req)
+    /* A transfer in flight still uses the MQTT connection for its acks, so
+     * tear the connection down only once it has finished. */
+    if (s_restart_req && !prv_xfer_busy())
     {
         s_restart_req = false;
         iotconnect_sdk_deinit();
@@ -601,7 +674,7 @@ void iotc_app_poll(bool network_up)
             if (!iotconnect_sdk_is_connected())
             {
                 IOTC_PRINT("IOTC: disconnected\r\n");
-                s_state = IOTC_APP_FAILED; /* TODO: reconnect backoff */
+                s_state = IOTC_APP_FAILED; /* the FAILED state retries after a delay */
                 break;
             }
             {
@@ -616,7 +689,7 @@ void iotc_app_poll(bool network_up)
                     (void) iotc_fu_selftest();
                 }
             }
-            if (s_model_pending)
+            if (s_model_pending && !s_model_running)
             {
                 /* Run the download as soon as there is heap for its TLS
                  * session - a live video stream on its own leaves enough, so
@@ -642,25 +715,12 @@ void iotc_app_poll(bool network_up)
                 }
                 else
                 {
-                    prv_model_push_execute();
+                    prv_xfer_start(&s_model_running);
                 }
             }
-            if (s_snapshot_pending)
+            if (s_snapshot_pending && !s_snapshot_running)
             {
-                char result[96];
-                IOTC_PRINT("IOTC: snapshot: capturing + uploading...\r\n");
-                int rc = iotc_snapshot_capture_upload(result, sizeof(result));
-                IOTC_PRINT("IOTC: snapshot: %s\r\n", result);
-                if (s_snapshot_ack_id)
-                {
-                    iotcl_mqtt_send_cmd_ack(s_snapshot_ack_id,
-                                            (0 == rc) ? IOTCL_C2D_EVT_CMD_SUCCESS_WITH_ACK
-                                                      : IOTCL_C2D_EVT_CMD_FAILED,
-                                            result);
-                    iotcl_free(s_snapshot_ack_id);
-                    s_snapshot_ack_id = NULL;
-                }
-                s_snapshot_pending = false;
+                prv_xfer_start(&s_snapshot_running);
             }
             if (s_reboot_pending &&
                 ((int32_t) (xTaskGetTickCount() - s_reboot_at) >= 0))
@@ -685,7 +745,8 @@ void iotc_app_poll(bool network_up)
             {
                 s_fail_at = xTaskGetTickCount();
             }
-            else if ((xTaskGetTickCount() - s_fail_at) >= pdMS_TO_TICKS(20000))
+            else if (((xTaskGetTickCount() - s_fail_at) >= pdMS_TO_TICKS(20000)) &&
+                     !prv_xfer_busy())
             {
                 s_fail_at = 0;
                 iotconnect_sdk_deinit();
