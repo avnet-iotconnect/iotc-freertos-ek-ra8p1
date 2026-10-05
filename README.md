@@ -1,4 +1,4 @@
-# Getting Started: Renesas EK-RA8P1 Vision AI with /IOTCONNECT
+# Quickstart: Renesas EK-RA8P1 Vision AI with /IOTCONNECT
 
 Purchase the kit: [EK-RA8P1 Evaluation Kit for RA8P1 MCU Group](https://www.renesas.com/en/design-resources/boards-kits/ek-ra8p1)
 
